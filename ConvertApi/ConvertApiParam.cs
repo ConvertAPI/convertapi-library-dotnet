@@ -1,0 +1,63 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.IO;
+using System.Linq;
+using System.Net;
+using System.Net.Http;
+using System.Net.Http.Headers;
+using System.Threading.Tasks;
+using ConvertApi.Exceptions;
+using ConvertApi.Model;
+
+namespace ConvertApi
+{
+    public class ConvertApiParam
+    {
+        public string Name { get; }
+        private readonly string[] _values;
+        private readonly List<Task<string>> _tasks = new List<Task<string>>();
+
+        public ConvertApiParam(string name, string[] values)
+        {
+            Name = name;
+            _values = values;
+        }        
+
+        public ConvertApiParam(string name, string value) : this(name, new[] { value }) { }
+
+        public ConvertApiParam(string name, int value) : this(name, value.ToString()) { }
+
+        public ConvertApiParam(string name, decimal value) : this(name, value.ToString(CultureInfo.InvariantCulture)) { }
+
+        public ConvertApiParam(string name, Stream value, string format) : this(name, new string[0])
+        {
+            var client = new HttpClient();
+            client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("text/plain"));
+            var content = new StreamContent(value);
+            content.Headers.ContentType = new MediaTypeHeaderValue("application/octet-stream");
+            content.Headers.Add("Content-Disposition", $"attachment; filename=\"data.{format}\"");
+
+            var task = client.PostAsync(new Uri($"{ConvertApiClient.ApiBaseUri}/upload"), content)
+                .ContinueWith(uploadTask =>
+               {
+                   var responseMessage = uploadTask.Result;
+                   if (responseMessage.StatusCode != HttpStatusCode.OK)
+                   {
+                       throw new ConvertApiException("Unable to upload file.", responseMessage);
+                   }
+                   return uploadTask.Result.Content.ReadAsStringAsync().Result;
+               });
+            _tasks.Add(task);
+        }
+
+        public ConvertApiParam(string name, FileStream value) : this(name, value, Path.GetExtension(value.Name).Substring(1)) { }
+
+        public ConvertApiParam(string name, ConvertApiResponse convertApiResponse) : this(name, convertApiResponse.Files.Select(s => s.Url.ToString()).ToArray()){}
+
+        public string[] GetValues()
+        {
+            return _tasks.Count == 0 ? _values : _tasks.Select(t => t.Result).ToArray();
+        }
+    }
+}

@@ -1,0 +1,27 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Version>2.0.0</Version>
+    <Company>Baltsoft</Company>
+    <Authors>Baltsoft</Authors>
+    <PackageProjectUrl>https://www.convertapi.com</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/ConvertAPI/ConvertApiNet</RepositoryUrl>
+    <RepositoryType>GIT</RepositoryType>
+    <PackageTags>pdf convert word excel powerpoint images web msoffice office openoffice postscript iworks</PackageTags>
+    <Copyright>2012-2018 Baltsoft</Copyright>
+    <PackageLicenseUrl>https://www.convertapi.com/terms</PackageLicenseUrl>
+    <PackageIconUrl>https://www.convertapi.com/content/favicons/android-chrome-256x256.png</PackageIconUrl>
+    <Description>Convert various files like MS Word, Excel, PowerPoint, Images to PDF and Images. Create PDF and Images from url and raw HTML. Extract and create PowerPoint presentation from PDF. Merge, Encrypt, Split, Repair and Decrypt PDF files. All supported files conversions and manipulations can be found at https://www.convertapi.com/doc/supported-formats</Description>
+    <PackageId>ConvertApi</PackageId>
+    <Product>ConvertApi</Product>
+    <AssemblyName>ConvertApi</AssemblyName>
+    <RootNamespace>ConvertApi</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
+  </ItemGroup>
+
+</Project>
