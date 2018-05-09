@@ -7,7 +7,7 @@
     <Company>Baltsoft</Company>
     <Authors>Baltsoft</Authors>
     <PackageProjectUrl>https://www.convertapi.com</PackageProjectUrl>
-    <RepositoryUrl>https://github.com/ConvertAPI/ConvertApiNet</RepositoryUrl>
+    <RepositoryUrl>https://github.com/ConvertAPI/convertapi-dotnet</RepositoryUrl>
     <RepositoryType>GIT</RepositoryType>
     <PackageTags>pdf convert word excel powerpoint images web msoffice office openoffice postscript iworks</PackageTags>
     <Copyright>2012-2018 Baltsoft</Copyright>
