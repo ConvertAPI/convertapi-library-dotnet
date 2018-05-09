@@ -19,17 +19,34 @@ namespace ConvertApi
             return task;
         }
 
+        private static ConvertApiResponse TaskResult(Task<ConvertApiResponse> task)
+        {
+            try
+            {
+                return task.Result;
+            }
+            catch (AggregateException e)
+            {
+                //Move actual exception from task which is written to InnerException and re-throw it
+                var innerException = e.Flatten().InnerException;
+                if (innerException != null)
+                    throw innerException;
+
+                throw;
+            }            
+        }
+
         public static void Convert(this ConvertApiClient convertApiClient, string fromFile, string toFile)
         {
             var toExt = Path.GetExtension(toFile).Replace(".", "");
             var task = BindConvertApiClient(convertApiClient, fromFile, toExt);
-            task.Result.AsFileAsync(0, new FileInfo(toFile)).Wait();
+            TaskResult(task).AsFileAsync(0, new FileInfo(toFile)).Wait();
         }
 
         public static void Convert(this ConvertApiClient convertApiClient, string fromFile, string outputExtension, string outputDirectory)
         {            
             var task = BindConvertApiClient(convertApiClient, fromFile, outputExtension);
-            task.Result.SaveFiles(outputDirectory);
+            TaskResult(task).SaveFiles(outputDirectory);
         }
 
         #endregion

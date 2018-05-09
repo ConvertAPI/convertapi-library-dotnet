@@ -17,8 +17,8 @@ namespace Demo
                 var tempDir = Path.Combine(Path.GetTempPath(), "ConvertAPI");
                 Directory.CreateDirectory(tempDir);
                 var filesDir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "files");
-                Console.WriteLine($"Using directory for result files: {tempDir}");
-                
+                Console.WriteLine($"Using directory for result files: {tempDir}");                
+
                 var convertApiClient = new ConvertApiClient(secret, 180);
                 ConvertUrlToPdf(convertApiClient, tempDir);
 
@@ -28,19 +28,30 @@ namespace Demo
                 convertApiClient = new ConvertApiClient(secret);
                 ConvertDocxToPdf(convertApiClient, filesDir, tempDir);
             }
-            catch (Exception e)
+            //Catch exceptions from asynchronous methods
+            catch (AggregateException e)
             {
-                Console.WriteLine(e.Message);
-                Console.WriteLine(e.InnerException?.Message);
-                var httpStatusCode = (e.InnerException as ConvertApiException)?.StatusCode;
-                Console.WriteLine("Status Code: " + httpStatusCode);
-                Console.WriteLine("Response: " + (e.InnerException as ConvertApiException)?.Response);
-
-                if (httpStatusCode == HttpStatusCode.Unauthorized)
-                    Console.WriteLine("Secret is not provided or no additional seconds left in account to proceed conversion. More information https://www.convertapi.com/a");
+                Console.WriteLine($"{e.GetType()}: {e.Message}");
+                WriteConvertApiException(e.InnerException);
+            }
+            // Catch exceptions from synchronous methods
+            catch (ConvertApiException e)
+            {                
+                WriteConvertApiException(e);
             }
 
             Console.ReadKey();
+        }
+
+        private static void WriteConvertApiException(Exception e)
+        {
+            Console.WriteLine(e?.Message);
+            var httpStatusCode = (e as ConvertApiException)?.StatusCode;
+            Console.WriteLine("Status Code: " + httpStatusCode);
+            Console.WriteLine("Response: " + (e as ConvertApiException)?.Response);
+
+            if (httpStatusCode == HttpStatusCode.Unauthorized)
+                Console.WriteLine("Secret is not provided or no additional seconds left in account to proceed conversion. More information https://www.convertapi.com/a");
         }
 
         /// <summary>
