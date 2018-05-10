@@ -18,27 +18,27 @@ ConvertAPI is designed to make converting file super easy, the following snippet
 
 ```csharp
 try
-            {                
-                var convertApiClient = new ConvertApiClient("<api secret>");
-                var fileToConvert = @"c:\test.docx";
-                var firstTask = convertApiClient.ConvertAsync("docx", "pdf", new[]
-                {
-                    new ConvertApiParam("File", File.OpenRead(fileToConvert))
-                });
-                firstTask.Result.SaveFiles(@"c:\");
-            }
-            //Catch exceptions from asynchronous methods
-            catch (Exception e)
-            {
-                Console.WriteLine($"{e.GetType()}: {e.Message}");
-                Console.WriteLine(e.InnerException?.Message);
-                var httpStatusCode = (e.InnerException as ConvertApiException)?.StatusCode;
-                Console.WriteLine("Status Code: " + httpStatusCode);
-                Console.WriteLine("Response: " + (e.InnerException as ConvertApiException)?.Response);
+{
+  var convertApiClient = new ConvertApiClient("<api secret>");
+  var fileToConvert = @"c:\test.docx";
+  var conversionTask = convertApiClient.ConvertAsync("docx", "pdf", new[]
+  {
+     new ConvertApiParam("File", File.OpenRead(fileToConvert))
+  });
+  conversionTask.Result.SaveFiles(@"c:\");
+  }
+  //Catch exceptions from asynchronous methods
+  catch (Exception e)
+  {
+    Console.WriteLine($"{e.GetType()}: {e.Message}");
+    Console.WriteLine(e.InnerException?.Message);
+    var httpStatusCode = (e.InnerException as ConvertApiException)?.StatusCode;
+    Console.WriteLine("Status Code: " + httpStatusCode);
+    Console.WriteLine("Response: " + (e.InnerException as ConvertApiException)?.Response);
 
-                if (httpStatusCode == HttpStatusCode.Unauthorized)
-                    Console.WriteLine("Secret is not provided or no additional seconds left in account to proceed conversion. More information https://www.convertapi.com/a");
-            }   
+    if (httpStatusCode == HttpStatusCode.Unauthorized)
+       Console.WriteLine("Secret is not provided or no additional seconds left in account to proceed conversion. More information https://www.convertapi.com/a");
+   }
 ```
 
 This is the bare-minimum to convert a file using the ConvertAPI client, but you can do a great deal more with the ConvertAPI.Net library. Take special note that you should replace `<api secret>` with the secret you obtained in item two of the pre-requisites.
