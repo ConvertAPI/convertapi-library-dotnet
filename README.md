@@ -19,13 +19,17 @@ ConvertAPI is designed to make converting file super easy, the following snippet
 ```csharp
 try
 {
+  
   var convertApiClient = new ConvertApiClient("<api secret>");
+  
   var fileToConvert = @"c:\test.docx";
   var conversionTask = convertApiClient.ConvertAsync("docx", "pdf", new[]
   {
      new ConvertApiParam("File", File.OpenRead(fileToConvert))
   });
+  
   conversionTask.Result.SaveFiles(@"c:\");
+  
   }
   //Catch exceptions from asynchronous methods
   catch (Exception e)
