@@ -13,7 +13,12 @@
     <Copyright>2012-2018 Baltsoft</Copyright>
     <PackageLicenseUrl>https://www.convertapi.com/terms</PackageLicenseUrl>
     <PackageIconUrl>https://www.convertapi.com/content/favicons/android-chrome-256x256.png</PackageIconUrl>
-    <Description>Convert various files like MS Word, Excel, PowerPoint, Images to PDF and Images. Create PDF and Images from url and raw HTML. Extract and create PowerPoint presentation from PDF. Merge, Encrypt, Split, Repair and Decrypt PDF files. All supported files conversions and manipulations can be found at https://www.convertapi.com/doc/supported-formats</Description>
+    <Description>Convert various files like MS Word, Excel, PowerPoint, Images to PDF and Images. Create PDF and Images from url and raw HTML. Extract and create PowerPoint presentation from PDF. Merge, Encrypt, Split, Repair and Decrypt PDF files. 
+
+All supported files conversions and manipulations can be found at https://www.convertapi.com/doc/supported-formats
+
+The Git repository can be found at 
+https://github.com/ConvertAPI/convertapi-dotnet</Description>
     <PackageId>ConvertApi</PackageId>
     <Product>ConvertApi</Product>
     <AssemblyName>ConvertApi</AssemblyName>
