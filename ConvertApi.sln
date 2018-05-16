@@ -5,7 +5,17 @@ VisualStudioVersion = 15.0.26730.15
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ConvertApi", "ConvertApi\ConvertApi.csproj", "{4DCAEC93-8D7C-40C1-84DB-2F53BE746A32}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Demo", "Demo\Demo.csproj", "{2710A809-E7D2-412A-B478-28D79C4A5582}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Examples", "Examples", "{139F9822-4A90-475F-BAA5-F0471A85461B}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "TestFiles", "TestFiles", "{4DDE1C9A-C9F9-46D7-BFC6-5B29B031F6E1}"
+	ProjectSection(SolutionItems) = preProject
+		Examples\TestFiles\test.docx = Examples\TestFiles\test.docx
+		Examples\TestFiles\test.pdf = Examples\TestFiles\test.pdf
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CreatePdfThumbnail", "Examples\CreatePdfThumbnail\CreatePdfThumbnail.csproj", "{126AA52A-5527-4366-8935-451F81D1FDFD}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Demo", "Examples\Demo\Demo.csproj", "{2710A809-E7D2-412A-B478-28D79C4A5582}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -17,6 +27,10 @@ Global
 		{4DCAEC93-8D7C-40C1-84DB-2F53BE746A32}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4DCAEC93-8D7C-40C1-84DB-2F53BE746A32}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4DCAEC93-8D7C-40C1-84DB-2F53BE746A32}.Release|Any CPU.Build.0 = Release|Any CPU
+		{126AA52A-5527-4366-8935-451F81D1FDFD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{126AA52A-5527-4366-8935-451F81D1FDFD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{126AA52A-5527-4366-8935-451F81D1FDFD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{126AA52A-5527-4366-8935-451F81D1FDFD}.Release|Any CPU.Build.0 = Release|Any CPU
 		{2710A809-E7D2-412A-B478-28D79C4A5582}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{2710A809-E7D2-412A-B478-28D79C4A5582}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2710A809-E7D2-412A-B478-28D79C4A5582}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -24,6 +38,11 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{4DDE1C9A-C9F9-46D7-BFC6-5B29B031F6E1} = {139F9822-4A90-475F-BAA5-F0471A85461B}
+		{126AA52A-5527-4366-8935-451F81D1FDFD} = {139F9822-4A90-475F-BAA5-F0471A85461B}
+		{2710A809-E7D2-412A-B478-28D79C4A5582} = {139F9822-4A90-475F-BAA5-F0471A85461B}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {337A0F6F-40A9-4993-BF66-05E4E374871F}

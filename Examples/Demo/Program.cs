@@ -16,7 +16,7 @@ namespace Demo
 
                 var tempDir = Path.Combine(Path.GetTempPath(), "ConvertAPI");
                 Directory.CreateDirectory(tempDir);
-                var filesDir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "files");
+                var filesDir = @"..\..\..\TestFiles\";
                 Console.WriteLine($"Using directory for result files: {tempDir}");                
 
                 var convertApiClient = new ConvertApiClient(secret, 180);
