@@ -14,7 +14,7 @@ namespace ConvertApi
 
         private static Task<ConvertApiResponse> BindConvertApiClient(ConvertApiClient convertApiClient, string fromFile, string outputExtension)
         {
-            var fromExt = Path.GetExtension(fromFile).Replace(".", "");            
+            var fromExt = Path.GetExtension(fromFile).Replace(".", "");
             var task = convertApiClient.ConvertAsync(fromExt, outputExtension, new[] { new ConvertApiParam("File", File.OpenRead(fromFile)) });
             return task;
         }
@@ -33,18 +33,18 @@ namespace ConvertApi
                     throw innerException;
 
                 throw;
-            }            
+            }
         }
 
         public static void Convert(this ConvertApiClient convertApiClient, string fromFile, string toFile)
         {
             var toExt = Path.GetExtension(toFile).Replace(".", "");
             var task = BindConvertApiClient(convertApiClient, fromFile, toExt);
-            TaskResult(task).AsFileAsync(0, new FileInfo(toFile)).Wait();
+            TaskResult(task).AsFileAsync(0, toFile).Wait();
         }
 
         public static void Convert(this ConvertApiClient convertApiClient, string fromFile, string outputExtension, string outputDirectory)
-        {            
+        {
             var task = BindConvertApiClient(convertApiClient, fromFile, outputExtension);
             TaskResult(task).SaveFiles(outputDirectory);
         }
@@ -61,7 +61,7 @@ namespace ConvertApi
         {
             return response.Files.Length;
         }
-        
+
         public static Task<Stream> AsStreamAsync(Uri url) => new ConvertApiClientBase(ConvertApiConstants.DownloadTimeoutInSeconds).HttpClient.GetStreamAsync(url);
 
         private static IEnumerable<Task<Stream>> AsFilesStreamAsync(this ConvertApiResponse response)
@@ -74,27 +74,30 @@ namespace ConvertApi
             return AsStreamAsync(response.Files[fileIndex].Url).Result;
         }
 
-        private static Task<FileInfo> AsFileAsync(this ConvertApiResponse response, int fileIndex, FileInfo fileInfo)
+        public static Task<FileInfo> AsFileAsync(this ConvertApiResponse response, int fileIndex, string fileName)
         {
-            return AsFileAsync(response.Files[fileIndex].Url, fileInfo);
+            return AsFileAsync(response.Files[fileIndex].Url, fileName);
         }
 
-        private static Task<FileInfo> AsFileAsync(Uri url, FileInfo fileInfo)
+        public static Task<FileInfo> AsFileAsync(this ProcessedFile processedFile, string fileName)
         {
+            return AsFileAsync(processedFile.Url, fileName);
+        }
+
+        private static Task<FileInfo> AsFileAsync(Uri url, string fileName)
+        {
+            var fileInfo = new FileInfo(fileName);
             return AsStreamAsync(url).ContinueWith(task =>
             {
-                using (var fileStream = fileInfo.OpenWrite()) task.Result.CopyTo(fileStream);
+                using (var fileStream = fileInfo.OpenWrite())
+                    task.Result.CopyTo(fileStream);
                 return fileInfo;
             });
         }
 
         public static FileInfo[] SaveFiles(this ConvertApiResponse response, string directory)
         {
-            return response.Files.Select(file =>
-            {
-                var fileInfo = new FileInfo(Path.Combine(directory, Path.GetFileName(file.FileName)));
-                return AsFileAsync(file.Url, fileInfo);
-            }).Select(task => task.Result).ToArray();
+            return response.Files.Select(file => AsFileAsync(file.Url, Path.Combine(directory, Path.GetFileName(file.FileName)))).Select(task => task.Result).ToArray();
         }
 
         #endregion
