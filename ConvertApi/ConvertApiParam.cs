@@ -23,7 +23,7 @@ namespace ConvertApi
         {
             Name = name;
             _values = values;
-        }        
+        }
 
         public ConvertApiParam(string name, string value) : this(name, new[] { value }) { }
 
@@ -31,13 +31,13 @@ namespace ConvertApi
 
         public ConvertApiParam(string name, decimal value) : this(name, value.ToString(CultureInfo.InvariantCulture)) { }
 
-        public ConvertApiParam(string name, Stream value, string format) : this(name, new string[0])
-        {            
-            var client = new ConvertApiClientBase(ConvertApiConstants.UploadTimeoutInSeconds).HttpClient;            
+        public ConvertApiParam(string name, Stream value, string fileName) : this(name, new string[0])
+        {
+            var client = new ConvertApiClientBase(ConvertApiConstants.UploadTimeoutInSeconds).HttpClient;
             client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("text/plain"));
             var content = new StreamContent(value);
             content.Headers.ContentType = new MediaTypeHeaderValue("application/octet-stream");
-            content.Headers.Add("Content-Disposition", $"attachment; filename=\"data.{format}\"");
+            content.Headers.Add("Content-Disposition", $"attachment; filename=\"{Path.GetFileName(fileName)}\"");
 
             var task = client.PostAsync(new Uri($"{ConvertApiClient.ApiBaseUri}/upload"), content)
                 .ContinueWith(uploadTask =>
@@ -52,9 +52,9 @@ namespace ConvertApi
             _tasks.Add(task);
         }
 
-        public ConvertApiParam(string name, FileStream value) : this(name, value, Path.GetExtension(value.Name).Substring(1)) { }
+        public ConvertApiParam(string name, FileStream value) : this(name, value, value.Name) { }
 
-        public ConvertApiParam(string name, ConvertApiResponse convertApiResponse) : this(name, convertApiResponse.Files.Select(s => s.Url.ToString()).ToArray()){}
+        public ConvertApiParam(string name, ConvertApiResponse convertApiResponse) : this(name, convertApiResponse.Files.Select(s => s.Url.ToString()).ToArray()) { }
 
         public string[] GetValues()
         {
