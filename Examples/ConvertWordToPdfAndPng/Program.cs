@@ -9,7 +9,7 @@ namespace ConvertWordToPdfAndPng
         static void Main(string[] args)
         {
             //Get your secret at https://www.convertapi.com/a
-            var convertApiClient = new ConvertApiClient("1234567890abcdef");
+            var convertApiClient = new ConvertApiClient("<Your secret here>");
             const string pdfFile = @"..\..\..\TestFiles\test.docx";
 
             var fileParam = new ConvertApiParam("File", File.OpenRead(pdfFile));
