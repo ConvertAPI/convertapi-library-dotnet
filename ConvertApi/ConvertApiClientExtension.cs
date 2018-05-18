@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Net.Http;
 using System.Threading.Tasks;
+using ConvertApi.Constants;
 using ConvertApi.Model;
 
 namespace ConvertApi
@@ -61,8 +61,8 @@ namespace ConvertApi
         {
             return response.Files.Length;
         }
-
-        public static Task<Stream> AsStreamAsync(Uri url) => new HttpClient().GetStreamAsync(url);
+        
+        public static Task<Stream> AsStreamAsync(Uri url) => new ConvertApiClientBase(ConvertApiConstants.DownloadTimeoutInSeconds).HttpClient.GetStreamAsync(url);
 
         private static IEnumerable<Task<Stream>> AsFilesStreamAsync(this ConvertApiResponse response)
         {

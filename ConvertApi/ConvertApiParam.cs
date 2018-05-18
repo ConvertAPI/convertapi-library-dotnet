@@ -7,6 +7,7 @@ using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
+using ConvertApi.Constants;
 using ConvertApi.Exceptions;
 using ConvertApi.Model;
 
@@ -31,8 +32,8 @@ namespace ConvertApi
         public ConvertApiParam(string name, decimal value) : this(name, value.ToString(CultureInfo.InvariantCulture)) { }
 
         public ConvertApiParam(string name, Stream value, string format) : this(name, new string[0])
-        {
-            var client = new HttpClient();
+        {            
+            var client = new ConvertApiClientBase(ConvertApiConstants.UploadTimeoutInSeconds).HttpClient;            
             client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("text/plain"));
             var content = new StreamContent(value);
             content.Headers.ContentType = new MediaTypeHeaderValue("application/octet-stream");

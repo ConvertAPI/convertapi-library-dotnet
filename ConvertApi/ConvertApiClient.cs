@@ -61,7 +61,7 @@ namespace ConvertApi
                 }
             }
 
-            return await Client.PostAsync(url.Uri, content).ContinueWith(t =>
+            return await HttpClient.PostAsync(url.Uri, content).ContinueWith(t =>
            {
                var responseMessage = t.Result;
                if (responseMessage.StatusCode != HttpStatusCode.OK)
