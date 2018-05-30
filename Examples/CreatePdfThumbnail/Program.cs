@@ -7,6 +7,11 @@ namespace CreatePdfThumbnail
 {
     class Program
     {
+        /// <summary>
+        /// Example of extracting first page from PDF and then chaining conversion PDF page to JPG.
+        /// https://www.convertapi.com/pdf-to-extract
+        /// https://www.convertapi.com/pdf-to-jpg
+        /// </summary>
         static void Main(string[] args)
         {
             //Get your secret at https://www.convertapi.com/a

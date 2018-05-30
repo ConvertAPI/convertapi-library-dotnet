@@ -6,6 +6,10 @@ namespace RetrieveUserInformation
 {
     class Program
     {
+        /// <summary>
+        /// Retrieve user information
+        /// https://www.convertapi.com/doc/user
+        /// </summary>
         static void Main(string[] args)
         {
             //Get your secret at https://www.convertapi.com/a

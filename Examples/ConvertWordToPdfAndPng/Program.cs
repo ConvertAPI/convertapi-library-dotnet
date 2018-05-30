@@ -6,6 +6,11 @@ namespace ConvertWordToPdfAndPng
 {
     class Program
     {
+        /// <summary>
+        /// Example of saving Word docx to PDF and to PNG
+        /// https://www.convertapi.com/docx-to-pdf
+        /// https://www.convertapi.com/docx-to-png
+        /// </summary>
         static void Main(string[] args)
         {
             //Get your secret at https://www.convertapi.com/a
