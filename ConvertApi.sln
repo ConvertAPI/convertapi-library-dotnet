@@ -19,6 +19,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Demo", "Examples\Demo\Demo.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConvertWordToPdfAndPng", "Examples\ConvertWordToPdfAndPng\ConvertWordToPdfAndPng.csproj", "{739A3D5E-C1F0-4A3D-A9C2-D104061B22C1}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RetrieveUserInformation", "Examples\RetrieveUserInformation\RetrieveUserInformation.csproj", "{18442749-E70F-400D-909D-A8A0E20A1A64}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -41,6 +43,10 @@ Global
 		{739A3D5E-C1F0-4A3D-A9C2-D104061B22C1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{739A3D5E-C1F0-4A3D-A9C2-D104061B22C1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{739A3D5E-C1F0-4A3D-A9C2-D104061B22C1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{18442749-E70F-400D-909D-A8A0E20A1A64}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{18442749-E70F-400D-909D-A8A0E20A1A64}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{18442749-E70F-400D-909D-A8A0E20A1A64}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{18442749-E70F-400D-909D-A8A0E20A1A64}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -50,6 +56,7 @@ Global
 		{126AA52A-5527-4366-8935-451F81D1FDFD} = {139F9822-4A90-475F-BAA5-F0471A85461B}
 		{2710A809-E7D2-412A-B478-28D79C4A5582} = {139F9822-4A90-475F-BAA5-F0471A85461B}
 		{739A3D5E-C1F0-4A3D-A9C2-D104061B22C1} = {139F9822-4A90-475F-BAA5-F0471A85461B}
+		{18442749-E70F-400D-909D-A8A0E20A1A64} = {139F9822-4A90-475F-BAA5-F0471A85461B}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {337A0F6F-40A9-4993-BF66-05E4E374871F}

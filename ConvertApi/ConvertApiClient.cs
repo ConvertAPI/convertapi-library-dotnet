@@ -62,12 +62,28 @@ namespace ConvertApi
             }
 
             return await HttpClient.PostAsync(url.Uri, content).ContinueWith(t =>
-           {
-               var responseMessage = t.Result;
-               if (responseMessage.StatusCode != HttpStatusCode.OK)
-                   throw new ConvertApiException($"Conversion from {fromFormat} to {toFormat} error.", responseMessage);
-               return JsonConvert.DeserializeObject<ConvertApiResponse>(responseMessage.Content.ReadAsStringAsync().Result);
-           });
+            {
+                var responseMessage = t.Result;
+                if (responseMessage.StatusCode != HttpStatusCode.OK)
+                    throw new ConvertApiException($"Conversion from {fromFormat} to {toFormat} error.", responseMessage);
+                return JsonConvert.DeserializeObject<ConvertApiResponse>(responseMessage.Content.ReadAsStringAsync().Result);
+            });
+        }
+
+        public async Task<ConvertApiUser> GetUser()
+        {
+            var url = new UriBuilder(ApiBaseUri)
+            {
+                Path = "user",
+                Query = $"secret={_secret}"
+            };
+            return await HttpClient.GetAsync(url.Uri).ContinueWith(t =>
+             {
+                 var responseMessage = t.Result;
+                 if (responseMessage.StatusCode != HttpStatusCode.OK)
+                     throw new ConvertApiException("Retrieve user information failed.", responseMessage);
+                 return JsonConvert.DeserializeObject<ConvertApiUser>(responseMessage.Content.ReadAsStringAsync().Result);
+             });
         }
     }
 }
