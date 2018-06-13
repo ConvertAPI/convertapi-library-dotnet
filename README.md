@@ -5,6 +5,14 @@ The ConvertAPI helps converting various file formats. Creating PDF and Images fr
 
 The ConvertAPI.NET NuGet package makes it easier to use the Convert API from your .NET 2, 3.x, and 4.x projects without having to build your own API calls. You can get your free API secret at https://www.convertapi.com/a
 
+## Installation
+
+Run this line from Package Manager Console:
+
+```csharp
+Install-Package ConvertApi
+```
+
 ### Usage
 Getting started with ConvertAPI is very easy. Let's talk about pre-requisites:
 
