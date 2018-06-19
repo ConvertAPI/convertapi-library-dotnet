@@ -20,7 +20,7 @@ Install-Package ConvertApi
 You can get your secret at https://www.convertapi.com/a
 
 ```csharp
-var convertApiClient = new ConvertApiClient("your api secret");
+ConvertApiClient convert = new ConvertApiClient("your api secret");
 ```
 
 ### File conversion
@@ -29,7 +29,7 @@ Example to convert file to PDF. All supported formats and options can be found
 [here](https://www.convertapi.com).
 
 ```csharp
-var convert = convertApiClient.ConvertAsync("docx", "pdf", new[]
+ConvertApiClient convert = convertApiClient.ConvertAsync("docx", "pdf", new[]
 {
    new ConvertApiParam("File", File.OpenRead(@"\source\test.docx"))
 });
@@ -54,10 +54,42 @@ int cost = convert.Result.ConversionCost;
 #### Convert file url
 
 ```csharp
-result = ConvertApi.convert('pdf', File: 'https://website/my_file.docx')
+ConvertApiClient convert = convertApiClient.ConvertAsync("pptx", "pdf", new[]
+{
+   new ConvertApiParam("File", "https://cdn.convertapi.com/cara/testfiles/presentation.pptx")
+});
 ```
 
-#### Converting your first file:
+#### Additional conversion parameters
+
+ConvertAPI accepts extra conversion parameters depending on converted formats. All conversion 
+parameters and explanations can be found [here](https://www.convertapi.com).
+
+```csharp
+ConvertApiClient convert = convertApiClient.ConvertAsync("pdf", "jpg", new[]
+{
+   new ConvertApiParam("File", File.OpenRead(@"\source\test.pdf")),
+   new ConvertApiParam("ScaleImage","true"),
+   new ConvertApiParam("ScaleProportions","true"),
+   new ConvertApiParam("ImageHeight","300"),
+   new ConvertApiParam("ImageWidth","300")
+});
+```
+
+### User information
+
+You can always check remaining seconds amount by fetching [user information](https://www.convertapi.com/doc/user).
+
+```csharp
+ConvertApiUser user = convert.GetUser().Result;
+int secondsLeft = user.SecondsLeft;
+```
+
+### More examples
+
+You can find more advanced examples in the [examples/](examples) folder.
+
+#### Converting your first file, full example:
 
 ConvertAPI is designed to make converting file super easy, the following snippet shows how easy it is to get started. Let's convert WORD DOCX file to PDF:
 
@@ -90,7 +122,7 @@ try
    }
 ```
 
-This is the bare-minimum to convert a file using the ConvertAPI client, but you can do a great deal more with the ConvertAPI.Net library. Take special note that you should replace `your api secret` with the secret you obtained in item two of the pre-requisites.
+This is the bare-minimum to convert a file using the ConvertAPI client, but you can do a great deal more with the ConvertAPI .NET library. Take special note that you should replace `your api secret` with the secret you obtained in item two of the pre-requisites.
 
 ### Issues &amp; Comments
 Please leave all comments, bugs, requests, and issues on the Issues page. We'll respond to your request ASAP!
