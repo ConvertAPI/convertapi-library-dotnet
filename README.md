@@ -65,7 +65,7 @@ ConvertAPI is designed to make converting file super easy, the following snippet
 try
 {
   
-  var convertApiClient = new ConvertApiClient("<api secret>");
+  var convertApiClient = new ConvertApiClient("your api secret");
   
   var fileToConvert = @"c:\test.docx";
   var conversionTask = convertApiClient.ConvertAsync("docx", "pdf", new[]
@@ -90,7 +90,7 @@ try
    }
 ```
 
-This is the bare-minimum to convert a file using the ConvertAPI client, but you can do a great deal more with the ConvertAPI.Net library. Take special note that you should replace `<api secret>` with the secret you obtained in item two of the pre-requisites.
+This is the bare-minimum to convert a file using the ConvertAPI client, but you can do a great deal more with the ConvertAPI.Net library. Take special note that you should replace `your api secret` with the secret you obtained in item two of the pre-requisites.
 
 ### Issues &amp; Comments
 Please leave all comments, bugs, requests, and issues on the Issues page. We'll respond to your request ASAP!
