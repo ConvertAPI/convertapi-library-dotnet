@@ -41,13 +41,13 @@ convert.Result.SaveFile(@"\result\test.pdf");
 Other result operations:
 
 ```csharp
-# save all result files to folder
+// save all result files to folder
 convert.Result.SaveFiles(@"\result\");
 
-# get result files
+// get result files
 ProcessedFile[] files = convert.Result.Files;
 
-# get conversion cost
+// get conversion cost
 int cost = convert.Result.ConversionCost; 
 ```
 
