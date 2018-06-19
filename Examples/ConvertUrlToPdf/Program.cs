@@ -17,7 +17,7 @@ namespace ConvertUrlToPdf
             try
             {
                 //Get your secret at https://www.convertapi.com/a
-                var convertApiClient = new ConvertApiClient("<Your secret here>", 180);
+                var convertApiClient = new ConvertApiClient("your api secret", 180);
                 var saveFiles = convertApiClient.ConvertAsync("web", "pdf", new[]
                 {
                 new ConvertApiParam("Url", "https://en.wikipedia.org/wiki/Data_conversion"),

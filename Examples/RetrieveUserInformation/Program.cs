@@ -13,7 +13,7 @@ namespace RetrieveUserInformation
         static void Main(string[] args)
         {
             //Get your secret at https://www.convertapi.com/a
-            var convertApiClient = new ConvertApiClient("<Your secret here>");
+            var convertApiClient = new ConvertApiClient("your api secret");
             var convertApiUser = convertApiClient.GetUser().Result;
 
             foreach (PropertyDescriptor descriptor in TypeDescriptor.GetProperties(convertApiUser))
