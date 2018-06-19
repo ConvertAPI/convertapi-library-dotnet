@@ -1,4 +1,4 @@
-# ConvertAPI
+# ConvertAPI c# Client
 ## Convert your files with our online file conversion API
 
 The ConvertAPI helps converting various file formats. Creating PDF and Images from various sources like Word, Excel, Powerpoint, images, web pages or raw HTML codes. Merge, Encrypt, Split, Repair and Decrypt PDF files. And many others files manipulations. In just few minutes you can integrate it into your application and use it easily.
@@ -13,12 +13,43 @@ Run this line from Package Manager Console:
 Install-Package ConvertApi
 ```
 
-### Usage
-Getting started with ConvertAPI is very easy. Let's talk about pre-requisites:
+## Usage
 
-#### Pre-requisites:
-1. A ConvertAPI Account: [Sign up for a new account](https://www.convertapi.com/a/su).
-2. A API secret: [Copy API secret](https://www.convertapi.com/a).
+### Configuration
+
+You can get your secret at https://www.convertapi.com/a
+
+```csharp
+var convertApiClient = new ConvertApiClient("your api secret");
+```
+
+### File conversion
+
+Example to convert file to PDF. All supported formats and options can be found 
+[here](https://www.convertapi.com).
+
+```csharp
+var convert = convertApiClient.ConvertAsync("docx", "pdf", new[]
+{
+   new ConvertApiParam("File", File.OpenRead(@"\source\test.docx"))
+});
+
+// save to file
+convert.Result.SaveFile(@"\result\test.pdf");
+```
+
+Other result operations:
+
+```csharp
+# save all result files to folder
+convert.Result.SaveFiles(@"\result\");
+
+# get result files
+ProcessedFile[] files = convert.Result.Files;
+
+# get conversion cost
+int cost = convert.Result.ConversionCost; 
+```
 
 #### Converting your first file:
 
