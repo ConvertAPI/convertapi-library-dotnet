@@ -1,4 +1,4 @@
-# ConvertAPI c# Client
+# ConvertAPI C# Client
 ## Convert your files with our online file conversion API
 
 The ConvertAPI helps converting various file formats. Creating PDF and Images from various sources like Word, Excel, Powerpoint, images, web pages or raw HTML codes. Merge, Encrypt, Split, Repair and Decrypt PDF files. And many others files manipulations. In just few minutes you can integrate it into your application and use it easily.
@@ -49,6 +49,12 @@ ProcessedFile[] files = convert.Result.Files;
 
 // get conversion cost
 int cost = convert.Result.ConversionCost; 
+```
+
+#### Convert file url
+
+```csharp
+result = ConvertApi.convert('pdf', File: 'https://website/my_file.docx')
 ```
 
 #### Converting your first file:
