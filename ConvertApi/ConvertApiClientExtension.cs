@@ -100,6 +100,11 @@ namespace ConvertApi
             return response.Files.Select(file => AsFileAsync(file.Url, Path.Combine(directory, Path.GetFileName(file.FileName)))).Select(task => task.Result).ToArray();
         }
 
+        public static FileInfo SaveFile(this ConvertApiResponse response, string fileName)
+        {
+            return response.Files[0].AsFileAsync(fileName).Result;
+        }
+
         #endregion
     }
 }
