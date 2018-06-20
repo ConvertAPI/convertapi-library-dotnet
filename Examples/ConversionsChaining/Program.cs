@@ -14,7 +14,7 @@ namespace ConversionsChaining
         static void Main(string[] args)
         {
             //Get your secret at https://www.convertapi.com/a
-            var convertApiClient = new ConvertApiClient("<Your secret here>");
+            var convertApiClient = new ConvertApiClient("your api secret");
             Console.WriteLine("Converting PDF to JPG and compressing result files with ZIP");
             var fileName = Path.Combine(Path.GetTempPath(), "test.pdf");
 

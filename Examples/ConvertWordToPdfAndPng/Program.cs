@@ -14,10 +14,10 @@ namespace ConvertWordToPdfAndPng
         static void Main(string[] args)
         {
             //Get your secret at https://www.convertapi.com/a
-            var convertApiClient = new ConvertApiClient("<Your secret here>");
-            const string pdfFile = @"..\..\..\TestFiles\test.docx";
+            var convertApiClient = new ConvertApiClient("your api secret");
+            const string sourceFile = @"..\..\..\TestFiles\test.docx";
 
-            var fileParam = new ConvertApiParam("File", File.OpenRead(pdfFile));
+            var fileParam = new ConvertApiParam("File", File.OpenRead(sourceFile));
 
             var convertToPdf = convertApiClient.ConvertAsync("docx", "pdf", new[]
             {
