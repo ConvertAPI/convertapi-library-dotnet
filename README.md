@@ -87,7 +87,7 @@ int secondsLeft = user.SecondsLeft;
 
 ### More examples
 
-You can find more advanced examples in the [https://github.com/ConvertAPI/convertapi-dotnet/tree/master/Examples](examples) folder.
+You can find more advanced examples in the [examples](https://github.com/ConvertAPI/convertapi-dotnet/tree/master/Examples) folder.
 
 #### Converting your first file, full example:
 
