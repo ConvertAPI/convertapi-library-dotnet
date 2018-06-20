@@ -1,4 +1,6 @@
-﻿namespace ConvertApi.Constants
+﻿using System.Reflection;
+
+namespace ConvertApi.Constants
 {
     public static class ConvertApiConstants
     {
@@ -6,9 +8,11 @@
         {
             UploadTimeoutInSeconds = 600;
             DownloadTimeoutInSeconds = 600;
+            HttpUserAgent = $"convertapi-dotnet-{new AssemblyName(typeof(ConvertApiConstants).Assembly.FullName).Version}";
         }
 
         public static int UploadTimeoutInSeconds { get; set; }
         public static int DownloadTimeoutInSeconds { get; set; }
+        public static string HttpUserAgent { get; set; }
     }
 }
