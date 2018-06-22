@@ -32,7 +32,7 @@ namespace ConvertApi
         {
             var url = new UriBuilder(ApiBaseUri)
             {
-                Path = $"{fromFormat}/to/{toFormat}",
+                Path = $"convert/{fromFormat}/to/{toFormat}",
                 Query = $"secret={_secret}"
             };
 
