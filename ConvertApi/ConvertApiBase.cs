@@ -1,14 +1,14 @@
 ﻿using System;
 using System.Net.Http;
-using ConvertApi.Constants;
+using ConvertApiDotNet.Constants;
 
-namespace ConvertApi
+namespace ConvertApiDotNet
 {
-    public class ConvertApiClientBase
+    public class ConvertApiBase
     {
         public HttpClient HttpClient;
 
-        public ConvertApiClientBase(int requestTimeoutInSeconds)
+        public ConvertApiBase(int requestTimeoutInSeconds)
         {
             HttpClient = new HttpClient
             {

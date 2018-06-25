@@ -20,7 +20,7 @@ Install-Package ConvertApi
 You can get your secret at https://www.convertapi.com/a
 
 ```csharp
-ConvertApiClient convert = new ConvertApiClient("your api secret");
+ConvertApi convert = new ConvertApi("your api secret");
 ```
 
 ### File conversion
@@ -29,7 +29,7 @@ Example to convert file to PDF. All supported formats and options can be found
 [here](https://www.convertapi.com).
 
 ```csharp
-ConvertApiClient convert = convertApiClient.ConvertAsync("docx", "pdf", new[]
+ConvertApi convert = ConvertApi.ConvertAsync("docx", "pdf", new[]
 {
    new ConvertApiParam("File", File.OpenRead(@"\source\test.docx"))
 });
@@ -54,7 +54,7 @@ int cost = convert.Result.ConversionCost;
 #### Convert file url
 
 ```csharp
-ConvertApiClient convert = convertApiClient.ConvertAsync("pptx", "pdf", new[]
+ConvertApi convert = ConvertApi.ConvertAsync("pptx", "pdf", new[]
 {
    new ConvertApiParam("File", "https://cdn.convertapi.com/cara/testfiles/presentation.pptx")
 });
@@ -66,7 +66,7 @@ ConvertAPI accepts extra conversion parameters depending on converted formats. A
 parameters and explanations can be found [here](https://www.convertapi.com).
 
 ```csharp
-ConvertApiClient convert = convertApiClient.ConvertAsync("pdf", "jpg", new[]
+ConvertApi convert = ConvertApi.ConvertAsync("pdf", "jpg", new[]
 {
    new ConvertApiParam("File", File.OpenRead(@"\source\test.pdf")),
    new ConvertApiParam("ScaleImage","true"),
@@ -97,10 +97,10 @@ ConvertAPI is designed to make converting file super easy, the following snippet
 try
 {
   
-  var convertApiClient = new ConvertApiClient("your api secret");
+  var convertApi = new ConvertApi("your api secret");
   
   var fileToConvert = @"c:\test.docx";
-  var conversionTask = convertApiClient.ConvertAsync("docx", "pdf", new[]
+  var conversionTask = convertApi.ConvertAsync("docx", "pdf", new[]
   {
      new ConvertApiParam("File", File.OpenRead(fileToConvert))
   });

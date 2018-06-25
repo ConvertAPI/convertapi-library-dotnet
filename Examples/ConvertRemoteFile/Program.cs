@@ -1,6 +1,6 @@
 ﻿using System;
 using System.IO;
-using ConvertApi;
+using ConvertApiDotNet;
 
 namespace ConvertRemoteFile
 {
@@ -9,13 +9,13 @@ namespace ConvertRemoteFile
         static void Main(string[] args)
         {
             //Get your secret at https://www.convertapi.com/a
-            var convertApiClient = new ConvertApiClient("your api secret");
+            var convertApi = new ConvertApi("your api secret");
 
             const string sourceFile = "https://cdn.convertapi.com/cara/testfiles/presentation.pptx";
 
             var fileParam = new ConvertApiParam("File", sourceFile);
 
-            var convertToPdf = convertApiClient.ConvertAsync("pptx", "pdf", new[]
+            var convertToPdf = convertApi.ConvertAsync("pptx", "pdf", new[]
             {
                 fileParam
             });

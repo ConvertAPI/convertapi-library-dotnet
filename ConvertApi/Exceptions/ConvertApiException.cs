@@ -2,7 +2,7 @@
 using System.Net;
 using System.Net.Http;
 
-namespace ConvertApi.Exceptions
+namespace ConvertApiDotNet.Exceptions
 {
     public class ConvertApiException : Exception
     {

@@ -3,13 +3,13 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
-using ConvertApi.Exceptions;
-using ConvertApi.Model;
+using ConvertApiDotNet.Exceptions;
+using ConvertApiDotNet.Model;
 using Newtonsoft.Json;
 
-namespace ConvertApi
+namespace ConvertApiDotNet
 {
-    public class ConvertApiClient : ConvertApiClientBase
+    public class ConvertApi : ConvertApiBase
     {
         private readonly string _secret;
         public static string ApiBaseUri;
@@ -21,7 +21,7 @@ namespace ConvertApi
         /// <param name="secret">Secret to authorize conversion can be found https://www.convertapi.com/a</param>
         /// <param name="requestTimeoutInSeconds">Conversion/request timeout</param>
         /// <param name="apiBaseUri">Default API base URL, in most cases used default</param>
-        public ConvertApiClient(string secret, int requestTimeoutInSeconds = 600, string apiBaseUri = "https://v2.convertapi.com") : base(requestTimeoutInSeconds)
+        public ConvertApi(string secret, int requestTimeoutInSeconds = 600, string apiBaseUri = "https://v2.convertapi.com") : base(requestTimeoutInSeconds)
         {
             _secret = secret;
             ApiBaseUri = apiBaseUri;
@@ -32,7 +32,7 @@ namespace ConvertApi
         {
             var url = new UriBuilder(ApiBaseUri)
             {
-                Path = $"{fromFormat}/to/{toFormat}",
+                Path = $"convert/{fromFormat}/to/{toFormat}",
                 Query = $"secret={_secret}"
             };
 

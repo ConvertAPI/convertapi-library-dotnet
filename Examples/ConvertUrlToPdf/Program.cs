@@ -1,8 +1,8 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
-using ConvertApi;
-using ConvertApi.Exceptions;
+using ConvertApiDotNet;
+using ConvertApiDotNet.Exceptions;
 
 namespace ConvertUrlToPdf
 {
@@ -17,8 +17,8 @@ namespace ConvertUrlToPdf
             try
             {
                 //Get your secret at https://www.convertapi.com/a
-                var convertApiClient = new ConvertApiClient("your api secret", 180);
-                var saveFiles = convertApiClient.ConvertAsync("web", "pdf", new[]
+                var convertApi = new ConvertApi("your api secret", 180);
+                var saveFiles = convertApi.ConvertAsync("web", "pdf", new[]
                 {
                 new ConvertApiParam("Url", "https://en.wikipedia.org/wiki/Data_conversion"),
                 new ConvertApiParam("FileName", "web-example")

@@ -3,19 +3,19 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using ConvertApi.Constants;
-using ConvertApi.Model;
+using ConvertApiDotNet.Constants;
+using ConvertApiDotNet.Model;
 
-namespace ConvertApi
+namespace ConvertApiDotNet
 {
-    public static class ConvertApiClientExtension
+    public static class ConvertApiExtension
     {
         #region Convert method extensions
 
-        private static Task<ConvertApiResponse> BindConvertApiClient(ConvertApiClient convertApiClient, string fromFile, string outputExtension)
+        private static Task<ConvertApiResponse> BindConvertApi(ConvertApi convertApi, string fromFile, string outputExtension)
         {
             var fromExt = Path.GetExtension(fromFile).Replace(".", "");
-            var task = convertApiClient.ConvertAsync(fromExt, outputExtension, new[] { new ConvertApiParam("File", File.OpenRead(fromFile)) });
+            var task = convertApi.ConvertAsync(fromExt, outputExtension, new[] { new ConvertApiParam("File", File.OpenRead(fromFile)) });
             return task;
         }
 
@@ -36,16 +36,16 @@ namespace ConvertApi
             }
         }
 
-        public static void Convert(this ConvertApiClient convertApiClient, string fromFile, string toFile)
+        public static void Convert(this ConvertApi convertApi, string fromFile, string toFile)
         {
             var toExt = Path.GetExtension(toFile).Replace(".", "");
-            var task = BindConvertApiClient(convertApiClient, fromFile, toExt);
+            var task = BindConvertApi(convertApi, fromFile, toExt);
             TaskResult(task).AsFileAsync(0, toFile).Wait();
         }
 
-        public static void Convert(this ConvertApiClient convertApiClient, string fromFile, string outputExtension, string outputDirectory)
+        public static void Convert(this ConvertApi convertApi, string fromFile, string outputExtension, string outputDirectory)
         {
-            var task = BindConvertApiClient(convertApiClient, fromFile, outputExtension);
+            var task = BindConvertApi(convertApi, fromFile, outputExtension);
             TaskResult(task).SaveFiles(outputDirectory);
         }
 
@@ -62,7 +62,7 @@ namespace ConvertApi
             return response.Files.Length;
         }
 
-        public static Task<Stream> AsStreamAsync(Uri url) => new ConvertApiClientBase(ConvertApiConstants.DownloadTimeoutInSeconds).HttpClient.GetStreamAsync(url);
+        public static Task<Stream> AsStreamAsync(Uri url) => new ConvertApiBase(ConvertApiConstants.DownloadTimeoutInSeconds).HttpClient.GetStreamAsync(url);
 
         private static IEnumerable<Task<Stream>> AsFilesStreamAsync(this ConvertApiResponse response)
         {
