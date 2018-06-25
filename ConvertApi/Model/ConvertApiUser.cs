@@ -1,4 +1,4 @@
-﻿namespace ConvertApi.Model
+﻿namespace ConvertApiDotNet.Model
 {
     public class ConvertApiUser
     {        

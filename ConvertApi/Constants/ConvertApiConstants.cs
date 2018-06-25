@@ -1,6 +1,6 @@
 ﻿using System.Reflection;
 
-namespace ConvertApi.Constants
+namespace ConvertApiDotNet.Constants
 {
     public static class ConvertApiConstants
     {

@@ -1,7 +1,7 @@
 ﻿using System;
 using Newtonsoft.Json;
 
-namespace ConvertApi.Model
+namespace ConvertApiDotNet.Model
 {
     public class ConvertApiResponse
     {

@@ -1,6 +1,6 @@
 ﻿using System;
 using System.IO;
-using ConvertApi;
+using ConvertApiDotNet;
 
 namespace ConvertWordToPdfAndPng
 {
@@ -14,12 +14,12 @@ namespace ConvertWordToPdfAndPng
         static void Main(string[] args)
         {
             //Get your secret at https://www.convertapi.com/a
-            var convertApiClient = new ConvertApiClient("your api secret");
+            var convertApi = new ConvertApi("your api secret");
             const string sourceFile = @"..\..\..\TestFiles\test.docx";
 
             var fileParam = new ConvertApiParam("File", File.OpenRead(sourceFile));
 
-            var convertToPdf = convertApiClient.ConvertAsync("docx", "pdf", new[]
+            var convertToPdf = convertApi.ConvertAsync("docx", "pdf", new[]
             {
                 fileParam
             });
@@ -29,7 +29,7 @@ namespace ConvertWordToPdfAndPng
 
             Console.WriteLine("The PDF saved to " + fileInfo);
             
-            var convertToPng = convertApiClient.ConvertAsync("docx", "png", new[]
+            var convertToPng = convertApi.ConvertAsync("docx", "png", new[]
             {
                 //Reuse the same uploaded file parameter
                 fileParam

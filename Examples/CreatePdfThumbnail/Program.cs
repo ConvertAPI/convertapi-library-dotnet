@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
-using ConvertApi;
+using ConvertApiDotNet;
 
 namespace CreatePdfThumbnail
 {
@@ -15,16 +15,16 @@ namespace CreatePdfThumbnail
         static void Main(string[] args)
         {
             //Get your secret at https://www.convertapi.com/a
-            var convertApiClient = new ConvertApiClient("your api secret");
+            var convertApi = new ConvertApi("your api secret");
             var pdfFile = @"..\..\..\TestFiles\test.pdf";
 
-            var extractFirstPage = convertApiClient.ConvertAsync("pdf", "extract", new[]
+            var extractFirstPage = convertApi.ConvertAsync("pdf", "extract", new[]
             {
                 new ConvertApiParam("File", File.OpenRead(pdfFile)),
                 new ConvertApiParam("PageRange","1")
             });
 
-            var thumbnail = convertApiClient.ConvertAsync("pdf", "jpg", new[]
+            var thumbnail = convertApi.ConvertAsync("pdf", "jpg", new[]
             {
                 new ConvertApiParam("File", extractFirstPage.Result),
                 new ConvertApiParam("ScaleImage","true"),

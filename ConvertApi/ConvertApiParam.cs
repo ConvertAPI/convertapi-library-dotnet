@@ -7,11 +7,11 @@ using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
-using ConvertApi.Constants;
-using ConvertApi.Exceptions;
-using ConvertApi.Model;
+using ConvertApiDotNet.Constants;
+using ConvertApiDotNet.Exceptions;
+using ConvertApiDotNet.Model;
 
-namespace ConvertApi
+namespace ConvertApiDotNet
 {
     public class ConvertApiParam
     {
@@ -33,13 +33,13 @@ namespace ConvertApi
 
         public ConvertApiParam(string name, Stream value, string fileName) : this(name, new string[0])
         {
-            var client = new ConvertApiClientBase(ConvertApiConstants.UploadTimeoutInSeconds).HttpClient;
+            var client = new ConvertApiBase(ConvertApiConstants.UploadTimeoutInSeconds).HttpClient;
             client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("text/plain"));
             var content = new StreamContent(value);
             content.Headers.ContentType = new MediaTypeHeaderValue("application/octet-stream");
             content.Headers.Add("Content-Disposition", $"attachment; filename=\"{Path.GetFileName(fileName)}\"");
 
-            var task = client.PostAsync(new Uri($"{ConvertApiClient.ApiBaseUri}/upload"), content)
+            var task = client.PostAsync(new Uri($"{ConvertApi.ApiBaseUri}/upload"), content)
                 .ContinueWith(uploadTask =>
                {
                    var responseMessage = uploadTask.Result;
