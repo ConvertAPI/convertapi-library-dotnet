@@ -20,7 +20,7 @@ Install-Package ConvertApi
 You can get your secret at https://www.convertapi.com/a
 
 ```csharp
-ConvertApi convert = new ConvertApi("your api secret");
+ConvertApi convertApi = new ConvertApi("your api secret");
 ```
 
 ### File conversion
@@ -29,7 +29,7 @@ Example to convert file to PDF. All supported formats and options can be found
 [here](https://www.convertapi.com).
 
 ```csharp
-ConvertApi convert = ConvertApi.ConvertAsync("docx", "pdf", new[]
+ConvertApi convert = convertApi.ConvertAsync("docx", "pdf", new[]
 {
    new ConvertApiParam("File", File.OpenRead(@"\source\test.docx"))
 });
