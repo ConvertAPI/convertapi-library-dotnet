@@ -29,7 +29,7 @@ Example to convert file to PDF. All supported formats and options can be found
 [here](https://www.convertapi.com).
 
 ```csharp
-ConvertApi convert = convertApi.ConvertAsync("docx", "pdf", new[]
+Task<ConvertApiResponse> convert = convertApi.ConvertAsync("docx", "pdf", new[]
 {
    new ConvertApiParam("File", File.OpenRead(@"\source\test.docx"))
 });
@@ -54,7 +54,7 @@ int cost = convert.Result.ConversionCost;
 #### Convert file url
 
 ```csharp
-ConvertApi convert = ConvertApi.ConvertAsync("pptx", "pdf", new[]
+Task<ConvertApiResponse> convert = ConvertApi.ConvertAsync("pptx", "pdf", new[]
 {
    new ConvertApiParam("File", "https://cdn.convertapi.com/cara/testfiles/presentation.pptx")
 });
@@ -66,7 +66,7 @@ ConvertAPI accepts extra conversion parameters depending on converted formats. A
 parameters and explanations can be found [here](https://www.convertapi.com).
 
 ```csharp
-ConvertApi convert = ConvertApi.ConvertAsync("pdf", "jpg", new[]
+Task<ConvertApiResponse> convert = ConvertApi.ConvertAsync("pdf", "jpg", new[]
 {
    new ConvertApiParam("File", File.OpenRead(@"\source\test.pdf")),
    new ConvertApiParam("ScaleImage","true"),
