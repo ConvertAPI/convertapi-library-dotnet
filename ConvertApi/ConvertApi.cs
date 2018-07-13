@@ -21,7 +21,7 @@ namespace ConvertApiDotNet
         /// <param name="secret">Secret to authorize conversion can be found https://www.convertapi.com/a</param>
         /// <param name="requestTimeoutInSeconds">Conversion/request timeout</param>
         /// <param name="apiBaseUri">Default API base URL, in most cases used default</param>
-        public ConvertApi(string secret, int requestTimeoutInSeconds = 600, string apiBaseUri = "https://v2.convertapi.com") : base(requestTimeoutInSeconds)
+        public ConvertApi(string secret, int requestTimeoutInSeconds = 180, string apiBaseUri = "https://v2.convertapi.com") : base(requestTimeoutInSeconds)
         {
             _secret = secret;
             ApiBaseUri = apiBaseUri;
