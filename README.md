@@ -20,7 +20,7 @@ Install-Package ConvertApi
 You can get your secret at https://www.convertapi.com/a
 
 ```csharp
-ConvertApi convert = new ConvertApi("your api secret");
+ConvertApi convertApi = new ConvertApi("your api secret");
 ```
 
 ### File conversion
@@ -29,35 +29,35 @@ Example to convert file to PDF. All supported formats and options can be found
 [here](https://www.convertapi.com).
 
 ```csharp
-ConvertApi convert = ConvertApi.ConvertAsync("docx", "pdf", new[]
+ConvertApiResponse result = convertApi.ConvertAsync("docx", "pdf", new[]
 {
    new ConvertApiParam("File", File.OpenRead(@"\source\test.docx"))
-});
+}).Result;
 
 // save to file
-convert.Result.SaveFile(@"\result\test.pdf");
+result.SaveFile(@"\result\test.pdf");
 ```
 
 Other result operations:
 
 ```csharp
 // save all result files to folder
-convert.Result.SaveFiles(@"\result\");
+result.SaveFiles(@"\result\");
 
 // get result files
-ProcessedFile[] files = convert.Result.Files;
+ProcessedFile[] files = result.Files;
 
 // get conversion cost
-int cost = convert.Result.ConversionCost; 
+int cost = result.ConversionCost; 
 ```
 
 #### Convert file url
 
 ```csharp
-ConvertApi convert = ConvertApi.ConvertAsync("pptx", "pdf", new[]
+ConvertApiResponse result = convertApi.ConvertAsync("pptx", "pdf", new[]
 {
    new ConvertApiParam("File", "https://cdn.convertapi.com/cara/testfiles/presentation.pptx")
-});
+}).Result;
 ```
 
 #### Additional conversion parameters
@@ -66,14 +66,14 @@ ConvertAPI accepts extra conversion parameters depending on converted formats. A
 parameters and explanations can be found [here](https://www.convertapi.com).
 
 ```csharp
-ConvertApi convert = ConvertApi.ConvertAsync("pdf", "jpg", new[]
+ConvertApiResponse result = convertApi.ConvertAsync("pdf", "jpg", new[]
 {
    new ConvertApiParam("File", File.OpenRead(@"\source\test.pdf")),
    new ConvertApiParam("ScaleImage","true"),
    new ConvertApiParam("ScaleProportions","true"),
    new ConvertApiParam("ImageHeight","300"),
    new ConvertApiParam("ImageWidth","300")
-});
+}).Result;
 ```
 
 ### User information
