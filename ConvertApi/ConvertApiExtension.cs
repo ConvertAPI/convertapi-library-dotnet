@@ -51,7 +51,7 @@ namespace ConvertApiDotNet
 
         #endregion
 
-        #region Result extensions
+
 
         /// <summary>
         /// Return the count of converted files
@@ -62,27 +62,8 @@ namespace ConvertApiDotNet
             return response.Files.Length;
         }
 
-        public static Task<Stream> AsStreamAsync(Uri url) => new ConvertApiBase(ConvertApiConstants.DownloadTimeoutInSeconds).HttpClient.GetStreamAsync(url);
 
-        private static IEnumerable<Task<Stream>> AsFilesStreamAsync(this ConvertApiResponse response)
-        {
-            return response.Files.Select(s => AsStreamAsync(s.Url));
-        }
-
-        private static Stream AsFilesStream(this ConvertApiResponse response, int fileIndex)
-        {
-            return AsStreamAsync(response.Files[fileIndex].Url).Result;
-        }
-
-        public static Task<FileInfo> AsFileAsync(this ConvertApiResponse response, int fileIndex, string fileName)
-        {
-            return AsFileAsync(response.Files[fileIndex].Url, fileName);
-        }
-
-        public static Task<FileInfo> AsFileAsync(this ProcessedFile processedFile, string fileName)
-        {
-            return AsFileAsync(processedFile.Url, fileName);
-        }
+        private static Task<Stream> AsStreamAsync(Uri url) => new ConvertApiBase(ConvertApiConstants.DownloadTimeoutInSeconds).HttpClient.GetStreamAsync(url);
 
         private static Task<FileInfo> AsFileAsync(Uri url, string fileName)
         {
@@ -95,9 +76,66 @@ namespace ConvertApiDotNet
             });
         }
 
-        public static FileInfo[] SaveFiles(this ConvertApiResponse response, string directory)
+
+        #region Files Task Methods
+
+        public static IEnumerable<Task<Stream>> AsFilesStreamAsync(this ConvertApiResponse response)
+        {
+            return response.Files.Select(s => AsStreamAsync(s.Url));
+        }
+
+        public static IEnumerable<Task<FileInfo>> AsFilesAsync(this ConvertApiResponse response)
+        {
+            return response.Files.Select(s => AsFileAsync(s.Url, s.FileName));
+        }
+
+        #endregion
+
+
+        #region File Task Methods
+
+        public static Task<Stream> AsFileStreamAsync(this ConvertApiResponse response, int fileIndex)
+        {
+            return AsStreamAsync(response.Files[fileIndex].Url);
+        }
+
+        public static Task<FileInfo> AsFileAsync(this ConvertApiResponse response, int fileIndex, string fileName)
+        {
+            return AsFileAsync(response.Files[fileIndex].Url, fileName);
+        }
+
+        public static Task<Stream> AsFileStreamAsync(this ProcessedFile processedFile)
+        {
+            return AsStreamAsync(processedFile.Url);
+        }
+
+        public static Task<FileInfo> AsFileAsync(this ProcessedFile processedFile, string fileName)
+        {
+            return AsFileAsync(processedFile.Url, fileName);
+        }
+
+        #endregion
+
+        #region Files Methods
+
+        public static IEnumerable<Stream> FilesStream(this ConvertApiResponse response)
+        {
+            return response.AsFilesStreamAsync().Select(s=>s.Result);            
+        }
+
+        public static IEnumerable<FileInfo>SaveFiles(this ConvertApiResponse response, string directory)
         {
             return response.Files.Select(file => AsFileAsync(file.Url, Path.Combine(directory, Path.GetFileName(file.FileName)))).Select(task => task.Result).ToArray();
+        }
+
+        #endregion
+
+
+        #region File Methods
+
+        public static Stream FileStream(this ConvertApiResponse response)
+        {
+            return response.Files[0].AsFileStreamAsync().Result;
         }
 
         public static FileInfo SaveFile(this ConvertApiResponse response, string fileName)
