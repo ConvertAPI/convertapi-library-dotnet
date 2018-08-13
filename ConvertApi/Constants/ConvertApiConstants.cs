@@ -8,7 +8,7 @@ namespace ConvertApiDotNet.Constants
         {
             UploadTimeoutInSeconds = 600;
             DownloadTimeoutInSeconds = 600;
-            HttpUserAgent = $"convertapi-dotnet-{new AssemblyName(typeof(ConvertApiConstants).Assembly.FullName).Version}";
+            HttpUserAgent = $"convertapi-dotnet/{new AssemblyName(typeof(ConvertApiConstants).Assembly.FullName).Version}";
         }
 
         public static int UploadTimeoutInSeconds { get; set; }
