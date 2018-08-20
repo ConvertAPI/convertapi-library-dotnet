@@ -56,7 +56,7 @@ namespace ConvertApiDotNet
             {
                 if (ignoredParameters.Contains(parameter.Name, StringComparer.OrdinalIgnoreCase)) continue;
 
-                if (parameter.Name.ToLower() == "file" || parameter.Name.ToLower() == "files" || parameter.GetValues().Length > 1)
+                if (parameter.Name.ToLower() == "files" || parameter.GetValues().Length > 1)
                 {
                     filesArray.AddRange(parameter.GetValues());
                 }
@@ -69,7 +69,7 @@ namespace ConvertApiDotNet
             for (var index = 0; index < filesArray.Count; index++)
             {
                 var file = filesArray[index];
-                var parameterName = filesArray.Count > 1 ? $"Files[{index}]" : "File";
+                var parameterName = $"Files[{index}]" ;
                 content.Add(new StringContent(file), parameterName);
             }
 

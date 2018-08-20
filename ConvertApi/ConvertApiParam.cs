@@ -73,15 +73,47 @@ namespace ConvertApiDotNet
         {
         }
 
+        public ConvertApiFileParam(FileInfo file) : base("File", file.OpenRead())
+        {
+        }
+
         public ConvertApiFileParam(Stream fileStream, string fileName) : base("File", fileStream, fileName)
         {
         }
 
-        public ConvertApiFileParam(ConvertApiResponse response) : base("File", response)
+        public ConvertApiFileParam(ConvertApiResponse response) : this(response.Files.First())
         {
         }
 
         public ConvertApiFileParam(ProcessedFile processedFile) : this(processedFile.Url)
+        {
+        }
+    }
+
+    public class ConvertApiFilesParam : ConvertApiParam
+    {
+        public ConvertApiFilesParam(Uri url) : base("Files", url.ToString())
+        {
+
+        }
+
+        public ConvertApiFilesParam(string path) : base("Files", File.OpenRead(path))
+        {
+        }
+
+        public ConvertApiFilesParam(FileInfo file) : base("Files", file.OpenRead())
+        {
+        }
+
+        public ConvertApiFilesParam(Stream fileStream, string fileName) : base("Files", fileStream, fileName)
+        {
+        }
+
+        public ConvertApiFilesParam(ConvertApiResponse response) : base("Files", response)
+        {
+        }
+
+        public ConvertApiFilesParam(ProcessedFile processedFile) : this(processedFile.Url)
         {
         }
     }

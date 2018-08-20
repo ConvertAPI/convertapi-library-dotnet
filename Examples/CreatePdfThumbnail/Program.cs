@@ -16,7 +16,7 @@ namespace CreatePdfThumbnail
         static void Main(string[] args)
         {
             //Get your secret at https://www.convertapi.com/a
-            var convertApi = new ConvertApi("your api secret");
+            var convertApi = new ConvertApi("wBcm6PoqjxZ7vtDQ");
             var pdfFile = @"..\..\..\TestFiles\test.pdf";
 
             var extractFirstPage = convertApi.ConvertAsync("pdf", "extract",

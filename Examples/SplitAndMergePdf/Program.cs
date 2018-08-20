@@ -21,10 +21,10 @@ namespace SplitAndMergePdf
             try
             {
                 //Get your secret at https://www.convertapi.com/a
-                var convertApi = new ConvertApi("your secret");
+                var convertApi = new ConvertApi("wBcm6PoqjxZ7vtDQ");
                 const string sourceFile = @"..\..\..\TestFiles\test.pdf";
 
-                var destinationFileName = Path.Combine(Path.GetTempPath(), "test-merged.pdf");
+                var destinationFileName = Path.Combine(Path.GetTempPath(), $"test-merged-{Guid.NewGuid()}.pdf");
 
                 var splitTask = convertApi.ConvertAsync("pdf", "split", 
                     new ConvertApiFileParam(sourceFile));
@@ -32,8 +32,8 @@ namespace SplitAndMergePdf
                 var processedFiles = splitTask.Result;
 
                 var mergeTask = convertApi.ConvertAsync("pdf", "merge", 
-                    new ConvertApiFileParam(processedFiles.Files.First()), 
-                    new ConvertApiFileParam(processedFiles.Files.Last()));
+                    new ConvertApiFilesParam(processedFiles.Files.First()), 
+                    new ConvertApiFilesParam(processedFiles.Files.Last()));
 
                 var saveFiles = mergeTask.Result.SaveFile(destinationFileName);
 
