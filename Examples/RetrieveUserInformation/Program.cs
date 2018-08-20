@@ -14,7 +14,7 @@ namespace RetrieveUserInformation
         {
             //Get your secret at https://www.convertapi.com/a
             var convertApi = new ConvertApi("your api secret");
-            var convertApiUser = convertApi.GetUser().Result;
+            var convertApiUser = convertApi.GetUserAsync().Result;
 
             foreach (PropertyDescriptor descriptor in TypeDescriptor.GetProperties(convertApiUser))
             {

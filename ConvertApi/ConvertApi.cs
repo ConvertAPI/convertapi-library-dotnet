@@ -82,7 +82,7 @@ namespace ConvertApiDotNet
             });
         }
 
-        public async Task<ConvertApiUser> GetUser()
+        public async Task<ConvertApiUser> GetUserAsync()
         {
             var url = new UriBuilder(ApiBaseUri)
             {
