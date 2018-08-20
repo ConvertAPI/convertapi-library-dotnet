@@ -21,7 +21,7 @@ namespace SplitAndMergePdf
             try
             {
                 //Get your secret at https://www.convertapi.com/a
-                var convertApi = new ConvertApi("wBcm6PoqjxZ7vtDQ");
+                var convertApi = new ConvertApi("your api secret");
                 const string sourceFile = @"..\..\..\TestFiles\test.pdf";
 
                 var destinationFileName = Path.Combine(Path.GetTempPath(), $"test-merged-{Guid.NewGuid()}.pdf");
