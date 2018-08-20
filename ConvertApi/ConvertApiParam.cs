@@ -62,14 +62,18 @@ namespace ConvertApiDotNet
         }
     }
 
-    public class ConvertApiFileParam: ConvertApiParam
+    public class ConvertApiFileParam : ConvertApiParam
     {
         public ConvertApiFileParam(Uri url) : base("File", url.ToString())
         {
-         
+
         }
 
         public ConvertApiFileParam(string path) : base("File", File.OpenRead(path))
+        {
+        }
+
+        public ConvertApiFileParam(Stream fileStream, string fileName) : base("File", fileStream, fileName)
         {
         }
 

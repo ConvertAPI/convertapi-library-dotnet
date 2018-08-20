@@ -1,4 +1,6 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
+using System.Text;
 using ConvertApiDotNet;
 
 namespace FromStreamToStream
@@ -15,17 +17,17 @@ namespace FromStreamToStream
             var convertApi = new ConvertApi("your api secret");
             const string sourceFile = @"..\..\..\TestFiles\test.docx";
 
-            var data = File.ReadAllBytes(sourceFile);
-            var stream = new MemoryStream(data);
+            var stream = new MemoryStream(File.ReadAllBytes(sourceFile));
 
-            var fileParam = new ConvertApiParam("File", stream, "test.docx");
-
-            var convertToPdf = convertApi.ConvertAsync("docx", "pdf", new[]
-            {
-                fileParam
-            });
+            var convertToPdf = convertApi.ConvertAsync("docx", "pdf", 
+                new ConvertApiFileParam(stream, "test.docx")
+                );
 
             var outputStream = convertToPdf.Result.FileStream();
+            
+            Console.Write(new StreamReader(outputStream).ReadToEnd());
+            Console.WriteLine("End of file stream.");
+            Console.ReadLine();
         }
     }
 }

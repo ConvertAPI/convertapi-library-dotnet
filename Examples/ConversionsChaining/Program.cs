@@ -13,15 +13,16 @@ namespace ConversionsChaining
         /// </summary>
         static void Main(string[] args)
         {
-            //Get your secret at https://www.convertapi.com/a
+            //Get your secret at https://www.convertapi.com/a            
             var convertApi = new ConvertApi("your api secret");
+
             Console.WriteLine("Converting PDF to JPG and compressing result files with ZIP");
             var fileName = Path.Combine(Path.GetTempPath(), "test.pdf");
 
-            var firstTask = convertApi.ConvertAsync("pdf", "jpg", new[] { new ConvertApiParam("File", File.OpenRead(fileName)) });
+            var firstTask = convertApi.ConvertAsync("pdf", "jpg", new ConvertApiFileParam(fileName));
             Console.WriteLine($"Conversions done. Cost: {firstTask.Result.ConversionCost}. Total files created: {firstTask.Result.FileCount()}");            
 
-            var secondsTask = convertApi.ConvertAsync("jpg", "zip", new[] { new ConvertApiParam("Files", firstTask.Result) });
+            var secondsTask = convertApi.ConvertAsync("jpg", "zip", new ConvertApiFileParam(firstTask.Result));
             var saveFiles = secondsTask.Result.SaveFiles(Path.GetTempPath());
 
             Console.WriteLine($"Conversions done. Cost: {secondsTask.Result.ConversionCost}. Total files created: {secondsTask.Result.FileCount()}");
