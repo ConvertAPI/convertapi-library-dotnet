@@ -26,18 +26,14 @@ namespace SplitAndMergePdf
 
                 var destinationFileName = Path.Combine(Path.GetTempPath(), "test-merged.pdf");
 
-                var splitTask = convertApi.ConvertAsync("pdf", "split", new[]
-                {
-                new ConvertApiParam("File", File.OpenRead(sourceFile))
-                });
+                var splitTask = convertApi.ConvertAsync("pdf", "split", 
+                    new ConvertApiFileParam(sourceFile));
 
                 var processedFiles = splitTask.Result;
 
-                var mergeTask = convertApi.ConvertAsync("pdf", "merge", new[]
-                {
-                new ConvertApiParam("Files[0]", processedFiles.Files.First().Url.ToString()),
-                new ConvertApiParam("Files[1]", processedFiles.Files.Last().Url.ToString())
-            });
+                var mergeTask = convertApi.ConvertAsync("pdf", "merge", 
+                    new ConvertApiFileParam(processedFiles.Files.First()), 
+                    new ConvertApiFileParam(processedFiles.Files.Last()));
 
                 var saveFiles = mergeTask.Result.SaveFile(destinationFileName);
 
