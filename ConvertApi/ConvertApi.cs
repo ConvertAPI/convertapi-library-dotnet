@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
@@ -28,7 +29,12 @@ namespace ConvertApiDotNet
             _requestTimeoutInSeconds = requestTimeoutInSeconds.ToString();
         }
 
-        public async Task<ConvertApiResponse> ConvertAsync(string fromFormat, string toFormat, ConvertApiParam[] parameters)
+        public async Task<ConvertApiResponse> ConvertAsync(string fromFormat, string toFormat, params ConvertApiParam[] parameters)
+        {
+            return await ConvertAsync(fromFormat, toFormat, (IEnumerable<ConvertApiParam>)parameters);
+        }
+
+        public async Task<ConvertApiResponse> ConvertAsync(string fromFormat, string toFormat, IEnumerable<ConvertApiParam> parameters)
         {
             var url = new UriBuilder(ApiBaseUri)
             {
@@ -42,23 +48,29 @@ namespace ConvertApiDotNet
                 {new StringContent(_requestTimeoutInSeconds), "TimeOut"}
             };
 
+            var ignoredParameters = new[] { "StoreFile", "Async", "JobId", "TimeOut" };
+
+            var filesArray = new List<string>();
+
             foreach (var parameter in parameters)
             {
-                var ignoredParameters = new[] { "StoreFile", "Async", "JobId", "TimeOut" };
                 if (ignoredParameters.Contains(parameter.Name, StringComparer.OrdinalIgnoreCase)) continue;
-                var values = parameter.GetValues();
-                if (values.Length == 1)
+
+                if (parameter.Name.ToLower() == "files" || parameter.GetValues().Length > 1)
                 {
-                    content.Add(new StringContent(parameter.GetValues().First()), parameter.Name);
+                    filesArray.AddRange(parameter.GetValues());
                 }
                 else
                 {
-                    var index = 0;
-                    foreach (var value in values)
-                    {
-                        content.Add(new StringContent(value), $"{parameter.Name}[{index++}]");
-                    }
+                    content.Add(new StringContent(parameter.GetValues().First()), parameter.Name);
                 }
+            }
+
+            for (var index = 0; index < filesArray.Count; index++)
+            {
+                var file = filesArray[index];
+                var parameterName = $"Files[{index}]" ;
+                content.Add(new StringContent(file), parameterName);
             }
 
             return await HttpClient.PostAsync(url.Uri, content).ContinueWith(t =>
@@ -70,7 +82,7 @@ namespace ConvertApiDotNet
             });
         }
 
-        public async Task<ConvertApiUser> GetUser()
+        public async Task<ConvertApiUser> GetUserAsync()
         {
             var url = new UriBuilder(ApiBaseUri)
             {

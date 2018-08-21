@@ -27,6 +27,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConvertRemoteFile", "Exampl
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FromStreamToStream", "Examples\FromStreamToStream\FromStreamToStream.csproj", "{A9B0D497-779E-49AA-BB68-ADC39F5FD978}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SplitAndMergePdf", "Examples\SplitAndMergePdf\SplitAndMergePdf.csproj", "{6C29C8F5-13B4-44C8-9196-3D6E0E7B8515}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -65,6 +67,10 @@ Global
 		{A9B0D497-779E-49AA-BB68-ADC39F5FD978}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A9B0D497-779E-49AA-BB68-ADC39F5FD978}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A9B0D497-779E-49AA-BB68-ADC39F5FD978}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6C29C8F5-13B4-44C8-9196-3D6E0E7B8515}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6C29C8F5-13B4-44C8-9196-3D6E0E7B8515}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6C29C8F5-13B4-44C8-9196-3D6E0E7B8515}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6C29C8F5-13B4-44C8-9196-3D6E0E7B8515}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -78,6 +84,7 @@ Global
 		{77050432-7EF2-431C-90E7-8EE01DF9BC20} = {139F9822-4A90-475F-BAA5-F0471A85461B}
 		{E6F16DC2-35B7-4F52-B66A-029F1D69A8D7} = {139F9822-4A90-475F-BAA5-F0471A85461B}
 		{A9B0D497-779E-49AA-BB68-ADC39F5FD978} = {139F9822-4A90-475F-BAA5-F0471A85461B}
+		{6C29C8F5-13B4-44C8-9196-3D6E0E7B8515} = {139F9822-4A90-475F-BAA5-F0471A85461B}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {337A0F6F-40A9-4993-BF66-05E4E374871F}

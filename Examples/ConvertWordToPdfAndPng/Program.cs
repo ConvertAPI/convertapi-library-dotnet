@@ -7,7 +7,7 @@ namespace ConvertWordToPdfAndPng
     class Program
     {
         /// <summary>
-        /// Example of saving Word docx to PDF and to PNG
+        /// Example of saving the same Word docx to PDF and to PNG without uploading the same Word file two times.
         /// https://www.convertapi.com/docx-to-pdf
         /// https://www.convertapi.com/docx-to-png
         /// </summary>
@@ -17,23 +17,16 @@ namespace ConvertWordToPdfAndPng
             var convertApi = new ConvertApi("your api secret");
             const string sourceFile = @"..\..\..\TestFiles\test.docx";
 
-            var fileParam = new ConvertApiParam("File", File.OpenRead(sourceFile));
+            var fileParam = new ConvertApiFileParam(sourceFile);
 
-            var convertToPdf = convertApi.ConvertAsync("docx", "pdf", new[]
-            {
-                fileParam
-            });
+            var convertToPdf = convertApi.ConvertAsync("docx", "pdf", fileParam);
 
             var outputFileName = convertToPdf.Result.Files[0];
             var fileInfo = outputFileName.AsFileAsync(Path.Combine(Path.GetTempPath(), outputFileName.FileName)).Result;
 
-            Console.WriteLine("The PDF saved to " + fileInfo);
-            
-            var convertToPng = convertApi.ConvertAsync("docx", "png", new[]
-            {
-                //Reuse the same uploaded file parameter
-                fileParam
-            });
+            Console.WriteLine("The PDF saved to " + fileInfo);            
+
+            var convertToPng = convertApi.ConvertAsync("docx", "png", fileParam);
 
             foreach (var processedFile in convertToPng.Result.Files)
             {

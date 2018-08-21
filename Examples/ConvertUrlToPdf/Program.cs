@@ -17,12 +17,13 @@ namespace ConvertUrlToPdf
             try
             {
                 //Get your secret at https://www.convertapi.com/a
-                var convertApi = new ConvertApi("your api secret", 180);
-                var saveFiles = convertApi.ConvertAsync("web", "pdf", new[]
-                {
-                new ConvertApiParam("Url", "https://en.wikipedia.org/wiki/Data_conversion"),
-                new ConvertApiParam("FileName", "web-example")
-                }).Result.SaveFiles(Path.GetTempPath());
+                var convertApi = new ConvertApi("your api secret");
+
+                var saveFiles = convertApi.ConvertAsync("web", "pdf", 
+                    new ConvertApiParam("Url", "https://en.wikipedia.org/wiki/Data_conversion"), 
+                    new ConvertApiParam("FileName", "web-example"))
+                    .Result.SaveFiles(Path.GetTempPath());
+
                 Console.WriteLine("The web page PDF saved to " + saveFiles.First());
             }
             //Catch exceptions from asynchronous methods

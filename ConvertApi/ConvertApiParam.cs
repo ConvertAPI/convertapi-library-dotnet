@@ -54,11 +54,67 @@ namespace ConvertApiDotNet
 
         public ConvertApiParam(string name, FileStream value) : this(name, value, value.Name) { }
 
-        public ConvertApiParam(string name, ConvertApiResponse convertApiResponse) : this(name, convertApiResponse.Files.Select(s => s.Url.ToString()).ToArray()) { }
+        public ConvertApiParam(string name, ConvertApiResponse response) : this(name, response.Files.Select(s => s.Url.ToString()).ToArray()) { }
 
         public string[] GetValues()
         {
             return _tasks.Count == 0 ? _values : _tasks.Select(t => t.Result).ToArray();
+        }
+    }
+
+    public class ConvertApiFileParam : ConvertApiParam
+    {
+        public ConvertApiFileParam(Uri url) : base("File", url.ToString())
+        {
+
+        }
+
+        public ConvertApiFileParam(string path) : base("File", File.OpenRead(path))
+        {
+        }
+
+        public ConvertApiFileParam(FileInfo file) : base("File", file.OpenRead())
+        {
+        }
+
+        public ConvertApiFileParam(Stream fileStream, string fileName) : base("File", fileStream, fileName)
+        {
+        }
+
+        public ConvertApiFileParam(ConvertApiResponse response) : this(response.Files.First())
+        {
+        }
+
+        public ConvertApiFileParam(ProcessedFile processedFile) : this(processedFile.Url)
+        {
+        }
+    }
+
+    public class ConvertApiFilesParam : ConvertApiParam
+    {
+        public ConvertApiFilesParam(Uri url) : base("Files", url.ToString())
+        {
+
+        }
+
+        public ConvertApiFilesParam(string path) : base("Files", File.OpenRead(path))
+        {
+        }
+
+        public ConvertApiFilesParam(FileInfo file) : base("Files", file.OpenRead())
+        {
+        }
+
+        public ConvertApiFilesParam(Stream fileStream, string fileName) : base("Files", fileStream, fileName)
+        {
+        }
+
+        public ConvertApiFilesParam(ConvertApiResponse response) : base("Files", response)
+        {
+        }
+
+        public ConvertApiFilesParam(ProcessedFile processedFile) : this(processedFile.Url)
+        {
         }
     }
 }
