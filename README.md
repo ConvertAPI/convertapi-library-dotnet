@@ -81,7 +81,7 @@ ConvertApiResponse result = convertApi.ConvertAsync("pdf", "jpg", new[]
 You can always check remaining seconds amount by fetching [user information](https://www.convertapi.com/doc/user).
 
 ```csharp
-ConvertApiUser user = convert.GetUser().Result;
+ConvertApiUser user = convert.GetUserAsync().Result;
 int secondsLeft = user.SecondsLeft;
 ```
 
