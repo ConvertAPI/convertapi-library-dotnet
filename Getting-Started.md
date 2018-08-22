@@ -17,7 +17,7 @@ const string sourceFile = @"c:\test.docx";
 var convertApi = new ConvertApi("your api secret");
 
 //Set input and output formats and pass file parameter. 
-//Word to PDF API used https://www.convertapi.com/docx-to-pdf
+//Word to PDF API. Read more https://www.convertapi.com/docx-to-pdf
 var convertToPdf = convertApi.ConvertAsync("docx", "pdf", new ConvertApiFileParam(sourceFile));
 //Save PDF file 
 convertToPdf.Result.SaveFiles(@"c:\output");
@@ -36,7 +36,7 @@ var sourceFile = new Uri("https://github.com/Baltsoft/CDN/raw/master/cara/testfi
 var convertApi = new ConvertApi("your api secret");
 
 //Set input and output formats and pass file parameter. 
-//PowerPoint to PNG API used https://www.convertapi.com/pptx-to-png
+//PowerPoint to PNG API. Read more https://www.convertapi.com/pptx-to-png
 var createThumbnails = convertApi.ConvertAsync("pptx", "png", 
 new ConvertApiFileParam(sourceFile)
 new ConvertApiParam("ScaleImage", "true"),
