@@ -135,12 +135,22 @@ namespace ConvertApiDotNet
 
         public static Stream FileStream(this ConvertApiResponse response)
         {
-            return response.Files[0].AsFileStreamAsync().Result;
+            return response.Files[0].FileStream();
         }
 
         public static FileInfo SaveFile(this ConvertApiResponse response, string fileName)
         {
-            return response.Files[0].AsFileAsync(fileName).Result;
+            return response.Files[0].SaveFile(fileName);
+        }
+
+        public static Stream FileStream(this ProcessedFile processedFile)
+        {
+            return processedFile.AsFileStreamAsync().Result;
+        }
+
+        public static FileInfo SaveFile(this ProcessedFile processedFile, string fileName)
+        {
+            return processedFile.AsFileAsync(fileName).Result;
         }
 
         #endregion
