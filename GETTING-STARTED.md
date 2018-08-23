@@ -14,7 +14,7 @@ using ConvertApiDotNet;
 const string sourceFile = @"c:\test.docx";
 
 //Get your secret at https://www.convertapi.com/a
-var convertApi = new ConvertApi("your api secret");
+var convertApi = new ConvertApi("your-api-secret");
 
 //Set input and output formats and pass file parameter. 
 //Word to PDF API. Read more https://www.convertapi.com/docx-to-pdf
@@ -33,7 +33,7 @@ using ConvertApiDotNet;
 var sourceFile = new Uri("https://github.com/Baltsoft/CDN/raw/master/cara/testfiles/presentation2.pptx");
 
 //Get your secret at https://www.convertapi.com/a
-var convertApi = new ConvertApi("your api secret");
+var convertApi = new ConvertApi("your-api-secret");
 
 //Set input and output formats and pass file parameter. 
 //PowerPoint to PNG API. Read more https://www.convertapi.com/pptx-to-png
@@ -58,7 +58,7 @@ using ConvertApiDotNet;
 const string htmlString = "<!DOCTYPE html><html><body><h1>My First Heading</h1><p>My first paragraph.</p></body></html>";
 
 //Get your secret at https://www.convertapi.com/a
-var convertApi = new ConvertApi("your api secret");
+var convertApi = new ConvertApi("your-api-secret");
 
 //Pass as stream
 var stream = new MemoryStream(Encoding.UTF8.GetBytes(htmlString));
