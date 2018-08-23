@@ -71,5 +71,25 @@ var convertToPdf = convertApi.ConvertAsync("html", "pdf",
 //PDF as stream
 var outputStream = convertToPdf.Result.FileStream();
 ```
-#### 3. Supported conversions and actions
+#### 3. Read account status
 
+```csharp
+//Import
+using ConvertApiDotNet;
+
+//Convert Word document
+const string sourceFile = @"c:\test.docx";
+
+//Get your secret at https://www.convertapi.com/a
+var convertApi = new ConvertApi("your-api-secret");
+
+//Read full account data
+var user = convertApi.GetUserAsync().Result;
+
+//Find out how much seconds left
+var secondsLeft = user.SecondsLeft;
+```
+
+#### 4. Supported file formats, conversions and actions
+
+https://www.convertapi.com/doc/supported-formats
