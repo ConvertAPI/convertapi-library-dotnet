@@ -15,16 +15,16 @@ namespace FromStreamToStream
         {
             //Get your secret at https://www.convertapi.com/a
             var convertApi = new ConvertApi("your api secret");
-            const string sourceFile = @"..\..\..\TestFiles\test.docx";
+            const string htmlString = "<!DOCTYPE html><html><body><h1>My First Heading</h1><p>My first paragraph.</p></body></html>";
 
-            var stream = new MemoryStream(File.ReadAllBytes(sourceFile));
+            var stream = new MemoryStream(Encoding.UTF8.GetBytes(htmlString));
 
-            var convertToPdf = convertApi.ConvertAsync("docx", "pdf", 
-                new ConvertApiFileParam(stream, "test.docx")
+            var convertToPdf = convertApi.ConvertAsync("html", "pdf",
+                new ConvertApiFileParam(stream, "test.html")
                 );
 
             var outputStream = convertToPdf.Result.FileStream();
-            
+
             Console.Write(new StreamReader(outputStream).ReadToEnd());
             Console.WriteLine("End of file stream.");
             Console.ReadLine();
