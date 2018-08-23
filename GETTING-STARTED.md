@@ -71,6 +71,34 @@ var convertToPdf = convertApi.ConvertAsync("html", "pdf",
 //PDF as stream
 var outputStream = convertToPdf.Result.FileStream();
 ```
+
+#### 2.d. Conversions chaining
+
+```csharp
+//Import
+using ConvertApiDotNet;
+
+//Split PDF document and merge first and last pages to new PDF
+const string sourceFile = @"c:\test.pdf";
+
+//Get your secret at https://www.convertapi.com/a
+var convertApi = new ConvertApi("your-api-secret");
+
+//Set input and output formats and pass file parameter. 
+//Split PDF API. Read more https://www.convertapi.com/pdf-to-split
+var splitTask = convertApi.ConvertAsync("pdf", "split",
+    new ConvertApiFileParam(sourceFile));
+
+//Get result of the first chain and move it to Merge conversion. 
+//Chains are executed on server without moving files.
+//Merge PDF API. Read more https://www.convertapi.com/pdf-to-merge
+var mergeTask = convertApi.ConvertAsync("pdf", "merge", 
+    new ConvertApiFilesParam(splitTask.Result.Files.First()), 
+    new ConvertApiFilesParam(splitTask.Result.Files.Last()));
+
+var saveFiles = mergeTask.Result.SaveFile("c:\merged-pdf.pdf");
+```
+
 #### 3. Read account status
 
 ```csharp
