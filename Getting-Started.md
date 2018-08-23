@@ -71,3 +71,5 @@ var convertToPdf = convertApi.ConvertAsync("html", "pdf",
 //PDF as stream
 var outputStream = convertToPdf.Result.FileStream();
 ```
+#### 3. Supported conversions and actions
+
