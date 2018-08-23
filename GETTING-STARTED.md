@@ -92,6 +92,37 @@ var secondsLeft = user.SecondsLeft;
 
 #### 4. Exception handling
 
+```csharp
+//Import
+using ConvertApiDotNet;
+using ConvertApiDotNet.Exceptions;
+
+//Convert PDF document
+const string sourceFile = @"c:\test.pdf";
+
+//Get your secret at https://www.convertapi.com/a
+var convertApi = new ConvertApi("your-api-secret");
+
+try
+{
+    //PDF to Powerpoint API. Read more https://www.convertapi.com/pdf-to-pptx
+    //Set incorect value for parameter AutoRotate and get exception
+    var convertToPdf = convertApi.ConvertAsync("pdf", "pptx", 
+        new ConvertApiFileParam(sourceFile),
+        new ConvertApiParam("AutoRotate","WrongParameter")
+        );
+     var outputFileName = convertToPdf.Result.Files[0];
+}
+//Catch exceptions from asynchronous methods
+catch (AggregateException e)
+{                                
+    //Read exception status code
+    Console.WriteLine("Status Code: " + (e.InnerException as ConvertApiException)?.StatusCode);
+    //Read exception detailed description
+    Console.WriteLine("Response: " + (e.InnerException as ConvertApiException)?.Response);
+}
+```
+
 #### 5. Supported file formats, conversions and actions
 
 https://www.convertapi.com/doc/supported-formats
