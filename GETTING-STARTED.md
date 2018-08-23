@@ -90,6 +90,15 @@ var user = convertApi.GetUserAsync().Result;
 var secondsLeft = user.SecondsLeft;
 ```
 
-#### 4. Supported file formats, conversions and actions
+#### 4. Exception handling
+
+#### 5. Supported file formats, conversions and actions
 
 https://www.convertapi.com/doc/supported-formats
+
+#### 6. Rest API documentation
+
+#### 7. GitHub 
+
+https://github.com/ConvertAPI/convertapi-dotnet
+
