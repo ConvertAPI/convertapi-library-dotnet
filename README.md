@@ -20,7 +20,7 @@ Install-Package ConvertApi
 You can get your secret at https://www.convertapi.com/a
 
 ```csharp
-ConvertApi convertApi = new ConvertApi("your api secret");
+ConvertApi convertApi = new ConvertApi("your-api-secret");
 ```
 
 ### File conversion
@@ -97,7 +97,7 @@ ConvertAPI is designed to make converting file super easy, the following snippet
 try
 {
   
-  var convertApi = new ConvertApi("your api secret");
+  var convertApi = new ConvertApi("your-api-secret");
   
   var fileToConvert = @"c:\test.docx";
   var conversionTask = convertApi.ConvertAsync("docx", "pdf", new[]
