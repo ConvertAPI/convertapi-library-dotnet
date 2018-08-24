@@ -12,11 +12,16 @@ namespace ConvertApiDotNet
     {
         #region Convert method extensions
 
-        private static Task<ConvertApiResponse> BindConvertApi(ConvertApi convertApi, string fromFile, string outputExtension)
+        private static Task<ConvertApiResponse> BindFile(ConvertApi convertApi, string fromFile, string outputExtension)
         {
             var fromExt = Path.GetExtension(fromFile).Replace(".", "");
-            var task = convertApi.ConvertAsync(fromExt, outputExtension, new[] { new ConvertApiParam("File", File.OpenRead(fromFile)) });
+            var task = convertApi.ConvertAsync(fromExt, outputExtension, new ConvertApiFileParam(fromFile));
             return task;
+        }
+
+        private static Task<ConvertApiResponse> BindUrl(ConvertApi convertApi, string url, string outputExtension)
+        {
+            return convertApi.ConvertAsync("url", outputExtension, new ConvertApiParam("url", url));
         }
 
         private static ConvertApiResponse TaskResult(Task<ConvertApiResponse> task)
@@ -36,17 +41,23 @@ namespace ConvertApiDotNet
             }
         }
 
-        public static void Convert(this ConvertApi convertApi, string fromFile, string toFile)
+        public static FileInfo ConvertFile(this ConvertApi convertApi, string fromFile, string toFile)
         {
             var toExt = Path.GetExtension(toFile).Replace(".", "");
-            var task = BindConvertApi(convertApi, fromFile, toExt);
-            TaskResult(task).AsFileAsync(0, toFile).Wait();
+            var task = BindFile(convertApi, fromFile, toExt);
+            return TaskResult(task).SaveFile(toFile);
         }
 
-        public static void Convert(this ConvertApi convertApi, string fromFile, string outputExtension, string outputDirectory)
+        public static IEnumerable<FileInfo> ConvertFile(this ConvertApi convertApi, string fromFile, string outputExtension, string outputDirectory)
         {
-            var task = BindConvertApi(convertApi, fromFile, outputExtension);
-            TaskResult(task).SaveFiles(outputDirectory);
+            var task = BindFile(convertApi, fromFile, outputExtension);
+            return TaskResult(task).SaveFiles(outputDirectory);
+        }
+
+        public static FileInfo ConvertUrl(this ConvertApi convertApi, string url, string toFile)
+        {
+            var task = BindUrl(convertApi, url, Path.GetExtension(toFile).Replace(".", ""));
+            return TaskResult(task).SaveFile(toFile);
         }
 
         #endregion
