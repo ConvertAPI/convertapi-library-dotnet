@@ -4,7 +4,22 @@
 PM> Install-Package ConvertApi
 ```
 
-#### 2.a. Convert local file
+#### 2.a. Simple conversion methods
+
+```csharp
+//Import
+using ConvertApiDotNet.Exceptions;
+
+//Get your secret at https://www.convertapi.com/a
+var convertApi = new ConvertApi("your-api-secret");
+
+//Excel to PDF API. Read more https://www.convertapi.com/xlsx-to-pdf
+var pdfFile = convertApi.ConvertFile(@"c:\test.xlsx", @"c:\sheet.pdf"));
+
+Console.WriteLine("PDF created at " + pdfFile.FullName);
+```
+
+#### 2.b. Convert local file
 
 ```csharp
 //Import
@@ -23,7 +38,7 @@ var convertToPdf = convertApi.ConvertAsync("docx", "pdf", new ConvertApiFilePara
 convertToPdf.Result.SaveFiles(@"c:\output");
 ```
 
-#### 2.b. Convert remote file and set additional parameters
+#### 2.c. Convert remote file and set additional parameters
 
 ```csharp
 //Import
@@ -48,7 +63,7 @@ var createThumbnails = convertApi.ConvertAsync("pptx", "png",
 createThumbnails.Result.SaveFiles(@"c:\output");
 ```
 
-#### 2.c. Convert from a stream
+#### 2.d. Convert from a stream
 
 ```csharp
 //Import
@@ -72,7 +87,7 @@ var convertToPdf = convertApi.ConvertAsync("html", "pdf",
 var outputStream = convertToPdf.Result.FileStream();
 ```
 
-#### 2.d. Conversions chaining
+#### 2.e. Conversions chaining
 
 ```csharp
 //Import
