@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using ConvertApiDotNet.Constants;
 using ConvertApiDotNet.Exceptions;
 using ConvertApiDotNet.Model;
+using Newtonsoft.Json;
 
 namespace ConvertApiDotNet
 {
@@ -25,17 +26,40 @@ namespace ConvertApiDotNet
             _values = values;
         }
 
+        public ConvertApiParam(string name)
+        {
+            Name = name;
+            _values = new string[0];
+        }
+
         public ConvertApiParam(string name, string value) : this(name, new[] { value }) { }
 
         public ConvertApiParam(string name, int value) : this(name, value.ToString()) { }
 
         public ConvertApiParam(string name, decimal value) : this(name, value.ToString(CultureInfo.InvariantCulture)) { }
 
-        public ConvertApiParam(string name, Stream value, string fileName) : this(name, new string[0])
+        public ConvertApiParam(string name, Uri remoteFileUrl) : this(name)
         {
             var client = new ConvertApiBase(ConvertApiConstants.UploadTimeoutInSeconds).HttpClient;
-            client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("text/plain"));
-            var content = new StreamContent(value);
+            client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));                        
+            var task = client.PostAsync(new Uri($"{ConvertApi.ApiBaseUri}/upload-from-url?url={remoteFileUrl}"), null)
+                .ContinueWith(uploadTask =>
+                {
+                    var responseMessage = uploadTask.Result;
+                    if (responseMessage.StatusCode != HttpStatusCode.OK)
+                    {
+                        throw new ConvertApiException("Unable to upload file.", responseMessage);
+                    }
+                    return uploadTask.Result.Content.ReadAsStringAsync().Result;
+                });
+            _tasks.Add(task);
+        }
+
+        public ConvertApiParam(string name, Stream fileStream, string fileName) : this(name)
+        {
+            var client = new ConvertApiBase(ConvertApiConstants.UploadTimeoutInSeconds).HttpClient;
+            client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+            var content = new StreamContent(fileStream);
             content.Headers.ContentType = new MediaTypeHeaderValue("application/octet-stream");
             content.Headers.Add("Content-Disposition", $"attachment; filename=\"{Path.GetFileName(fileName)}\"");
 
@@ -47,7 +71,7 @@ namespace ConvertApiDotNet
                    {
                        throw new ConvertApiException("Unable to upload file.", responseMessage);
                    }
-                   return uploadTask.Result.Content.ReadAsStringAsync().Result;
+                   return JsonConvert.DeserializeObject<ConvertApiUpload>(uploadTask.Result.Content.ReadAsStringAsync().Result).FileId;
                });
             _tasks.Add(task);
         }
@@ -64,7 +88,7 @@ namespace ConvertApiDotNet
 
     public class ConvertApiFileParam : ConvertApiParam
     {
-        public ConvertApiFileParam(Uri url) : base("File", url.ToString())
+        public ConvertApiFileParam(Uri url) : base("File", url)
         {
 
         }

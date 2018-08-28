@@ -2,21 +2,27 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net;
+using System.Net.Http;
 using System.Threading.Tasks;
 using ConvertApiDotNet.Constants;
 using ConvertApiDotNet.Model;
 
 namespace ConvertApiDotNet
-{
+{    
+
     public static class ConvertApiExtension
     {
         #region Convert method extensions
 
         private static Task<ConvertApiResponse> BindFile(ConvertApi convertApi, string fromFile, string outputExtension)
         {
-            var fromExt = Path.GetExtension(fromFile).Replace(".", "");
-            var task = convertApi.ConvertAsync(fromExt, outputExtension, new ConvertApiFileParam(fromFile));
-            return task;
+            return convertApi.ConvertAsync(Path.GetExtension(fromFile).Replace(".", ""), outputExtension, new ConvertApiFileParam(fromFile));
+        }
+
+        private static Task<ConvertApiResponse> BindFile(ConvertApi convertApi, Uri fileUrl, string outputExtension)
+        {            
+            return convertApi.ConvertAsync("*", outputExtension, new ConvertApiFileParam(fileUrl));
         }
 
         private static Task<ConvertApiResponse> BindUrl(ConvertApi convertApi, string url, string outputExtension)
@@ -43,8 +49,13 @@ namespace ConvertApiDotNet
 
         public static FileInfo ConvertFile(this ConvertApi convertApi, string fromFile, string toFile)
         {
-            var toExt = Path.GetExtension(toFile).Replace(".", "");
-            var task = BindFile(convertApi, fromFile, toExt);
+            var task = BindFile(convertApi, fromFile, Path.GetExtension(toFile).Replace(".", ""));
+            return TaskResult(task).SaveFile(toFile);
+        }
+
+        public static FileInfo ConvertRemoteFile(this ConvertApi convertApi, string fileUrl, string toFile)
+        {
+            var task = BindFile(convertApi, new Uri(fileUrl), Path.GetExtension(toFile).Replace(".", ""));
             return TaskResult(task).SaveFile(toFile);
         }
 

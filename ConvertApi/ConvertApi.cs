@@ -22,7 +22,7 @@ namespace ConvertApiDotNet
         /// <param name="secret">Secret to authorize conversion can be found https://www.convertapi.com/a</param>
         /// <param name="requestTimeoutInSeconds">Conversion/request timeout</param>
         /// <param name="apiBaseUri">Default API base URL, in most cases used default</param>
-        public ConvertApi(string secret, int requestTimeoutInSeconds = 180, string apiBaseUri = "https://v2.convertapi.com") : base(requestTimeoutInSeconds)
+        public ConvertApi(string secret, int requestTimeoutInSeconds = 180, string apiBaseUri = "https://staging.v2.convertapi.com") : base(requestTimeoutInSeconds)
         {
             _secret = secret;
             ApiBaseUri = apiBaseUri;
@@ -35,13 +35,7 @@ namespace ConvertApiDotNet
         }
 
         public async Task<ConvertApiResponse> ConvertAsync(string fromFormat, string toFormat, IEnumerable<ConvertApiParam> parameters)
-        {
-            var url = new UriBuilder(ApiBaseUri)
-            {
-                Path = $"convert/{fromFormat}/to/{toFormat}",
-                Query = $"secret={_secret}"
-            };
-
+        {            
             var content = new MultipartFormDataContent
             {
                 {new StringContent("true"), "StoreFile"},
@@ -72,6 +66,12 @@ namespace ConvertApiDotNet
                 var parameterName = $"Files[{index}]" ;
                 content.Add(new StringContent(file), parameterName);
             }
+
+            var url = new UriBuilder(ApiBaseUri)
+            {
+                Path = $"convert/{fromFormat}/to/{toFormat}",
+                Query = $"secret={_secret}"
+            };
 
             return await HttpClient.PostAsync(url.Uri, content).ContinueWith(t =>
             {
