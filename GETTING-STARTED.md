@@ -13,10 +13,14 @@ using ConvertApiDotNet;
 //Get your secret at https://www.convertapi.com/a
 var convertApi = new ConvertApi("your-api-secret");
 
-//Excel to PDF API. Read more https://www.convertapi.com/xlsx-to-pdf
-var pdfFile = convertApi.ConvertFile(@"c:\test.xlsx", @"c:\sheet.pdf"));
+//Excel to PDF API https://www.convertapi.com/xlsx-to-pdf
+convertApi.ConvertFile(@"c:\test.xlsx", @"c:\sheet.pdf"));
 
-Console.WriteLine("PDF created at " + pdfFile.FullName);
+//Web to PDF API https://www.convertapi.com/web-to-pdf
+convertApi.ConvertUrl("https://www.google.com", @"c:\google.pdf"));
+
+//Remote Word to PDF API https://www.convertapi.com/docx-to-pdf
+convertApi.ConvertRemoteFile("https://cdn.convertapi.com/cara/testfiles/document.docx", @"c:\document.pdf"));
 ```
 
 #### 2.b. Convert local file
