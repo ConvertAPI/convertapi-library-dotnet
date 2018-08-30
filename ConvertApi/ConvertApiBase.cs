@@ -6,7 +6,7 @@ namespace ConvertApiDotNet
 {
     public class ConvertApiBase
     {
-        public HttpClient HttpClient;
+        internal HttpClient HttpClient;
 
         public ConvertApiBase(int requestTimeoutInSeconds)
         {
