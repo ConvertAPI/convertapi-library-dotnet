@@ -20,7 +20,7 @@ Install-Package ConvertApi
 You can get your secret at https://www.convertapi.com/a
 
 ```csharp
-ConvertApi convertApi = new ConvertApi("your api secret");
+ConvertApi convertApi = new ConvertApi("your-api-secret");
 ```
 
 ### File conversion
@@ -81,7 +81,7 @@ ConvertApiResponse result = convertApi.ConvertAsync("pdf", "jpg", new[]
 You can always check remaining seconds amount by fetching [user information](https://www.convertapi.com/doc/user).
 
 ```csharp
-ConvertApiUser user = convert.GetUser().Result;
+ConvertApiUser user = convert.GetUserAsync().Result;
 int secondsLeft = user.SecondsLeft;
 ```
 
@@ -97,7 +97,7 @@ ConvertAPI is designed to make converting file super easy, the following snippet
 try
 {
   
-  var convertApi = new ConvertApi("your api secret");
+  var convertApi = new ConvertApi("your-api-secret");
   
   var fileToConvert = @"c:\test.docx";
   var conversionTask = convertApi.ConvertAsync("docx", "pdf", new[]
@@ -122,7 +122,7 @@ try
    }
 ```
 
-This is the bare-minimum to convert a file using the ConvertAPI client, but you can do a great deal more with the ConvertAPI .NET library. Take special note that you should replace `your api secret` with the secret you obtained in item two of the pre-requisites.
+This is the bare-minimum to convert a file using the ConvertAPI client, but you can do a great deal more with the ConvertAPI .NET library. Take special note that you should replace `your-api-secret` with the secret you obtained in item two of the pre-requisites.
 
 ### Issues &amp; Comments
 Please leave all comments, bugs, requests, and issues on the Issues page. We'll respond to your request ASAP!
