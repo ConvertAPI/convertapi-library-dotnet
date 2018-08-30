@@ -133,7 +133,7 @@ var user = convertApi.GetUserAsync().Result;
 var secondsLeft = user.SecondsLeft;
 ```
 
-#### 4. Exception handling
+#### 4. Exception handling (asynchronous)
 
 ```csharp
 //Import
