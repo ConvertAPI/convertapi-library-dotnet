@@ -112,8 +112,8 @@ var splitTask = convertApi.ConvertAsync("pdf", "split",
 //Chains are executed on server without moving files.
 //Merge PDF API. Read more https://www.convertapi.com/pdf-to-merge
 var mergeTask = convertApi.ConvertAsync("pdf", "merge", 
-    new ConvertApiFilesParam(splitTask.Result.Files.First()), 
-    new ConvertApiFilesParam(splitTask.Result.Files.Last()));
+    new ConvertApiFileParam(splitTask.Result.Files.First()), 
+    new ConvertApiFileParam(splitTask.Result.Files.Last()));
 
 var saveFiles = mergeTask.Result.SaveFile("c:\merged-pdf.pdf");
 ```
