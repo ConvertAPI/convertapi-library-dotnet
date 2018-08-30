@@ -22,7 +22,7 @@ namespace ConvertApiDotNet
         /// <param name="secret">Secret to authorize conversion can be found https://www.convertapi.com/a</param>
         /// <param name="requestTimeoutInSeconds">Conversion/request timeout</param>
         /// <param name="apiBaseUri">Default API base URL, in most cases used default</param>
-        public ConvertApi(string secret, int requestTimeoutInSeconds = 180, string apiBaseUri = "https://staging.v2.convertapi.com") : base(requestTimeoutInSeconds)
+        public ConvertApi(string secret, int requestTimeoutInSeconds = 180, string apiBaseUri = "https://v2.convertapi.com") : base(requestTimeoutInSeconds)
         {
             _secret = secret;
             ApiBaseUri = apiBaseUri;
@@ -82,33 +82,6 @@ namespace ConvertApiDotNet
                     _dictionary[keyToAdd].Add(value);
                 }
             }
-
-            /*public Dictionary<string, object> Get()
-            {
-                return _dictionary;
-            }
-
-            //Check for duplicate string and add S at the end of parameter
-            public void Add(string key, object value)
-            {
-                var index = 0;
-                var added = false;
-                var keyToAdd = key.ToLower();
-
-                while (!added)
-                {
-                    if (!_dictionary.ContainsKey(keyToAdd))
-                    {
-                        _dictionary.Add(keyToAdd, value);
-                        added = true;
-                    }
-                    else
-                    {
-                        index++;
-                        keyToAdd = key.ToLower() + "[" + index + "]";
-                    }
-                }
-            }*/
         }
 
         public async Task<ConvertApiResponse> ConvertAsync(string fromFormat, string toFormat, IEnumerable<ConvertApiBaseParam> parameters)
@@ -138,8 +111,7 @@ namespace ConvertApiDotNet
                 else
                 if (parameter is ConvertApiFileParam)
                 {
-                    var convertApiFileParam = (parameter as ConvertApiFileParam);
-                    var convertApiUpload = convertApiFileParam.GetValue();
+                    var convertApiUpload = (parameter as ConvertApiFileParam).GetValue();
                     if (convertApiUpload != null)
                     {
                         dicList.Add(parameter.Name, convertApiUpload);
@@ -164,7 +136,15 @@ namespace ConvertApiDotNet
                         break;
                     case ConvertApiUpload upload:
                         content.Add(new StringContent(upload.FileId), s.Key);
+
+                        //Set FROM format if it is not set
+                        if (string.Equals(fromFormat.ToLower(), "*", StringComparison.OrdinalIgnoreCase))
+                        {
+                            fromFormat = upload.FileExt;
+                        }
+
                         break;
+
                 }
             }
 

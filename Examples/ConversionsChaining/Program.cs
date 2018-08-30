@@ -22,7 +22,7 @@ namespace ConversionsChaining
             var firstTask = convertApi.ConvertAsync("pdf", "jpg", new ConvertApiFileParam(fileName));
             Console.WriteLine($"Conversions done. Cost: {firstTask.Result.ConversionCost}. Total files created: {firstTask.Result.FileCount()}");            
 
-            var secondsTask = convertApi.ConvertAsync("jpg", "zip", new ConvertApiFilesParam(firstTask.Result));
+            var secondsTask = convertApi.ConvertAsync("jpg", "zip", new ConvertApiFileParam(firstTask.Result));
             var saveFiles = secondsTask.Result.SaveFiles(Path.GetTempPath());
 
             Console.WriteLine($"Conversions done. Cost: {secondsTask.Result.ConversionCost}. Total files created: {secondsTask.Result.FileCount()}");

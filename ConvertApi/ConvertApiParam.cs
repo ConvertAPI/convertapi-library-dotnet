@@ -53,7 +53,7 @@ namespace ConvertApiDotNet
 
         public ConvertApiParam(string name, string value) : base(name)
         {
-            _value[0] = value;
+            _value = new[] { value };            
         }
 
         public ConvertApiParam(string name, int value) : this(name, value.ToString()) { }
@@ -109,7 +109,7 @@ namespace ConvertApiDotNet
             return _tasks?.Result;
         }
 
-        public ConvertApiFileParam(Uri url) : base("File", url) { }
+        public ConvertApiFileParam(Uri url) : this("File", url) { }
 
         public ConvertApiFileParam(string path) : this("File", File.OpenRead(path), Path.GetFileName(path)) { }
 
