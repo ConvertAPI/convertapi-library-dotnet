@@ -174,9 +174,7 @@ catch (AggregateException e)
 
 https://www.convertapi.com/doc/supported-formats
 
-#### 6. Rest API documentation
-
-#### 7. GitHub 
+#### 6. GitHub 
 
 https://github.com/ConvertAPI/convertapi-dotnet
 
