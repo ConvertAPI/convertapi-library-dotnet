@@ -8,7 +8,7 @@ PM> Install-Package ConvertApi
 
 ```csharp
 //Import
-using ConvertApiDotNet.Exceptions;
+using ConvertApiDotNet;
 
 //Get your secret at https://www.convertapi.com/a
 var convertApi = new ConvertApi("your-api-secret");
