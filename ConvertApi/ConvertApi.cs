@@ -29,19 +29,63 @@ namespace ConvertApiDotNet
             _requestTimeoutInSeconds = requestTimeoutInSeconds.ToString();
         }
 
-        public async Task<ConvertApiResponse> ConvertAsync(string fromFormat, string toFormat, params ConvertApiParam[] parameters)
+        public async Task<ConvertApiResponse> ConvertAsync(string fromFormat, string toFormat, params ConvertApiBaseParam[] parameters)
         {
-            return await ConvertAsync(fromFormat, toFormat, (IEnumerable<ConvertApiParam>)parameters);
+            return await ConvertAsync(fromFormat, toFormat, (IEnumerable<ConvertApiBaseParam>)parameters);
         }
 
-        public async Task<ConvertApiResponse> ConvertAsync(string fromFormat, string toFormat, IEnumerable<ConvertApiParam> parameters)
+        public class Dic
         {
-            var url = new UriBuilder(ApiBaseUri)
-            {
-                Path = $"convert/{fromFormat}/to/{toFormat}",
-                Query = $"secret={_secret}"
-            };
+            private readonly Dictionary<string, List<object>> _dictionary;
 
+            public Dic()
+            {
+                _dictionary = new Dictionary<string, List<object>>();
+            }
+
+            //Check for duplicate string and add S at the end of parameter
+            public Dictionary<string, object> Get()
+            {
+                var dic = new Dictionary<string, object>();
+                foreach (var keyValuePair in _dictionary)
+                {
+                    if (keyValuePair.Value.Count == 1)
+                        dic.Add(keyValuePair.Key, keyValuePair.Value[0]);
+                    else
+                    {
+                        for (var index = 0; index < keyValuePair.Value.Count; index++)
+                        {
+                            string name;
+                            if (!keyValuePair.Key.EndsWith("s"))
+                                name = keyValuePair.Key + "s";
+                            else
+                                name = keyValuePair.Key;
+                            dic.Add(name + "[" + index + "]", keyValuePair.Value[index]);
+                        }
+                    }
+                }
+
+                return dic;
+            }
+
+
+            public void Add(string key, object value)
+            {
+                var keyToAdd = key.ToLower();
+
+                if (!_dictionary.ContainsKey(keyToAdd))
+                {
+                    _dictionary.Add(keyToAdd, new List<object> { value });
+                }
+                else
+                {
+                    _dictionary[keyToAdd].Add(value);
+                }
+            }
+        }
+
+        public async Task<ConvertApiResponse> ConvertAsync(string fromFormat, string toFormat, IEnumerable<ConvertApiBaseParam> parameters)
+        {
             var content = new MultipartFormDataContent
             {
                 {new StringContent("true"), "StoreFile"},
@@ -50,28 +94,66 @@ namespace ConvertApiDotNet
 
             var ignoredParameters = new[] { "StoreFile", "Async", "JobId", "TimeOut" };
 
-            var filesArray = new List<string>();
 
-            foreach (var parameter in parameters)
+            var validParameters = parameters.Where(n => !ignoredParameters.Contains(n.Name, StringComparer.OrdinalIgnoreCase)).ToList();
+
+
+            var dicList = new Dic();
+            foreach (var parameter in validParameters)
             {
-                if (ignoredParameters.Contains(parameter.Name, StringComparer.OrdinalIgnoreCase)) continue;
-
-                if (parameter.Name.ToLower() == "files" || parameter.GetValues().Length > 1)
+                if (parameter is ConvertApiParam)
                 {
-                    filesArray.AddRange(parameter.GetValues());
+                    foreach (var value in (parameter as ConvertApiParam).GetValues())
+                    {
+                        dicList.Add(parameter.Name, value);
+                    }
                 }
                 else
+                if (parameter is ConvertApiFileParam)
                 {
-                    content.Add(new StringContent(parameter.GetValues().First()), parameter.Name);
+                    var convertApiUpload = (parameter as ConvertApiFileParam).GetValue();
+                    if (convertApiUpload != null)
+                    {
+                        dicList.Add(parameter.Name, convertApiUpload);
+                    }
+                    else
+                    {
+                        foreach (var value in (parameter as ConvertApiFileParam).GetValues())
+                        {
+                            dicList.Add(parameter.Name, value);
+                        }
+                    }
                 }
             }
 
-            for (var index = 0; index < filesArray.Count; index++)
+
+            foreach (var s in dicList.Get())
             {
-                var file = filesArray[index];
-                var parameterName = $"Files[{index}]" ;
-                content.Add(new StringContent(file), parameterName);
+                switch (s.Value)
+                {
+                    case string value:
+                        content.Add(new StringContent(value), s.Key);
+                        break;
+                    case ConvertApiUpload upload:
+                        content.Add(new StringContent(upload.FileId), s.Key);
+
+                        //Set FROM format if it is not set
+                        if (string.Equals(fromFormat.ToLower(), "*", StringComparison.OrdinalIgnoreCase))
+                        {
+                            fromFormat = upload.FileExt;
+                        }
+
+                        break;
+
+                }
             }
+
+
+            var url = new UriBuilder(ApiBaseUri)
+            {
+                Path = $"convert/{fromFormat}/to/{toFormat}",
+                Query = $"secret={_secret}"
+            };
 
             return await HttpClient.PostAsync(url.Uri, content).ContinueWith(t =>
             {

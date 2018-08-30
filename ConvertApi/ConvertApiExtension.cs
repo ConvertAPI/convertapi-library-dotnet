@@ -8,20 +8,36 @@ using ConvertApiDotNet.Model;
 
 namespace ConvertApiDotNet
 {
+
     public static class ConvertApiExtension
     {
         #region Convert method extensions
 
-        private static Task<ConvertApiResponse> BindFile(ConvertApi convertApi, string fromFile, string outputExtension)
+        private static IEnumerable<ConvertApiBaseParam> JoinParameters(ConvertApiBaseParam convertApiFileParam,IEnumerable<ConvertApiBaseParam> parameters)
         {
-            var fromExt = Path.GetExtension(fromFile).Replace(".", "");
-            var task = convertApi.ConvertAsync(fromExt, outputExtension, new ConvertApiFileParam(fromFile));
-            return task;
+            var paramsList = new List<ConvertApiBaseParam> {convertApiFileParam};
+            paramsList.AddRange(parameters);
+            return paramsList;
         }
 
-        private static Task<ConvertApiResponse> BindUrl(ConvertApi convertApi, string url, string outputExtension)
+        private static string GetPlainExtension(string fromFile)
         {
-            return convertApi.ConvertAsync("url", outputExtension, new ConvertApiParam("url", url));
+            return Path.GetExtension(fromFile).Replace(".", "");
+        }
+
+        private static Task<ConvertApiResponse> BindFile(ConvertApi convertApi, string fromFile, string outputExtension, IEnumerable<ConvertApiBaseParam> parameters)
+        {
+            return convertApi.ConvertAsync(GetPlainExtension(fromFile), outputExtension, JoinParameters(new ConvertApiFileParam(fromFile), parameters));
+        }
+
+        private static Task<ConvertApiResponse> BindFile(ConvertApi convertApi, Uri fileUrl, string outputExtension, IEnumerable<ConvertApiBaseParam> parameters)
+        {            
+            return convertApi.ConvertAsync("*", outputExtension, JoinParameters(new ConvertApiFileParam(fileUrl), parameters));
+        }
+
+        private static Task<ConvertApiResponse> BindUrl(ConvertApi convertApi, string url, string outputExtension, IEnumerable<ConvertApiBaseParam> parameters)
+        {            
+            return convertApi.ConvertAsync("web", outputExtension, JoinParameters(new ConvertApiParam("url", url), parameters));
         }
 
         private static ConvertApiResponse TaskResult(Task<ConvertApiResponse> task)
@@ -41,22 +57,33 @@ namespace ConvertApiDotNet
             }
         }
 
-        public static FileInfo ConvertFile(this ConvertApi convertApi, string fromFile, string toFile)
+        public static FileInfo ConvertFile(this ConvertApi convertApi, string fromFile, string toFile, params ConvertApiBaseParam[] parameters)
         {
-            var toExt = Path.GetExtension(toFile).Replace(".", "");
-            var task = BindFile(convertApi, fromFile, toExt);
+            var task = BindFile(convertApi, fromFile, GetPlainExtension(toFile), parameters);
             return TaskResult(task).SaveFile(toFile);
         }
 
-        public static IEnumerable<FileInfo> ConvertFile(this ConvertApi convertApi, string fromFile, string outputExtension, string outputDirectory)
+        public static IEnumerable<FileInfo> ConvertFile(this ConvertApi convertApi, string fromFile, string outputExtension, string outputDirectory, params ConvertApiBaseParam[] parameters)
         {
-            var task = BindFile(convertApi, fromFile, outputExtension);
+            var task = BindFile(convertApi, fromFile, outputExtension, parameters);
             return TaskResult(task).SaveFiles(outputDirectory);
         }
 
-        public static FileInfo ConvertUrl(this ConvertApi convertApi, string url, string toFile)
+        public static FileInfo ConvertRemoteFile(this ConvertApi convertApi, string fileUrl, string toFile, params ConvertApiBaseParam[] parameters)
         {
-            var task = BindUrl(convertApi, url, Path.GetExtension(toFile).Replace(".", ""));
+            var task = BindFile(convertApi, new Uri(fileUrl), GetPlainExtension(toFile), parameters);
+            return TaskResult(task).SaveFile(toFile);
+        }
+
+        public static IEnumerable<FileInfo> ConvertRemoteFile(this ConvertApi convertApi, string fileUrl, string outputExtension, string outputDirectory, params ConvertApiBaseParam[] parameters)
+        {
+            var task = BindFile(convertApi, new Uri(fileUrl), outputExtension, parameters);
+            return TaskResult(task).SaveFiles(outputDirectory);
+        }
+
+        public static FileInfo ConvertUrl(this ConvertApi convertApi, string url, string toFile, params ConvertApiBaseParam[] parameters)
+        {
+            var task = BindUrl(convertApi, url, GetPlainExtension(toFile), parameters);
             return TaskResult(task).SaveFile(toFile);
         }
 
@@ -131,10 +158,10 @@ namespace ConvertApiDotNet
 
         public static IEnumerable<Stream> FilesStream(this ConvertApiResponse response)
         {
-            return response.AsFilesStreamAsync().Select(s=>s.Result);            
+            return response.AsFilesStreamAsync().Select(s => s.Result);
         }
 
-        public static IEnumerable<FileInfo>SaveFiles(this ConvertApiResponse response, string directory)
+        public static IEnumerable<FileInfo> SaveFiles(this ConvertApiResponse response, string directory)
         {
             return response.Files.Select(file => AsFileAsync(file.Url, Path.Combine(directory, Path.GetFileName(file.FileName)))).Select(task => task.Result).ToArray();
         }

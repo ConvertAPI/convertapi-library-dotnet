@@ -1,9 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using ConvertApiDotNet;
 using ConvertApiDotNet.Exceptions;
 
@@ -32,8 +29,8 @@ namespace SplitAndMergePdf
                 var processedFiles = splitTask.Result;
 
                 var mergeTask = convertApi.ConvertAsync("pdf", "merge", 
-                    new ConvertApiFilesParam(processedFiles.Files.First()), 
-                    new ConvertApiFilesParam(processedFiles.Files.Last()));
+                    new ConvertApiFileParam(processedFiles.Files.First()), 
+                    new ConvertApiFileParam(processedFiles.Files.Last()));
 
                 var saveFiles = mergeTask.Result.SaveFile(destinationFileName);
 

@@ -9,7 +9,7 @@ namespace Simple
     {
         static void Main(string[] args)
         {
-            //Get your secret at https://www.convertapi.com/a
+            //Get your secret at https://www.convertapi.com/a            
             var convertApi = new ConvertApi("your api secret");
 
             try
@@ -28,6 +28,11 @@ namespace Simple
                 Console.WriteLine("Google web site to PDF");
                 var googlePdf = convertApi.ConvertUrl("https://www.google.com", Path.Combine(Path.GetTempPath(), "google.pdf"));
                 Console.WriteLine("PDF created at " + googlePdf.FullName);
+
+                Console.WriteLine("Converting Word to PDF...");
+                pdfFile = convertApi.ConvertRemoteFile("https://cdn.convertapi.com/cara/testfiles/document.docx", Path.Combine(Path.GetTempPath(), "document.pdf"));
+                Console.WriteLine("PDF created at " + pdfFile.FullName);
+
             }
             catch (ConvertApiException e)
             {
