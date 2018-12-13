@@ -76,11 +76,11 @@ namespace ConvertApiDotNet
 
         public ConvertApiFileParam(string path) : base("File")
         {
-            //ToDo Not so great method to find out is it file or file id passed up. But no other choice because can't create two constructor with the same parameter.
-            if (path.StartsWith("LSF"))
-                Value = new[] { path };
-            else
+            //If file then load as stream if not then assume that it is file id
+            if (File.Exists(path))
                 Upload(File.OpenRead(path), Path.GetFileName(path));
+            else
+                Value = new[] {path};
         }
 
         public ConvertApiFileParam(FileInfo file) : base("File")
@@ -103,7 +103,10 @@ namespace ConvertApiDotNet
             client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
             var content = new StreamContent(fileStream);
             content.Headers.ContentType = new MediaTypeHeaderValue("application/octet-stream");
-            content.Headers.Add("Content-Disposition", $"attachment; filename=\"{Path.GetFileName(fileName)}\"");
+            content.Headers.ContentDisposition = new ContentDispositionHeaderValue("attachment")
+            {
+                FileNameStar = Path.GetFileName(fileName)
+            };
 
             var task = client.PostAsync(new Uri($"{ConvertApi.ApiBaseUri}/upload"), content)
                 .ContinueWith(uploadTask =>
@@ -122,7 +125,7 @@ namespace ConvertApiDotNet
         {
             var client = new ConvertApiBase(ConvertApiConstants.UploadTimeoutInSeconds).HttpClient;
             client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-            var task = client.PostAsync(new Uri($"{ConvertApi.ApiBaseUri}/upload-from-url?url={remoteFileUrl}"), null)
+            var task = client.PostAsync(new Uri($"{ConvertApi.ApiBaseUri}/remote-upload?url={remoteFileUrl}"), null)
                 .ContinueWith(uploadTask =>
                 {
                     var responseMessage = uploadTask.Result;
