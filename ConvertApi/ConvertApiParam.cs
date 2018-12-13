@@ -15,22 +15,29 @@ namespace ConvertApiDotNet
 {
     public class ConvertApiBaseParam
     {
-        public ConvertApiBaseParam(string name, string[] toArray)
+        public ConvertApiBaseParam(string name, string value)
         {
             Name = name;
-            _value = toArray;
+            Value = new[] { value };
+        }
+
+
+        public ConvertApiBaseParam(string name, string[] values)
+        {
+            Name = name;
+            Value = values;
         }
 
         public ConvertApiBaseParam(string name, Uri url)
         {
             Name = name;
-            _value = new[] { url.ToString()};         
+            Value = new[] { url.ToString() };
         }
 
         protected ConvertApiBaseParam(string name, ConvertApiResponse convertApiResponse)
         {
             Name = name;
-            _value = convertApiResponse.Files.Select(s => s.Url.ToString()).ToArray();
+            Value = convertApiResponse.Files.Select(s => s.Url.ToString()).ToArray();
         }
 
         public ConvertApiBaseParam(string name)
@@ -39,22 +46,18 @@ namespace ConvertApiDotNet
         }
 
         public string Name { get; }
-        internal Task<ConvertApiUpload> _tasks;
-        internal string[] _value;
+        internal Task<ConvertApiUpload> Tasks;
+        internal string[] Value;
 
         public string[] GetValues()
         {
-            return _value;
+            return Value;
         }
     }
 
     public class ConvertApiParam : ConvertApiBaseParam
     {
-
-        public ConvertApiParam(string name, string value) : base(name)
-        {
-            _value = new[] { value };            
-        }
+        public ConvertApiParam(string name, string value) : base(name, value) { }
 
         public ConvertApiParam(string name, int value) : this(name, value.ToString()) { }
 
@@ -66,13 +69,44 @@ namespace ConvertApiDotNet
 
     public class ConvertApiFileParam : ConvertApiBaseParam
     {
-        public ConvertApiFileParam(string name, Stream fileStream, string fileName) : base(name)
+        public ConvertApiFileParam(Uri url) : base("File")
+        {
+            Upload(url);
+        }
+
+        public ConvertApiFileParam(string path) : base("File")
+        {
+            //If file then load as stream if not then assume that it is file id
+            if (File.Exists(path))
+                Upload(File.OpenRead(path), Path.GetFileName(path));
+            else
+                Value = new[] {path};
+        }
+
+        public ConvertApiFileParam(FileInfo file) : base("File")
+        {
+            Upload(file.OpenRead(), file.Name);
+        }
+
+        public ConvertApiFileParam(Stream fileStream, string fileName) : base("File")
+        {
+            Upload(fileStream, fileName);
+        }
+
+        public ConvertApiFileParam(ProcessedFile processedFile) : base("File", processedFile.Url) { }
+
+        public ConvertApiFileParam(ConvertApiResponse response) : base("File", response) { }
+
+        private void Upload(Stream fileStream, string fileName)
         {
             var client = new ConvertApiBase(ConvertApiConstants.UploadTimeoutInSeconds).HttpClient;
             client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
             var content = new StreamContent(fileStream);
             content.Headers.ContentType = new MediaTypeHeaderValue("application/octet-stream");
-            content.Headers.Add("Content-Disposition", $"attachment; filename=\"{Path.GetFileName(fileName)}\"");
+            content.Headers.ContentDisposition = new ContentDispositionHeaderValue("attachment")
+            {
+                FileNameStar = Path.GetFileName(fileName)
+            };
 
             var task = client.PostAsync(new Uri($"{ConvertApi.ApiBaseUri}/upload"), content)
                 .ContinueWith(uploadTask =>
@@ -84,14 +118,14 @@ namespace ConvertApiDotNet
                     }
                     return JsonConvert.DeserializeObject<ConvertApiUpload>(uploadTask.Result.Content.ReadAsStringAsync().Result);
                 });
-            _tasks = task;
+            Tasks = task;
         }
 
-        public ConvertApiFileParam(string name, Uri remoteFileUrl) : base(name)
+        private void Upload(Uri remoteFileUrl)
         {
             var client = new ConvertApiBase(ConvertApiConstants.UploadTimeoutInSeconds).HttpClient;
             client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-            var task = client.PostAsync(new Uri($"{ConvertApi.ApiBaseUri}/upload-from-url?url={remoteFileUrl}"), null)
+            var task = client.PostAsync(new Uri($"{ConvertApi.ApiBaseUri}/remote-upload?url={remoteFileUrl}"), null)
                 .ContinueWith(uploadTask =>
                 {
                     var responseMessage = uploadTask.Result;
@@ -101,24 +135,12 @@ namespace ConvertApiDotNet
                     }
                     return JsonConvert.DeserializeObject<ConvertApiUpload>(uploadTask.Result.Content.ReadAsStringAsync().Result);
                 });
-            _tasks = task;
+            Tasks = task;
         }
 
         public ConvertApiUpload GetValue()
         {
-            return _tasks?.Result;
+            return Tasks?.Result;
         }
-
-        public ConvertApiFileParam(Uri url) : this("File", url) { }
-
-        public ConvertApiFileParam(string path) : this("File", File.OpenRead(path), Path.GetFileName(path)) { }
-
-        public ConvertApiFileParam(FileInfo file) : this("File", file.OpenRead(), file.Name) { }
-
-        public ConvertApiFileParam(Stream fileStream, string fileName) : this("File", fileStream, fileName) { }
-
-        public ConvertApiFileParam(ProcessedFile processedFile) : this(processedFile.Url) { }
-
-        public ConvertApiFileParam(ConvertApiResponse response) : base("File", response) { }
     }
 }
