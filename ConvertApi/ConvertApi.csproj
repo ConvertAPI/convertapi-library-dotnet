@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Version>2.6</Version>
+    <Version>2.7</Version>
     <Company>Baltsoft</Company>
     <Authors>Baltsoft</Authors>
     <PackageProjectUrl>https://www.convertapi.com</PackageProjectUrl>
@@ -23,9 +23,9 @@ https://github.com/ConvertAPI/convertapi-dotnet</Description>
     <Product>ConvertApi</Product>
     <AssemblyName>ConvertApi</AssemblyName>
     <RootNamespace>ConvertApiDotNet</RootNamespace>
-    <AssemblyVersion>2.6.0.0</AssemblyVersion>
-    <FileVersion>2.6.0.0</FileVersion>
-    <PackageReleaseNotes>Fixed big when unicode file is passed and content disposition fails.
+    <AssemblyVersion>2.7.0.0</AssemblyVersion>
+    <FileVersion>2.7.0.0</FileVersion>
+    <PackageReleaseNotes>Fixed bug when unicode file is passed and content disposition fails.
 Improved detection File VS File id.</PackageReleaseNotes>
   </PropertyGroup>
 

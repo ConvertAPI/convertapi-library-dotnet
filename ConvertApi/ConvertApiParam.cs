@@ -69,11 +69,19 @@ namespace ConvertApiDotNet
 
     public class ConvertApiFileParam : ConvertApiBaseParam
     {
+        /// <summary>
+        /// Convert remote file.
+        /// </summary>
+        /// <param name="url">Remote file url</param>
         public ConvertApiFileParam(Uri url) : base("File")
         {
             Upload(url);
         }
 
+        /// <summary>
+        /// Convert local file or pass File ID.
+        /// </summary>
+        /// <param name="path">Full path to local file or File ID.</param>
         public ConvertApiFileParam(string path) : base("File")
         {
             //If file then load as stream if not then assume that it is file id
@@ -83,16 +91,25 @@ namespace ConvertApiDotNet
                 Value = new[] {path};
         }
 
+        /// <summary>
+        /// Convert local file.
+        /// </summary>
+        /// <param name="file">Full path to local file</param>
         public ConvertApiFileParam(FileInfo file) : base("File")
         {
             Upload(file.OpenRead(), file.Name);
         }
 
+        /// <summary>
+        /// Convert file from stream
+        /// </summary>
+        /// <param name="fileStream">File stream</param>
+        /// <param name="fileName">Set source file name.</param>
         public ConvertApiFileParam(Stream fileStream, string fileName) : base("File")
         {
             Upload(fileStream, fileName);
         }
-
+        
         public ConvertApiFileParam(ProcessedFile processedFile) : base("File", processedFile.Url) { }
 
         public ConvertApiFileParam(ConvertApiResponse response) : base("File", response) { }
@@ -125,7 +142,7 @@ namespace ConvertApiDotNet
         {
             var client = new ConvertApiBase(ConvertApiConstants.UploadTimeoutInSeconds).HttpClient;
             client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-            var task = client.PostAsync(new Uri($"{ConvertApi.ApiBaseUri}/remote-upload?url={remoteFileUrl}"), null)
+            var task = client.PostAsync(new Uri($"{ConvertApi.ApiBaseUri}/upload-remote?url={remoteFileUrl}"), null)
                 .ContinueWith(uploadTask =>
                 {
                     var responseMessage = uploadTask.Result;
