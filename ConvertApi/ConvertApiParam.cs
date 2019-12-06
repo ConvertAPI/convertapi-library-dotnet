@@ -142,7 +142,7 @@ namespace ConvertApiDotNet
         {
             var client = new ConvertApiBase(ConvertApiConstants.UploadTimeoutInSeconds).HttpClient;
             client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-            var task = client.PostAsync(new Uri($"{ConvertApi.ApiBaseUri}/upload-remote?url={remoteFileUrl}"), null)
+            var task = client.PostAsync(new Uri($"{ConvertApi.ApiBaseUri}/upload?url={remoteFileUrl}"), null)
                 .ContinueWith(uploadTask =>
                 {
                     var responseMessage = uploadTask.Result;
