@@ -129,11 +129,12 @@ namespace ConvertApiDotNet
                 .ContinueWith(uploadTask =>
                 {
                     var responseMessage = uploadTask.Result;
+                    var result = uploadTask.Result.Content.ReadAsStringAsync().Result;
                     if (responseMessage.StatusCode != HttpStatusCode.OK)
                     {
-                        throw new ConvertApiException("Unable to upload file.", responseMessage);
+                       throw new ConvertApiException(responseMessage.StatusCode, $"Unable to upload file. {responseMessage.ReasonPhrase}", result);
                     }
-                    return JsonConvert.DeserializeObject<ConvertApiUpload>(uploadTask.Result.Content.ReadAsStringAsync().Result);
+                    return JsonConvert.DeserializeObject<ConvertApiUpload>(result);
                 });
             Tasks = task;
         }
@@ -146,11 +147,12 @@ namespace ConvertApiDotNet
                 .ContinueWith(uploadTask =>
                 {
                     var responseMessage = uploadTask.Result;
+                    var result = uploadTask.Result.Content.ReadAsStringAsync().Result;
                     if (responseMessage.StatusCode != HttpStatusCode.OK)
                     {
-                        throw new ConvertApiException("Unable to upload file.", responseMessage);
+                        throw new ConvertApiException(responseMessage.StatusCode, $"Unable to upload file. {responseMessage.ReasonPhrase}", result);
                     }
-                    return JsonConvert.DeserializeObject<ConvertApiUpload>(uploadTask.Result.Content.ReadAsStringAsync().Result);
+                    return JsonConvert.DeserializeObject<ConvertApiUpload>(result);
                 });
             Tasks = task;
         }

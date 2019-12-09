@@ -155,13 +155,13 @@ namespace ConvertApiDotNet
                 Query = $"secret={_secret}"
             };
 
-            return await HttpClient.PostAsync(url.Uri, content).ContinueWith(t =>
-            {
-                var responseMessage = t.Result;
-                if (responseMessage.StatusCode != HttpStatusCode.OK)
-                    throw new ConvertApiException($"Conversion from {fromFormat} to {toFormat} error.", responseMessage);
-                return JsonConvert.DeserializeObject<ConvertApiResponse>(responseMessage.Content.ReadAsStringAsync().Result);
-            });
+
+            var response = await HttpClient.PostAsync(url.Uri, content);
+            var result = await response.Content.ReadAsStringAsync();
+            if (response.StatusCode != HttpStatusCode.OK)
+                throw new ConvertApiException(response.StatusCode,
+                    $"Conversion from {fromFormat} to {toFormat} error. {response.ReasonPhrase}", result);
+            return JsonConvert.DeserializeObject<ConvertApiResponse>(result);
         }
 
         public async Task<ConvertApiUser> GetUserAsync()
@@ -171,13 +171,12 @@ namespace ConvertApiDotNet
                 Path = "user",
                 Query = $"secret={_secret}"
             };
-            return await HttpClient.GetAsync(url.Uri).ContinueWith(t =>
-             {
-                 var responseMessage = t.Result;
-                 if (responseMessage.StatusCode != HttpStatusCode.OK)
-                     throw new ConvertApiException("Retrieve user information failed.", responseMessage);
-                 return JsonConvert.DeserializeObject<ConvertApiUser>(responseMessage.Content.ReadAsStringAsync().Result);
-             });
+
+            var response = await HttpClient.GetAsync(url.Uri);
+            var result = await response.Content.ReadAsStringAsync();
+            if (response.StatusCode != HttpStatusCode.OK)
+                throw new ConvertApiException(response.StatusCode, $"Retrieve user information failed. {response.ReasonPhrase}", result);
+            return JsonConvert.DeserializeObject<ConvertApiUser>(result);
         }
     }
 }

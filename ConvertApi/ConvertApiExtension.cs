@@ -42,19 +42,7 @@ namespace ConvertApiDotNet
 
         private static ConvertApiResponse TaskResult(Task<ConvertApiResponse> task)
         {
-            try
-            {
-                return task.Result;
-            }
-            catch (AggregateException e)
-            {
-                //Move actual exception from task which is written to InnerException and re-throw it
-                var innerException = e.Flatten().InnerException;
-                if (innerException != null)
-                    throw innerException;
-
-                throw;
-            }
+           return Task.Run(async () => await task).GetAwaiter().GetResult();
         }
 
         public static FileInfo ConvertFile(this ConvertApi convertApi, string fromFile, string toFile, params ConvertApiBaseParam[] parameters)
@@ -101,7 +89,10 @@ namespace ConvertApiDotNet
         }
 
 
-        private static Task<Stream> AsStreamAsync(Uri url) => new ConvertApiBase(ConvertApiConstants.DownloadTimeoutInSeconds).HttpClient.GetStreamAsync(url);
+        private static Task<Stream> AsStreamAsync(Uri url)
+        {
+            return new ConvertApiBase(ConvertApiConstants.DownloadTimeoutInSeconds).HttpClient.GetStreamAsync(url);
+        }
 
         private static Task<FileInfo> AsFileAsync(Uri url, string fileName)
         {
