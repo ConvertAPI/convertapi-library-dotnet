@@ -46,7 +46,6 @@ namespace ConvertApiDotNet
         }
 
         public string Name { get; }
-        internal Task<ConvertApiUpload> Tasks;
         internal string[] Value;
 
         public string[] GetValues()
@@ -69,13 +68,15 @@ namespace ConvertApiDotNet
 
     public class ConvertApiFileParam : ConvertApiBaseParam
     {
+        internal Task<ConvertApiUpload> Tasks { get; set; }
+
         /// <summary>
         /// Convert remote file.
         /// </summary>
         /// <param name="url">Remote file url</param>
         public ConvertApiFileParam(Uri url) : base("File")
         {
-            Upload(url);
+            Tasks = Upload(url);
         }
 
         /// <summary>
@@ -86,9 +87,11 @@ namespace ConvertApiDotNet
         {
             //If file then load as stream if not then assume that it is file id
             if (File.Exists(path))
-                Upload(File.OpenRead(path), Path.GetFileName(path));
+            {
+                Tasks = Upload(new FileInfo(path));
+            }
             else
-                Value = new[] {path};
+                Value = new[] { path };
         }
 
         /// <summary>
@@ -97,7 +100,7 @@ namespace ConvertApiDotNet
         /// <param name="file">Full path to local file</param>
         public ConvertApiFileParam(FileInfo file) : base("File")
         {
-            Upload(file.OpenRead(), file.Name);
+            Tasks = Upload(file);
         }
 
         /// <summary>
@@ -107,59 +110,62 @@ namespace ConvertApiDotNet
         /// <param name="fileName">Set source file name.</param>
         public ConvertApiFileParam(Stream fileStream, string fileName) : base("File")
         {
-            Upload(fileStream, fileName);
+            Tasks = Upload(fileStream, fileName);
         }
-        
+
         public ConvertApiFileParam(ProcessedFile processedFile) : base("File", processedFile.Url) { }
 
         public ConvertApiFileParam(ConvertApiResponse response) : base("File", response) { }
 
-        private void Upload(Stream fileStream, string fileName)
+        private static async Task<ConvertApiUpload> Upload(FileInfo file)
         {
-            var client = new ConvertApiBase(ConvertApiConstants.UploadTimeoutInSeconds).HttpClient;
-            client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-            var content = new StreamContent(fileStream);
-            content.Headers.ContentType = new MediaTypeHeaderValue("application/octet-stream");
-            content.Headers.ContentDisposition = new ContentDispositionHeaderValue("attachment")
+            using (var fileStream = file.OpenRead())
             {
-                FileNameStar = Path.GetFileName(fileName)
-            };
-
-            var task = client.PostAsync(new Uri($"{ConvertApi.ApiBaseUri}/upload"), content)
-                .ContinueWith(uploadTask =>
-                {
-                    var responseMessage = uploadTask.Result;
-                    var result = uploadTask.Result.Content.ReadAsStringAsync().Result;
-                    if (responseMessage.StatusCode != HttpStatusCode.OK)
-                    {
-                       throw new ConvertApiException(responseMessage.StatusCode, $"Unable to upload file. {responseMessage.ReasonPhrase}", result);
-                    }
-                    return JsonConvert.DeserializeObject<ConvertApiUpload>(result);
-                });
-            Tasks = task;
+                return await Upload(fileStream, fileStream.Name);
+            }
         }
 
-        private void Upload(Uri remoteFileUrl)
+        private static async Task<ConvertApiUpload> Upload(Stream fileStream, string fileName)
         {
             var client = new ConvertApiBase(ConvertApiConstants.UploadTimeoutInSeconds).HttpClient;
             client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-            var task = client.PostAsync(new Uri($"{ConvertApi.ApiBaseUri}/upload?url={remoteFileUrl}"), null)
-                .ContinueWith(uploadTask =>
+            HttpResponseMessage responseMessage;
+            using (var content = new StreamContent(fileStream))
+            {
+                content.Headers.ContentType = new MediaTypeHeaderValue("application/octet-stream");
+                content.Headers.ContentDisposition = new ContentDispositionHeaderValue("attachment")
                 {
-                    var responseMessage = uploadTask.Result;
-                    var result = uploadTask.Result.Content.ReadAsStringAsync().Result;
-                    if (responseMessage.StatusCode != HttpStatusCode.OK)
-                    {
-                        throw new ConvertApiException(responseMessage.StatusCode, $"Unable to upload file. {responseMessage.ReasonPhrase}", result);
-                    }
-                    return JsonConvert.DeserializeObject<ConvertApiUpload>(result);
-                });
-            Tasks = task;
+                    FileNameStar = Path.GetFileName(fileName)
+                };
+
+                responseMessage = await client.PostAsync(new Uri($"{ConvertApi.ApiBaseUri}/upload"), content);
+            }
+
+            var result = await responseMessage.Content.ReadAsStringAsync();
+            if (responseMessage.StatusCode != HttpStatusCode.OK)
+            {
+                throw new ConvertApiException(responseMessage.StatusCode, $"Unable to upload file. {responseMessage.ReasonPhrase}", result);
+            }
+            return JsonConvert.DeserializeObject<ConvertApiUpload>(result);
         }
 
-        public ConvertApiUpload GetValue()
+        private static async Task<ConvertApiUpload> Upload(Uri remoteFileUrl)
         {
-            return Tasks?.Result;
+            var client = new ConvertApiBase(ConvertApiConstants.UploadTimeoutInSeconds).HttpClient;
+            client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+
+            var responseMessage = await client.PostAsync(new Uri($"{ConvertApi.ApiBaseUri}/upload?url={remoteFileUrl}"), null);
+            var result = await responseMessage.Content.ReadAsStringAsync();
+            if (responseMessage.StatusCode != HttpStatusCode.OK)
+            {
+                throw new ConvertApiException(responseMessage.StatusCode, $"Unable to upload file. {responseMessage.ReasonPhrase}", result);
+            }
+            return JsonConvert.DeserializeObject<ConvertApiUpload>(result);
+        }
+
+        public async Task<ConvertApiUpload> GetValueAsync()
+        {
+            return Tasks == null ? null : await Tasks;
         }
     }
 }

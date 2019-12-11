@@ -34,56 +34,6 @@ namespace ConvertApiDotNet
             return await ConvertAsync(fromFormat, toFormat, (IEnumerable<ConvertApiBaseParam>)parameters);
         }
 
-        public class Dic
-        {
-            private readonly Dictionary<string, List<object>> _dictionary;
-
-            public Dic()
-            {
-                _dictionary = new Dictionary<string, List<object>>();
-            }
-
-            //Check for duplicate string and add S at the end of parameter
-            public Dictionary<string, object> Get()
-            {
-                var dic = new Dictionary<string, object>();
-                foreach (var keyValuePair in _dictionary)
-                {
-                    if (keyValuePair.Value.Count == 1)
-                        dic.Add(keyValuePair.Key, keyValuePair.Value[0]);
-                    else
-                    {
-                        for (var index = 0; index < keyValuePair.Value.Count; index++)
-                        {
-                            string name;
-                            if (!keyValuePair.Key.EndsWith("s"))
-                                name = keyValuePair.Key + "s";
-                            else
-                                name = keyValuePair.Key;
-                            dic.Add(name + "[" + index + "]", keyValuePair.Value[index]);
-                        }
-                    }
-                }
-
-                return dic;
-            }
-
-
-            public void Add(string key, object value)
-            {
-                var keyToAdd = key.ToLower();
-
-                if (!_dictionary.ContainsKey(keyToAdd))
-                {
-                    _dictionary.Add(keyToAdd, new List<object> { value });
-                }
-                else
-                {
-                    _dictionary[keyToAdd].Add(value);
-                }
-            }
-        }
-
         public async Task<ConvertApiResponse> ConvertAsync(string fromFormat, string toFormat, IEnumerable<ConvertApiBaseParam> parameters)
         {
             var content = new MultipartFormDataContent
@@ -98,7 +48,7 @@ namespace ConvertApiDotNet
             var validParameters = parameters.Where(n => !ignoredParameters.Contains(n.Name, StringComparer.OrdinalIgnoreCase)).ToList();
 
 
-            var dicList = new Dic();
+            var dicList = new ParamDictionary();
             foreach (var parameter in validParameters)
             {
                 if (parameter is ConvertApiParam)
@@ -111,7 +61,7 @@ namespace ConvertApiDotNet
                 else
                 if (parameter is ConvertApiFileParam)
                 {
-                    var convertApiUpload = (parameter as ConvertApiFileParam).GetValue();
+                    var convertApiUpload = await (parameter as ConvertApiFileParam).GetValueAsync();
                     if (convertApiUpload != null)
                     {
                         dicList.Add(parameter.Name, convertApiUpload);
