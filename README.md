@@ -66,14 +66,14 @@ ConvertAPI accepts extra conversion parameters depending on converted formats. A
 parameters and explanations can be found [here](https://www.convertapi.com).
 
 ```csharp
-ConvertApiResponse result = convertApi.ConvertAsync("pdf", "jpg", new[]
+ConvertApiResponse result = await convertApi.ConvertAsync("pdf", "jpg", new[]
 {
    new ConvertApiParam("File", File.OpenRead(@"\source\test.pdf")),
    new ConvertApiParam("ScaleImage","true"),
    new ConvertApiParam("ScaleProportions","true"),
    new ConvertApiParam("ImageHeight","300"),
    new ConvertApiParam("ImageWidth","300")
-}).Result;
+});
 ```
 
 ### User information
@@ -81,7 +81,7 @@ ConvertApiResponse result = convertApi.ConvertAsync("pdf", "jpg", new[]
 You can always check remaining seconds amount by fetching [user information](https://www.convertapi.com/doc/user).
 
 ```csharp
-ConvertApiUser user = convert.GetUserAsync().Result;
+ConvertApiUser user = await convert.GetUserAsync();
 int secondsLeft = user.SecondsLeft;
 ```
 
@@ -96,30 +96,24 @@ ConvertAPI is designed to make converting file super easy, the following snippet
 ```csharp
 try
 {
-  
   var convertApi = new ConvertApi("your-api-secret");
-  
+
   var fileToConvert = @"c:\test.docx";
-  var conversionTask = convertApi.ConvertAsync("docx", "pdf", new[]
-  {
-     new ConvertApiParam("File", File.OpenRead(fileToConvert))
-  });
-  
-  conversionTask.Result.SaveFiles(@"c:\");
-  
+  var conversionTask = await convertApi.ConvertAsync("docx", "pdf", 
+      new ConvertApiFileParam(File.OpenRead(fileToConvert),"test.docx")
+      );
+
+  var fileSaved = await conversionTask.Files.SaveFilesAsync(@"c:\");
   }
   //Catch exceptions from asynchronous methods
-  catch (Exception e)
+  catch (ConvertApiException e)
   {
-    Console.WriteLine($"{e.GetType()}: {e.Message}");
-    Console.WriteLine(e.InnerException?.Message);
-    var httpStatusCode = (e.InnerException as ConvertApiException)?.StatusCode;
-    Console.WriteLine("Status Code: " + httpStatusCode);
-    Console.WriteLine("Response: " + (e.InnerException as ConvertApiException)?.Response);
+     Console.WriteLine("Status Code: " + e.StatusCode);
+     Console.WriteLine("Response: " + e.Response);
 
-    if (httpStatusCode == HttpStatusCode.Unauthorized)
-       Console.WriteLine("Secret is not provided or no additional seconds left in account to proceed conversion. More information https://www.convertapi.com/a");
-   }
+      if (e.StatusCode == HttpStatusCode.Unauthorized)
+          Console.WriteLine("Secret is not provided or no additional seconds left in account to proceed conversion. More information https://www.convertapi.com/a");
+  }
 ```
 
 This is the bare-minimum to convert a file using the ConvertAPI client, but you can do a great deal more with the ConvertAPI .NET library. Take special note that you should replace `your-api-secret` with the secret you obtained in item two of the pre-requisites.
