@@ -4,92 +4,63 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
+using ConvertApiDotNet.Constants;
 using ConvertApiDotNet.Exceptions;
+using ConvertApiDotNet.Interface;
 using ConvertApiDotNet.Model;
 using Newtonsoft.Json;
 
 namespace ConvertApiDotNet
 {
-    public class ConvertApi : ConvertApiBase
+    public class ConvertApi
     {
         private readonly string _secret;
-        public static string ApiBaseUri;
-        private readonly string _requestTimeoutInSeconds;
+        public static string ApiBaseUri = "https://v2.convertapi.com";
+        private int _requestTimeoutInSeconds = 180;
+        private static IConvertApiHttpClient _convertApiHttpClient;
 
         /// <summary>
         /// Initiate new instance of ConvertAPI client
         /// </summary>
         /// <param name="secret">Secret to authorize conversion can be found https://www.convertapi.com/a</param>
-        /// <param name="requestTimeoutInSeconds">Conversion/request timeout</param>
-        /// <param name="apiBaseUri">Default API base URL, in most cases used default</param>
-        public ConvertApi(string secret, int requestTimeoutInSeconds = 180, string apiBaseUri = "https://v2.convertapi.com") : base(requestTimeoutInSeconds)
+        /// <param name="convertApiHttpClient">Inject your own HttpClient</param>
+        public ConvertApi(string secret, IConvertApiHttpClient convertApiHttpClient)
         {
             _secret = secret;
-            ApiBaseUri = apiBaseUri;
-            _requestTimeoutInSeconds = requestTimeoutInSeconds.ToString();
+            _convertApiHttpClient = convertApiHttpClient;
+        }
+
+        public ConvertApi(string secret)
+        {
+            _secret = secret;
+        }
+
+        public static IConvertApiHttpClient GetClient()
+        {
+            return _convertApiHttpClient ?? (_convertApiHttpClient = new DefaultConvertApiHttpClient());
+        }
+
+        public void SetTimeOut(int requestTimeoutInSeconds)
+        {
+            _requestTimeoutInSeconds = requestTimeoutInSeconds;
         }
 
         public async Task<ConvertApiResponse> ConvertAsync(string fromFormat, string toFormat, params ConvertApiBaseParam[] parameters)
         {
-            return await ConvertAsync(fromFormat, toFormat, (IEnumerable<ConvertApiBaseParam>)parameters);
-        }
-
-        public class Dic
-        {
-            private readonly Dictionary<string, List<object>> _dictionary;
-
-            public Dic()
-            {
-                _dictionary = new Dictionary<string, List<object>>();
-            }
-
-            //Check for duplicate string and add S at the end of parameter
-            public Dictionary<string, object> Get()
-            {
-                var dic = new Dictionary<string, object>();
-                foreach (var keyValuePair in _dictionary)
-                {
-                    if (keyValuePair.Value.Count == 1)
-                        dic.Add(keyValuePair.Key, keyValuePair.Value[0]);
-                    else
-                    {
-                        for (var index = 0; index < keyValuePair.Value.Count; index++)
-                        {
-                            string name;
-                            if (!keyValuePair.Key.EndsWith("s"))
-                                name = keyValuePair.Key + "s";
-                            else
-                                name = keyValuePair.Key;
-                            dic.Add(name + "[" + index + "]", keyValuePair.Value[index]);
-                        }
-                    }
-                }
-
-                return dic;
-            }
-
-
-            public void Add(string key, object value)
-            {
-                var keyToAdd = key.ToLower();
-
-                if (!_dictionary.ContainsKey(keyToAdd))
-                {
-                    _dictionary.Add(keyToAdd, new List<object> { value });
-                }
-                else
-                {
-                    _dictionary[keyToAdd].Add(value);
-                }
-            }
+            return await ConvertAsync(fromFormat, toFormat, string.Empty, (IEnumerable<ConvertApiBaseParam>)parameters);
         }
 
         public async Task<ConvertApiResponse> ConvertAsync(string fromFormat, string toFormat, IEnumerable<ConvertApiBaseParam> parameters)
         {
+            return await ConvertAsync(fromFormat, toFormat, string.Empty, parameters);
+        }
+
+        public async Task<ConvertApiResponse> ConvertAsync(string fromFormat, string toFormat, string converter, IEnumerable<ConvertApiBaseParam> parameters)
+        {
             var content = new MultipartFormDataContent
             {
                 {new StringContent("true"), "StoreFile"},
-                {new StringContent(_requestTimeoutInSeconds), "TimeOut"}
+                {new StringContent(_requestTimeoutInSeconds.ToString()), "TimeOut"}
             };
 
             var ignoredParameters = new[] { "StoreFile", "Async", "JobId", "TimeOut" };
@@ -98,7 +69,7 @@ namespace ConvertApiDotNet
             var validParameters = parameters.Where(n => !ignoredParameters.Contains(n.Name, StringComparer.OrdinalIgnoreCase)).ToList();
 
 
-            var dicList = new Dic();
+            var dicList = new ParamDictionary();
             foreach (var parameter in validParameters)
             {
                 if (parameter is ConvertApiParam)
@@ -111,7 +82,7 @@ namespace ConvertApiDotNet
                 else
                 if (parameter is ConvertApiFileParam)
                 {
-                    var convertApiUpload = (parameter as ConvertApiFileParam).GetValue();
+                    var convertApiUpload = await (parameter as ConvertApiFileParam).GetValueAsync();
                     if (convertApiUpload != null)
                     {
                         dicList.Add(parameter.Name, convertApiUpload);
@@ -148,22 +119,27 @@ namespace ConvertApiDotNet
                 }
             }
 
+            if (!string.IsNullOrEmpty(converter))
+                converter = $"/{converter}";
 
             var url = new UriBuilder(ApiBaseUri)
             {
-                Path = $"convert/{fromFormat}/to/{toFormat}",
+                Path = $"convert/{fromFormat}/to/{toFormat}{converter}",
                 Query = $"secret={_secret}"
             };
 
-            return await HttpClient.PostAsync(url.Uri, content).ContinueWith(t =>
-            {
-                var responseMessage = t.Result;
-                if (responseMessage.StatusCode != HttpStatusCode.OK)
-                    throw new ConvertApiException($"Conversion from {fromFormat} to {toFormat} error.", responseMessage);
-                return JsonConvert.DeserializeObject<ConvertApiResponse>(responseMessage.Content.ReadAsStringAsync().Result);
-            });
+            var response = await GetClient().PostAsync(url.Uri, _requestTimeoutInSeconds + 10, content);
+            var result = await response.Content.ReadAsStringAsync();
+            if (response.StatusCode != HttpStatusCode.OK)
+                throw new ConvertApiException(response.StatusCode,
+                    $"Conversion from {fromFormat} to {toFormat} error. {response.ReasonPhrase}", result);
+            return JsonConvert.DeserializeObject<ConvertApiResponse>(result);
         }
 
+        /// <summary>
+        /// Get user/account information
+        /// </summary>
+        /// <returns>Returns account status like user name, credits left and other information</returns>
         public async Task<ConvertApiUser> GetUserAsync()
         {
             var url = new UriBuilder(ApiBaseUri)
@@ -171,13 +147,12 @@ namespace ConvertApiDotNet
                 Path = "user",
                 Query = $"secret={_secret}"
             };
-            return await HttpClient.GetAsync(url.Uri).ContinueWith(t =>
-             {
-                 var responseMessage = t.Result;
-                 if (responseMessage.StatusCode != HttpStatusCode.OK)
-                     throw new ConvertApiException("Retrieve user information failed.", responseMessage);
-                 return JsonConvert.DeserializeObject<ConvertApiUser>(responseMessage.Content.ReadAsStringAsync().Result);
-             });
+
+            var response = await GetClient().GetAsync(url.Uri, ConvertApiConstants.DownloadTimeoutInSeconds);
+            var result = await response.Content.ReadAsStringAsync();
+            if (response.StatusCode != HttpStatusCode.OK)
+                throw new ConvertApiException(response.StatusCode, $"Retrieve user information failed. {response.ReasonPhrase}", result);
+            return JsonConvert.DeserializeObject<ConvertApiUser>(result);
         }
     }
 }

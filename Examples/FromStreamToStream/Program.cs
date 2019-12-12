@@ -1,6 +1,8 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 using ConvertApiDotNet;
 
 namespace FromStreamToStream
@@ -8,10 +10,10 @@ namespace FromStreamToStream
     class Program
     {
         /// <summary>
-        /// Example of converting Word document from stream and getting back PDF stream
+        /// Example of converting HTML document from stream and getting back PDF stream
         /// https://www.convertapi.com/docx-to-pdf        
         /// </summary>
-        static void Main(string[] args)
+        static async Task Main(string[] args)
         {
             //Get your secret at https://www.convertapi.com/a
             var convertApi = new ConvertApi("your api secret");
@@ -19,11 +21,11 @@ namespace FromStreamToStream
 
             var stream = new MemoryStream(Encoding.UTF8.GetBytes(htmlString));
 
-            var convertToPdf = convertApi.ConvertAsync("html", "pdf",
+            var convertToPdf = await convertApi.ConvertAsync("html", "pdf",
                 new ConvertApiFileParam(stream, "test.html")
                 );
 
-            var outputStream = convertToPdf.Result.FileStream();
+            var outputStream = await convertToPdf.Files.First().FileStreamAsync();
 
             Console.Write(new StreamReader(outputStream).ReadToEnd());
             Console.WriteLine("End of file stream.");
