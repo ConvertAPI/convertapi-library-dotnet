@@ -1,6 +1,7 @@
-﻿using System;
+﻿using ConvertApiDotNet;
+using System;
 using System.ComponentModel;
-using ConvertApiDotNet;
+using System.Threading.Tasks;
 
 namespace RetrieveUserInformation
 {
@@ -10,18 +11,18 @@ namespace RetrieveUserInformation
         /// Retrieve user information
         /// https://www.convertapi.com/doc/user
         /// </summary>
-        static void Main(string[] args)
+        static async Task Main(string[] args)
         {
             //Get your secret at https://www.convertapi.com/a
             var convertApi = new ConvertApi("your api secret");
-            var convertApiUser = convertApi.GetUserAsync().Result;
+            var convertApiUser = await convertApi.GetUserAsync();
 
-            foreach (PropertyDescriptor descriptor in TypeDescriptor.GetProperties(convertApiUser))
-            {
-                var name = descriptor.Name;
-                var value = descriptor.GetValue(convertApiUser);
-                Console.WriteLine("{0}={1}", name, value);
-            }
+            Console.WriteLine("Secret={0}", convertApiUser.Secret);
+            Console.WriteLine("ApiKey={0}", convertApiUser.ApiKey);
+            Console.WriteLine("Active={0}", convertApiUser.Active);
+            Console.WriteLine("FullName={0}", convertApiUser.FullName);
+            Console.WriteLine("Email={0}", convertApiUser.Email);
+            Console.WriteLine("SecondsLeft={0}", convertApiUser.SecondsLeft);
 
             Console.ReadLine();
         }

@@ -100,7 +100,8 @@ namespace ConvertApiDotNet
 
         private static async Task<Stream> AsStreamAsync(Uri url)
         {
-            return await new ConvertApiBase(ConvertApiConstants.DownloadTimeoutInSeconds).HttpClient.GetStreamAsync(url);
+            var httpResponseMessage = await ConvertApi.GetClient().GetAsync(url, ConvertApiConstants.DownloadTimeoutInSeconds);
+            return await httpResponseMessage.Content.ReadAsStreamAsync();
         }
 
         private static async Task<FileInfo> SaveFileAsync(Uri url, string fileName)

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using ConvertApiDotNet;
 using ConvertApiDotNet.Exceptions;
 
@@ -12,28 +13,28 @@ namespace ConvertUrlToPdf
         /// Example of converting Web Page URL to PDF file
         /// https://www.convertapi.com/web-to-pdf
         /// </summary>
-        static void Main(string[] args)
+        static async Task Main(string[] args)
         {            
             try
             {
                 //Get your secret at https://www.convertapi.com/a
                 var convertApi = new ConvertApi("your api secret");
 
-                var saveFiles = convertApi.ConvertAsync("web", "pdf", 
-                    new ConvertApiParam("Url", "https://en.wikipedia.org/wiki/Data_conversion"), 
-                    new ConvertApiParam("FileName", "web-example"))
-                    .Result.SaveFiles(Path.GetTempPath());
+                Console.WriteLine("Converting web page https://en.wikipedia.org/wiki/Data_conversion to PDF...");
 
-                Console.WriteLine("The web page PDF saved to " + saveFiles.First());
+                var response = await convertApi.ConvertAsync("web", "pdf", 
+                    new ConvertApiParam("Url", "https://en.wikipedia.org/wiki/Data_conversion"), 
+                    new ConvertApiParam("FileName", "web-example"));
+
+                var fileSaved = await response.Files.SaveFilesAsync(Path.GetTempPath());
+
+                Console.WriteLine("The web page PDF saved to " + fileSaved.First());
             }
             //Catch exceptions from asynchronous methods
-            catch (AggregateException e)
+            catch (ConvertApiException e)
             {
-                Console.WriteLine($"{e.GetType()}: {e.Message}");
-                Console.WriteLine(e.InnerException?.Message);
-                var httpStatusCode = (e.InnerException as ConvertApiException)?.StatusCode;
-                Console.WriteLine("Status Code: " + httpStatusCode);
-                Console.WriteLine("Response: " + (e.InnerException as ConvertApiException)?.Response);
+                Console.WriteLine("Status Code: " + e.StatusCode);
+                Console.WriteLine("Response: " + e.Response);
             }
             Console.ReadLine();
         }

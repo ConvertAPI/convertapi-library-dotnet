@@ -127,8 +127,6 @@ namespace ConvertApiDotNet
 
         private static async Task<ConvertApiUpload> Upload(Stream fileStream, string fileName)
         {
-            var client = new ConvertApiBase(ConvertApiConstants.UploadTimeoutInSeconds).HttpClient;
-            client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
             HttpResponseMessage responseMessage;
             using (var content = new StreamContent(fileStream))
             {
@@ -138,7 +136,12 @@ namespace ConvertApiDotNet
                     FileNameStar = Path.GetFileName(fileName)
                 };
 
-                responseMessage = await client.PostAsync(new Uri($"{ConvertApi.ApiBaseUri}/upload"), content);
+                var url = new UriBuilder(ConvertApi.ApiBaseUri)
+                {
+                    Path = "/upload",
+                };
+
+                responseMessage = await ConvertApi.GetClient().PostAsync(url.Uri, ConvertApiConstants.UploadTimeoutInSeconds, content);
             }
 
             var result = await responseMessage.Content.ReadAsStringAsync();
@@ -151,10 +154,13 @@ namespace ConvertApiDotNet
 
         private static async Task<ConvertApiUpload> Upload(Uri remoteFileUrl)
         {
-            var client = new ConvertApiBase(ConvertApiConstants.UploadTimeoutInSeconds).HttpClient;
-            client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+            var url = new UriBuilder(ConvertApi.ApiBaseUri)
+            {
+                Path = "/upload",
+                Query = $"url={remoteFileUrl}"
+            };
 
-            var responseMessage = await client.PostAsync(new Uri($"{ConvertApi.ApiBaseUri}/upload?url={remoteFileUrl}"), null);
+            var responseMessage = await ConvertApi.GetClient().PostAsync(url.Uri, ConvertApiConstants.UploadTimeoutInSeconds,null);
             var result = await responseMessage.Content.ReadAsStringAsync();
             if (responseMessage.StatusCode != HttpStatusCode.OK)
             {
