@@ -3,14 +3,14 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Version>2.6</Version>
+    <Version>3.0</Version>
     <Company>Baltsoft</Company>
     <Authors>Baltsoft</Authors>
     <PackageProjectUrl>https://www.convertapi.com</PackageProjectUrl>
     <RepositoryUrl>https://github.com/ConvertAPI/convertapi-dotnet</RepositoryUrl>
     <RepositoryType>GIT</RepositoryType>
     <PackageTags>pdf convert word excel powerpoint images web msoffice office openoffice postscript iworks</PackageTags>
-    <Copyright>2012-2018 Baltsoft</Copyright>
+    <Copyright>2012-2019 Baltsoft</Copyright>
     <PackageLicenseUrl>https://www.convertapi.com/terms</PackageLicenseUrl>
     <PackageIconUrl>https://www.convertapi.com/content/favicons/android-chrome-256x256.png</PackageIconUrl>
     <Description>Convert various files like MS Word, Excel, PowerPoint, Images to PDF and Images. Create PDF and Images from url and raw HTML. Extract and create PowerPoint presentation from PDF. Merge, Encrypt, Split, Repair and Decrypt PDF files. 
@@ -23,10 +23,9 @@ https://github.com/ConvertAPI/convertapi-dotnet</Description>
     <Product>ConvertApi</Product>
     <AssemblyName>ConvertApi</AssemblyName>
     <RootNamespace>ConvertApiDotNet</RootNamespace>
-    <AssemblyVersion>2.6.0.0</AssemblyVersion>
-    <FileVersion>2.6.0.0</FileVersion>
-    <PackageReleaseNotes>Fixed big when unicode file is passed and content disposition fails.
-Improved detection File VS File id.</PackageReleaseNotes>
+    <AssemblyVersion>3.0.0.0</AssemblyVersion>
+    <FileVersion>3.0.0.0</FileVersion>
+    <PackageReleaseNotes>Asynconous improvement and other bug fixes. Added alternative converter property.</PackageReleaseNotes>
   </PropertyGroup>
 
   <ItemGroup>

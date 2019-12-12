@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Threading.Tasks;
 using ConvertApiDotNet;
 
 namespace ConvertWordToPdfAndPng
@@ -11,7 +12,7 @@ namespace ConvertWordToPdfAndPng
         /// https://www.convertapi.com/docx-to-pdf
         /// https://www.convertapi.com/docx-to-png
         /// </summary>
-        static void Main(string[] args)
+        static async Task Main(string[] args)
         {
             //Get your secret at https://www.convertapi.com/a
             var convertApi = new ConvertApi("your api secret");
@@ -19,18 +20,18 @@ namespace ConvertWordToPdfAndPng
 
             var fileParam = new ConvertApiFileParam(sourceFile);
 
-            var convertToPdf = convertApi.ConvertAsync("docx", "pdf", fileParam);
+            var convertToPdf = await convertApi.ConvertAsync("docx", "pdf", fileParam);
 
-            var outputFileName = convertToPdf.Result.Files[0];
-            var fileInfo = outputFileName.AsFileAsync(Path.Combine(Path.GetTempPath(), outputFileName.FileName)).Result;
+            var outputFileName = convertToPdf.Files[0];
+            var fileInfo = await outputFileName.SaveFileAsync(Path.Combine(Path.GetTempPath(), outputFileName.FileName));
 
             Console.WriteLine("The PDF saved to " + fileInfo);            
 
-            var convertToPng = convertApi.ConvertAsync("docx", "png", fileParam);
+            var convertToPng = await convertApi.ConvertAsync("docx", "png", fileParam);
 
-            foreach (var processedFile in convertToPng.Result.Files)
+            foreach (var processedFile in convertToPng.Files)
             {
-                fileInfo = processedFile.AsFileAsync(Path.Combine(Path.GetTempPath(), processedFile.FileName)).Result;
+                fileInfo = await processedFile.SaveFileAsync(Path.Combine(Path.GetTempPath(), processedFile.FileName));
                 Console.WriteLine("The PNG saved to " + fileInfo);
             }
 
