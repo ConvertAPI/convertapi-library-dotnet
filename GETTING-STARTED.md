@@ -124,9 +124,6 @@ var saveFiles = await mergeTask.Files[0].SaveFileAsync("c:\merged-pdf.pdf");
 //Import
 using ConvertApiDotNet;
 
-//Convert Word document
-const string sourceFile = @"c:\test.docx";
-
 //Get your secret at https://www.convertapi.com/a
 var convertApi = new ConvertApi("your-api-secret");
 
