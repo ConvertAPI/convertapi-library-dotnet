@@ -1,5 +1,5 @@
-ARG NUGET_KEY
 FROM mcr.microsoft.com/dotnet/core/sdk:3.1-bionic
+ARG NUGET_KEY
 WORKDIR /src
 COPY . .
 RUN dotnet build ConvertApi
