@@ -37,9 +37,9 @@ var convertApi = new ConvertApi("your-api-secret");
 
 //Set input and output formats and pass file parameter. 
 //Word to PDF API. Read more https://www.convertapi.com/docx-to-pdf
-var convertToPdf = convertApi.ConvertAsync("docx", "pdf", new ConvertApiFileParam(sourceFile));
+var convertToPdf = await convertApi.ConvertAsync("docx", "pdf", new ConvertApiFileParam(sourceFile));
 //Save PDF file 
-convertToPdf.Result.SaveFiles(@"c:\output");
+var files = await convertToPdf.SaveFilesAsync(@"c:\output");
 ```
 
 #### 2.c. Convert remote file and set additional parameters
@@ -52,7 +52,7 @@ using ConvertApiDotNet;
 var sourceFile = new Uri("https://github.com/Baltsoft/CDN/raw/master/cara/testfiles/presentation2.pptx");
 
 //Get your secret at https://www.convertapi.com/a
-var convertApi = new ConvertApi("your-api-secret");
+var convertApi = new await ConvertApi("your-api-secret");
 
 //Set input and output formats and pass file parameter. 
 //PowerPoint to PNG API. Read more https://www.convertapi.com/pptx-to-png
@@ -64,7 +64,7 @@ var createThumbnails = convertApi.ConvertAsync("pptx", "png",
     new ConvertApiParam("ImageWidth", "500")
 );
 //Save PNG files
-createThumbnails.Result.SaveFiles(@"c:\output");
+var files = await createThumbnails.SaveFilesAsync(@"c:\output");
 ```
 
 #### 2.d. Convert from a stream
@@ -83,12 +83,12 @@ var convertApi = new ConvertApi("your-api-secret");
 var stream = new MemoryStream(Encoding.UTF8.GetBytes(htmlString));
 
 //Html to PDF API. Read more https://www.convertapi.com/html-to-pdf
-var convertToPdf = convertApi.ConvertAsync("html", "pdf", 
+var convertToPdf = await convertApi.ConvertAsync("html", "pdf", 
     new ConvertApiFileParam(stream, "test.html")
 );
 
 //PDF as stream
-var outputStream = convertToPdf.Result.FileStream();
+var outputStream = await convertToPdf.Files[0].FileStreamAsync();
 ```
 
 #### 2.e. Conversions chaining
@@ -105,17 +105,17 @@ var convertApi = new ConvertApi("your-api-secret");
 
 //Set input and output formats and pass file parameter. 
 //Split PDF API. Read more https://www.convertapi.com/pdf-to-split
-var splitTask = convertApi.ConvertAsync("pdf", "split",
+var splitTask = await convertApi.ConvertAsync("pdf", "split",
     new ConvertApiFileParam(sourceFile));
 
 //Get result of the first chain and move it to Merge conversion. 
 //Chains are executed on server without moving files.
 //Merge PDF API. Read more https://www.convertapi.com/pdf-to-merge
 var mergeTask = convertApi.ConvertAsync("pdf", "merge", 
-    new ConvertApiFileParam(splitTask.Result.Files.First()), 
-    new ConvertApiFileParam(splitTask.Result.Files.Last()));
+    new ConvertApiFileParam(splitTask.Files.First()), 
+    new ConvertApiFileParam(splitTask.Files.Last()));
 
-var saveFiles = mergeTask.Result.SaveFile("c:\merged-pdf.pdf");
+var saveFiles = await mergeTask.Files[0].SaveFileAsync("c:\merged-pdf.pdf");
 ```
 
 #### 3. Read account status
@@ -124,14 +124,11 @@ var saveFiles = mergeTask.Result.SaveFile("c:\merged-pdf.pdf");
 //Import
 using ConvertApiDotNet;
 
-//Convert Word document
-const string sourceFile = @"c:\test.docx";
-
 //Get your secret at https://www.convertapi.com/a
 var convertApi = new ConvertApi("your-api-secret");
 
 //Read full account data
-var user = convertApi.GetUserAsync().Result;
+var user = await convertApi.GetUserAsync();
 
 //Find out how much seconds left
 var secondsLeft = user.SecondsLeft;
@@ -154,19 +151,19 @@ try
 {
     //PDF to Powerpoint API. Read more https://www.convertapi.com/pdf-to-pptx
     //Set incorect value for parameter AutoRotate and get exception
-    var convertToPdf = convertApi.ConvertAsync("pdf", "pptx", 
+    var convertToPdf = await convertApi.ConvertAsync("pdf", "pptx", 
         new ConvertApiFileParam(sourceFile),
         new ConvertApiParam("AutoRotate","WrongParameter")
         );
-     var outputFileName = convertToPdf.Result.Files[0];
+     var outputFileName = convertToPdf.Files[0];
 }
-//Catch exceptions from asynchronous methods
-catch (AggregateException e)
+//Catch exceptions from ConvertApi
+catch (ConvertApiException e)
 {                                
     //Read exception status code
-    Console.WriteLine("Status Code: " + (e.InnerException as ConvertApiException)?.StatusCode);
+     Console.WriteLine("Status Code: " + e.StatusCode);
     //Read exception detailed description
-    Console.WriteLine("Response: " + (e.InnerException as ConvertApiException)?.Response);
+     Console.WriteLine("Response: " + e.Response);
 }
 ```
 
