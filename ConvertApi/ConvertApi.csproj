@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Version>3.0.2</Version>
+    <Version>3.0.3</Version>
     <Company>Baltsoft</Company>
     <Authors>Baltsoft</Authors>
     <PackageProjectUrl>https://www.convertapi.com</PackageProjectUrl>
@@ -23,9 +23,9 @@ https://github.com/ConvertAPI/convertapi-dotnet</Description>
     <Product>ConvertApi</Product>
     <AssemblyName>ConvertApi</AssemblyName>
     <RootNamespace>ConvertApiDotNet</RootNamespace>
-    <AssemblyVersion>3.0.2.0</AssemblyVersion>
-    <FileVersion>3.0.2.0</FileVersion>
-    <PackageReleaseNotes>Small changes.</PackageReleaseNotes>
+    <AssemblyVersion>3.0.3.0</AssemblyVersion>
+    <FileVersion>3.0.3.0</FileVersion>
+    <PackageReleaseNotes>Added file parameter overrides to fit Watermark PDF implementation. </PackageReleaseNotes>
   </PropertyGroup>
 
   <ItemGroup>

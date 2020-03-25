@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -18,7 +19,7 @@ namespace ConvertApiDotNet
         public ConvertApiBaseParam(string name, string value)
         {
             Name = name;
-            Value = new[] { value };
+            Value = new[] {value};
         }
 
 
@@ -31,16 +32,16 @@ namespace ConvertApiDotNet
         public ConvertApiBaseParam(string name, Uri url)
         {
             Name = name;
-            Value = new[] { url.ToString() };
+            Value = new[] {url.ToString()};
         }
 
-        protected ConvertApiBaseParam(string name, ConvertApiResponse convertApiResponse)
+        /*protected ConvertApiBaseParam(string name, ConvertApiResponse convertApiResponse)
         {
             Name = name;
             Value = convertApiResponse.Files.Select(s => s.Url.ToString()).ToArray();
-        }
+        }*/
 
-        public ConvertApiBaseParam(string name)
+        protected ConvertApiBaseParam(string name)
         {
             Name = name;
         }
@@ -48,7 +49,7 @@ namespace ConvertApiDotNet
         public string Name { get; }
         internal string[] Value;
 
-        public string[] GetValues()
+        public IEnumerable<string> GetValues()
         {
             return Value;
         }
@@ -56,25 +57,32 @@ namespace ConvertApiDotNet
 
     public class ConvertApiParam : ConvertApiBaseParam
     {
-        public ConvertApiParam(string name, string value) : base(name, value) { }
+        public ConvertApiParam(string name, string value) : base(name, value)
+        {
+        }
 
-        public ConvertApiParam(string name, int value) : this(name, value.ToString()) { }
+        public ConvertApiParam(string name, int value) : this(name, value.ToString())
+        {
+        }
 
-        public ConvertApiParam(string name, decimal value) : this(name, value.ToString(CultureInfo.InvariantCulture)) { }
-
-        public ConvertApiParam(string name, ConvertApiResponse response) : base(name, response) { }
-
+        public ConvertApiParam(string name, decimal value) : this(name, value.ToString(CultureInfo.InvariantCulture))
+        {
+        }
     }
 
     public class ConvertApiFileParam : ConvertApiBaseParam
     {
-        internal Task<ConvertApiUpload> Tasks { get; set; }
+        private Task<ConvertApiUpload> Tasks { get; set; }
 
         /// <summary>
         /// Convert remote file.
         /// </summary>
         /// <param name="url">Remote file url</param>
-        public ConvertApiFileParam(Uri url) : base("File")
+        public ConvertApiFileParam(Uri url) : this("file", url)
+        {
+        }
+
+        public ConvertApiFileParam(string name, Uri url) : base(name)
         {
             Tasks = Upload(url);
         }
@@ -83,7 +91,11 @@ namespace ConvertApiDotNet
         /// Convert local file or pass File ID.
         /// </summary>
         /// <param name="path">Full path to local file or File ID.</param>
-        public ConvertApiFileParam(string path) : base("File")
+        public ConvertApiFileParam(string path) : this("file", path)
+        {
+        }
+
+        public ConvertApiFileParam(string name, string path) : base(name)
         {
             //If file then load as stream if not then assume that it is file id
             if (File.Exists(path))
@@ -91,14 +103,18 @@ namespace ConvertApiDotNet
                 Tasks = Upload(new FileInfo(path));
             }
             else
-                Value = new[] { path };
+                Value = new[] {path};
         }
 
         /// <summary>
         /// Convert local file.
         /// </summary>
         /// <param name="file">Full path to local file</param>
-        public ConvertApiFileParam(FileInfo file) : base("File")
+        public ConvertApiFileParam(FileInfo file) : this("File", file)
+        {
+        }
+
+        public ConvertApiFileParam(string name, FileInfo file) : base(name)
         {
             Tasks = Upload(file);
         }
@@ -108,14 +124,31 @@ namespace ConvertApiDotNet
         /// </summary>
         /// <param name="fileStream">File stream</param>
         /// <param name="fileName">Set source file name.</param>
-        public ConvertApiFileParam(Stream fileStream, string fileName) : base("File")
+        public ConvertApiFileParam(Stream fileStream, string fileName) : this("File", fileStream, fileName)
+        {
+        }
+
+        public ConvertApiFileParam(string name, Stream fileStream, string fileName) : base(name)
         {
             Tasks = Upload(fileStream, fileName);
         }
 
-        public ConvertApiFileParam(ProcessedFile processedFile) : base("File", processedFile.Url) { }
+        public ConvertApiFileParam(ProcessedFile processedFile) : this("File", processedFile)
+        {
+        }
 
-        public ConvertApiFileParam(ConvertApiResponse response) : base("File", response) { }
+        public ConvertApiFileParam(string name, ProcessedFile processedFile) : base(name, processedFile.Url)
+        {
+        }
+
+        public ConvertApiFileParam(ConvertApiResponse response) : this("File", response)
+        {
+        }
+
+        public ConvertApiFileParam(string name, ConvertApiResponse response) : base(name)
+        {
+            Value = response.Files.Select(s => s.Url.ToString()).ToArray();
+        }
 
         private static async Task<ConvertApiUpload> Upload(FileInfo file)
         {
@@ -149,6 +182,7 @@ namespace ConvertApiDotNet
             {
                 throw new ConvertApiException(responseMessage.StatusCode, $"Unable to upload file. {responseMessage.ReasonPhrase}", result);
             }
+
             return JsonConvert.DeserializeObject<ConvertApiUpload>(result);
         }
 
@@ -160,12 +194,13 @@ namespace ConvertApiDotNet
                 Query = $"url={remoteFileUrl}"
             };
 
-            var responseMessage = await ConvertApi.GetClient().PostAsync(url.Uri, ConvertApiConstants.UploadTimeoutInSeconds,null);
+            var responseMessage = await ConvertApi.GetClient().PostAsync(url.Uri, ConvertApiConstants.UploadTimeoutInSeconds, null);
             var result = await responseMessage.Content.ReadAsStringAsync();
             if (responseMessage.StatusCode != HttpStatusCode.OK)
             {
                 throw new ConvertApiException(responseMessage.StatusCode, $"Unable to upload file. {responseMessage.ReasonPhrase}", result);
             }
+
             return JsonConvert.DeserializeObject<ConvertApiUpload>(result);
         }
 
