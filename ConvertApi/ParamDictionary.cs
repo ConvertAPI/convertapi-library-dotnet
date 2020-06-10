@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace ConvertApiDotNet
 {
@@ -36,6 +38,10 @@ namespace ConvertApiDotNet
             return dic;
         }
 
+        public string Find(string key)
+        {
+            return _dictionary.FirstOrDefault(w => string.Equals(w.Key, key, StringComparison.OrdinalIgnoreCase)).Value?[0]?.ToString();
+        }
 
         public void Add(string key, object value)
         {
@@ -43,7 +49,7 @@ namespace ConvertApiDotNet
 
             if (!_dictionary.ContainsKey(keyToAdd))
             {
-                _dictionary.Add(keyToAdd, new List<object> { value });
+                _dictionary.Add(keyToAdd, new List<object> {value});
             }
             else
             {

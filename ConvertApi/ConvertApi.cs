@@ -47,15 +47,10 @@ namespace ConvertApiDotNet
 
         public async Task<ConvertApiResponse> ConvertAsync(string fromFormat, string toFormat, params ConvertApiBaseParam[] parameters)
         {
-            return await ConvertAsync(fromFormat, toFormat, string.Empty, (IEnumerable<ConvertApiBaseParam>)parameters);
+            return await ConvertAsync(fromFormat, toFormat,  (IEnumerable<ConvertApiBaseParam>)parameters);
         }
-
+        
         public async Task<ConvertApiResponse> ConvertAsync(string fromFormat, string toFormat, IEnumerable<ConvertApiBaseParam> parameters)
-        {
-            return await ConvertAsync(fromFormat, toFormat, string.Empty, parameters);
-        }
-
-        public async Task<ConvertApiResponse> ConvertAsync(string fromFormat, string toFormat, string converter, IEnumerable<ConvertApiBaseParam> parameters)
         {
             var content = new MultipartFormDataContent
             {
@@ -67,7 +62,6 @@ namespace ConvertApiDotNet
 
 
             var validParameters = parameters.Where(n => !ignoredParameters.Contains(n.Name, StringComparer.OrdinalIgnoreCase)).ToList();
-
 
             var dicList = new ParamDictionary();
             foreach (var parameter in validParameters)
@@ -119,8 +113,10 @@ namespace ConvertApiDotNet
                 }
             }
 
+            var converter = dicList.Find("converter");
+
             if (!string.IsNullOrEmpty(converter))
-                converter = $"/{converter}";
+                converter = $"/converter/{converter}";
 
             var url = new UriBuilder(ApiBaseUri)
             {

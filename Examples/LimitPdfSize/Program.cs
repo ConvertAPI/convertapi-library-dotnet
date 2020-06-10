@@ -1,10 +1,10 @@
-﻿using ConvertApiDotNet;
-using System;
-using System.Linq;
+﻿using System;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
+using ConvertApiDotNet;
 
-namespace CompressAndSplit
+namespace LimitPdfSize
 {
     /// <summary>
     /// Compressing PDF and if the result is larger than SIZE_LIMIT_BYTES removing last pages to make file less than SIZE_LIMIT_BYTES.
