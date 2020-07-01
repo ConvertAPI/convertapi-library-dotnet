@@ -1,7 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <Version>3.0.4</Version>
     <Company>Baltsoft</Company>
@@ -23,9 +22,11 @@ https://github.com/ConvertAPI/convertapi-dotnet</Description>
     <Product>ConvertApi</Product>
     <AssemblyName>ConvertApi</AssemblyName>
     <RootNamespace>ConvertApiDotNet</RootNamespace>
-    <AssemblyVersion>3.0.4.0</AssemblyVersion>
-    <FileVersion>3.0.4.0</FileVersion>
+    <AssemblyVersion>3.0.5.0</AssemblyVersion>
+    <FileVersion>3.0.5.0</FileVersion>
     <PackageReleaseNotes>Added file parameter overrides to fit Watermark PDF implementation. </PackageReleaseNotes>
+    <TargetFrameworks>netstandard2.0;netcoreapp3.1</TargetFrameworks>
+    <PackageVersion>3.0.5</PackageVersion>
   </PropertyGroup>
 
   <ItemGroup>
