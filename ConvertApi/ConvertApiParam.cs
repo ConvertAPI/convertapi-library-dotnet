@@ -191,7 +191,7 @@ namespace ConvertApiDotNet
             var url = new UriBuilder(ConvertApi.ApiBaseUri)
             {
                 Path = "/upload",
-                Query = $"url={remoteFileUrl}"
+                Query = $"url={WebUtility.UrlEncode(remoteFileUrl.ToString())}"
             };
 
             var responseMessage = await ConvertApi.GetClient().PostAsync(url.Uri, ConvertApiConstants.UploadTimeoutInSeconds, null);
