@@ -23,7 +23,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RetrieveUserInformation", "
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConvertUrlToPdf", "Examples\ConvertUrlToPdf\ConvertUrlToPdf.csproj", "{F415FA3B-2720-493D-9872-437F09EA6700}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConversionsChaining", "Examples\ConversionsChaining\ConversionsChaining.csproj", "{77050432-7EF2-431C-90E7-8EE01DF9BC20}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Workflow", "Examples\Workflow\Workflow.csproj", "{77050432-7EF2-431C-90E7-8EE01DF9BC20}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConvertRemoteFile", "Examples\ConvertRemoteFile\ConvertRemoteFile.csproj", "{E6F16DC2-35B7-4F52-B66A-029F1D69A8D7}"
 EndProject

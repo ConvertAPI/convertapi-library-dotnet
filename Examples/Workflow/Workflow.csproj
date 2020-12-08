@@ -6,8 +6,8 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{77050432-7EF2-431C-90E7-8EE01DF9BC20}</ProjectGuid>
     <OutputType>Exe</OutputType>
-    <RootNamespace>ConversionsChaining</RootNamespace>
-    <AssemblyName>ConversionsChaining</AssemblyName>
+    <RootNamespace>Workflow</RootNamespace>
+    <AssemblyName>Workflow</AssemblyName>
     <TargetFrameworkVersion>v4.7</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
