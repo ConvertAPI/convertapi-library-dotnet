@@ -23,7 +23,7 @@ convertApi.ConvertUrl("https://www.google.com", @"c:\google.pdf"));
 convertApi.ConvertRemoteFile("https://cdn.convertapi.com/cara/testfiles/document.docx", @"c:\document.pdf"));
 ```
 
-#### 2.b. Convert local file
+#### 2.b. Convert a local file
 
 ```csharp
 //Import
@@ -42,7 +42,7 @@ var convertToPdf = await convertApi.ConvertAsync("docx", "pdf", new ConvertApiFi
 var files = await convertToPdf.SaveFilesAsync(@"c:\output");
 ```
 
-#### 2.c. Convert remote file and set additional parameters
+#### 2.c. Convert a remote file and set additional parameters
 
 ```csharp
 //Import
