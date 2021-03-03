@@ -31,7 +31,7 @@ Example to convert file to PDF. All supported formats and options can be found
 ```csharp
 ConvertApiResponse result = await convertApi.ConvertAsync("docx", "pdf", new[]
 {
-   new ConvertApiParam("File", File.OpenRead(@"\source\test.docx"))
+   new ConvertApiFileParam(@"c:\source\test.docx")   
 });
 
 // save to file
@@ -68,7 +68,7 @@ parameters and explanations can be found [here](https://www.convertapi.com).
 ```csharp
 ConvertApiResponse result = await convertApi.ConvertAsync("pdf", "jpg", new[]
 {
-   new ConvertApiParam("File", File.OpenRead(@"\source\test.pdf")),
+   new ConvertApiFileParam(@"c:\source\test.docx"),
    new ConvertApiParam("ScaleImage","true"),
    new ConvertApiParam("ScaleProportions","true"),
    new ConvertApiParam("ImageHeight","300"),
@@ -100,7 +100,7 @@ try
 
   var fileToConvert = @"c:\test.docx";
   var conversionTask = await convertApi.ConvertAsync("docx", "pdf", 
-      new ConvertApiFileParam(File.OpenRead(fileToConvert),"test.docx")
+      new ConvertApiFileParam(@"c:\source\test.docx")
       );
 
   var fileSaved = await conversionTask.Files.SaveFilesAsync(@"c:\");
