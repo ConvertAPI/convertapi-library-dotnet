@@ -56,7 +56,7 @@ int cost = result.ConversionCost;
 ```csharp
 ConvertApiResponse result = await convertApi.ConvertAsync("pptx", "pdf", new[]
 {
-   new ConvertApiParam("File", "https://cdn.convertapi.com/cara/testfiles/presentation.pptx")
+   new ConvertApiFileParam(new Uri("https://cdn.convertapi.com/cara/testfiles/presentation.pptx"))
 });
 ```
 
