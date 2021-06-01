@@ -96,13 +96,10 @@ ConvertAPI is designed to make converting file super easy, the following snippet
 ```csharp
 try
 {
-  var convertApi = new ConvertApi("your-api-secret");
-
-  var fileToConvert = @"c:\test.docx";
+  var convertApi = new ConvertApi("your-api-secret");  
   var conversionTask = await convertApi.ConvertAsync("docx", "pdf", 
       new ConvertApiFileParam(@"c:\source\test.docx")
       );
-
   var fileSaved = await conversionTask.Files.SaveFilesAsync(@"c:\");
   }
   //Catch exceptions from asynchronous methods
