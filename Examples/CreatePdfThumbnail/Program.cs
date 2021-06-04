@@ -26,7 +26,6 @@ namespace CreatePdfThumbnail
             );
 
             var thumbnail = await convertApi.ConvertAsync("pdf", "jpg",
-
                 new ConvertApiFileParam(extractFirstPage),
                 new ConvertApiParam("ScaleImage", "true"),
                 new ConvertApiParam("ScaleProportions", "true"),
@@ -36,6 +35,7 @@ namespace CreatePdfThumbnail
 
             var saveFiles = await thumbnail.SaveFilesAsync(Path.GetTempPath());
             Console.WriteLine("The thumbnail saved to " + saveFiles.First());
+            var deletedCount = await thumbnail.Files.DeleteFilesAsync();
             Console.ReadLine();
         }
     }

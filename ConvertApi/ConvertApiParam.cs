@@ -72,7 +72,7 @@ namespace ConvertApiDotNet
 
     public class ConvertApiFileParam : ConvertApiBaseParam
     {
-        private Task<ConvertApiUpload> Tasks { get; set; }
+        private Task<ConvertApiFiles> Tasks { get; set; }
 
         /// <summary>
         /// Convert remote file.
@@ -133,11 +133,11 @@ namespace ConvertApiDotNet
             Tasks = Upload(fileStream, fileName);
         }
 
-        public ConvertApiFileParam(ProcessedFile processedFile) : this("File", processedFile)
+        public ConvertApiFileParam(ConvertApiFiles processedFile) : this("File", processedFile)
         {
         }
 
-        public ConvertApiFileParam(string name, ProcessedFile processedFile) : base(name, processedFile.Url)
+        public ConvertApiFileParam(string name, ConvertApiFiles processedFile) : base(name, processedFile.Url)
         {
         }
 
@@ -150,7 +150,7 @@ namespace ConvertApiDotNet
             Value = response.Files.Select(s => s.Url.ToString()).ToArray();
         }
 
-        private static async Task<ConvertApiUpload> Upload(FileInfo file)
+        private static async Task<ConvertApiFiles> Upload(FileInfo file)
         {
             using (var fileStream = file.OpenRead())
             {
@@ -158,7 +158,7 @@ namespace ConvertApiDotNet
             }
         }
 
-        private static async Task<ConvertApiUpload> Upload(Stream fileStream, string fileName)
+        private static async Task<ConvertApiFiles> Upload(Stream fileStream, string fileName)
         {
             HttpResponseMessage responseMessage;
             using (var content = new StreamContent(fileStream))
@@ -183,10 +183,10 @@ namespace ConvertApiDotNet
                 throw new ConvertApiException(responseMessage.StatusCode, $"Unable to upload file. {responseMessage.ReasonPhrase}", result);
             }
 
-            return JsonConvert.DeserializeObject<ConvertApiUpload>(result);
+            return JsonConvert.DeserializeObject<ConvertApiFiles>(result);
         }
 
-        private static async Task<ConvertApiUpload> Upload(Uri remoteFileUrl)
+        private static async Task<ConvertApiFiles> Upload(Uri remoteFileUrl)
         {
             var url = new UriBuilder(ConvertApi.ApiBaseUri)
             {
@@ -201,10 +201,10 @@ namespace ConvertApiDotNet
                 throw new ConvertApiException(responseMessage.StatusCode, $"Unable to upload file. {responseMessage.ReasonPhrase}", result);
             }
 
-            return JsonConvert.DeserializeObject<ConvertApiUpload>(result);
+            return JsonConvert.DeserializeObject<ConvertApiFiles>(result);
         }
 
-        public async Task<ConvertApiUpload> GetValueAsync()
+        public async Task<ConvertApiFiles> GetValueAsync()
         {
             return Tasks == null ? null : await Tasks;
         }

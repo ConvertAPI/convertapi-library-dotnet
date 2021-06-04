@@ -99,7 +99,7 @@ namespace ConvertApiDotNet
                     case string value:
                         content.Add(new StringContent(value), s.Key);
                         break;
-                    case ConvertApiUpload upload:
+                    case ConvertApiFiles upload:
                         content.Add(new StringContent(upload.FileId), s.Key);
 
                         //Set FROM format if it is not set
