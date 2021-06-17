@@ -36,6 +36,7 @@ namespace CreatePdfThumbnail
             var saveFiles = await thumbnail.SaveFilesAsync(Path.GetTempPath());
             Console.WriteLine("The thumbnail saved to " + saveFiles.First());
             var deletedCount = await thumbnail.Files.DeleteFilesAsync();
+            deletedCount = await thumbnail.Files.DeleteFilesAsync();
             Console.ReadLine();
         }
     }
