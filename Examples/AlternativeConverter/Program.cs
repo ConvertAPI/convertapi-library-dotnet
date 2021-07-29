@@ -16,7 +16,7 @@ namespace AlternativeConverter
         /// </summary>
         static async Task Main(string[] args)
         {
-            var convertApi = new ConvertApi("8wTuDWLxgHleYS4E");
+            var convertApi = new ConvertApi("your api secret");
 
             var pdf1 = Path.Combine(Path.GetTempPath(), $"test-Office-{Guid.NewGuid()}.pdf");
             var doc1 = await convertApi.ConvertAsync("docx", "pdf",
