@@ -14,12 +14,16 @@ namespace ConvertApiDotNet
 {
     public class ConvertApi
     {
-        private readonly string _secret;
-        private readonly string _token;
-        private readonly int _apiKey;
+        public static string Secret;
+        public static string Token;
+        public static int ApiKey;
         public static string ApiBaseUri = "https://v2.convertapi.com";
         private int _requestTimeoutInSeconds = 180;
         private static IConvertApiHttpClient _convertApiHttpClient;
+
+        public ConvertApi()
+        {
+        }
 
         /// <summary>
         /// Initiate new instance of ConvertAPI client
@@ -28,7 +32,7 @@ namespace ConvertApiDotNet
         /// <param name="convertApiHttpClient">Inject your own HttpClient</param>
         public ConvertApi(string secret, IConvertApiHttpClient convertApiHttpClient)
         {
-            _secret = secret;
+            Secret = secret;
             _convertApiHttpClient = convertApiHttpClient;
         }
 
@@ -37,7 +41,7 @@ namespace ConvertApiDotNet
             if (string.IsNullOrEmpty(secret))
                 throw new ArgumentNullException(nameof(secret));
             
-            _secret = secret;
+            Secret = secret;
         }
         
         public ConvertApi(string token, int apiKey)
@@ -45,8 +49,8 @@ namespace ConvertApiDotNet
             if (string.IsNullOrEmpty(token))
                 throw new ArgumentNullException(nameof(token));
             
-            _token = token;
-            _apiKey = apiKey;
+            Token = token;
+            ApiKey = apiKey;
         }
 
         public static IConvertApiHttpClient GetClient()
@@ -136,7 +140,7 @@ namespace ConvertApiDotNet
             {
                 Path = $"convert/{fromFormat}/to/{toFormat}{converter}",
                 //We give Token authentication priority if token provided and then Secret
-                Query = !string.IsNullOrEmpty(_token) ? $"token={_token}&apikey={_apiKey}" : $"secret={_secret}"
+                Query = !string.IsNullOrEmpty(Token) ? $"token={Token}&apikey={ApiKey}" : $"secret={Secret}"
             };
 
             var response = await GetClient().PostAsync(url.Uri, _requestTimeoutInSeconds + 10, content);
@@ -156,7 +160,7 @@ namespace ConvertApiDotNet
             var url = new UriBuilder(ApiBaseUri)
             {
                 Path = "user",
-                Query = $"secret={_secret}"
+                Query = $"secret={Secret}"
             };
 
             var response = await GetClient().GetAsync(url.Uri, ConvertApiConstants.DownloadTimeoutInSeconds);
