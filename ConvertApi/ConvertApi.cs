@@ -15,6 +15,8 @@ namespace ConvertApiDotNet
     public class ConvertApi
     {
         private readonly string _secret;
+        private readonly string _token;
+        private readonly int _apiKey;
         public static string ApiBaseUri = "https://v2.convertapi.com";
         private int _requestTimeoutInSeconds = 180;
         private static IConvertApiHttpClient _convertApiHttpClient;
@@ -32,7 +34,19 @@ namespace ConvertApiDotNet
 
         public ConvertApi(string secret)
         {
+            if (string.IsNullOrEmpty(secret))
+                throw new ArgumentNullException(nameof(secret));
+            
             _secret = secret;
+        }
+        
+        public ConvertApi(string token, int apiKey)
+        {
+            if (string.IsNullOrEmpty(token))
+                throw new ArgumentNullException(nameof(token));
+            
+            _token = token;
+            _apiKey = apiKey;
         }
 
         public static IConvertApiHttpClient GetClient()
@@ -121,7 +135,8 @@ namespace ConvertApiDotNet
             var url = new UriBuilder(ApiBaseUri)
             {
                 Path = $"convert/{fromFormat}/to/{toFormat}{converter}",
-                Query = $"secret={_secret}"
+                //We give Token authentication priority if token provided and then Secret
+                Query = !string.IsNullOrEmpty(_token) ? $"token={_token}&apikey={_apiKey}" : $"secret={_secret}"
             };
 
             var response = await GetClient().PostAsync(url.Uri, _requestTimeoutInSeconds + 10, content);
