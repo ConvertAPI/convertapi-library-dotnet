@@ -63,7 +63,7 @@ ConvertApiResponse result = await convertApi.ConvertAsync("pptx", "pdf", new[]
 #### Additional conversion parameters
 
 ConvertAPI accepts extra conversion parameters depending on converted formats. All conversion 
-parameters and explanations can be found [here](https://www.convertapi.com).
+parameters and explanations can be found [here](https://www.convertapi.com/conversions).
 
 ```csharp
 ConvertApiResponse result = await convertApi.ConvertAsync("pdf", "jpg", new[]
