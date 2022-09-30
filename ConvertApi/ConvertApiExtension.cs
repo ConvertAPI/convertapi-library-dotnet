@@ -101,7 +101,7 @@ namespace ConvertApiDotNet
 
         private static async Task<Stream> AsStreamAsync(Uri url)
         {
-            var httpResponseMessage = await ConvertApi.GetClient().GetAsync(url, ConvertApiConstants.DownloadTimeoutInSeconds);
+            var httpResponseMessage = await ConvertApi.GetClient().GetAsync(url, ConvertApiConstants.DownloadTimeout);
             return await httpResponseMessage.Content.ReadAsStreamAsync();
         }
 

@@ -1,4 +1,5 @@
-﻿using System.Reflection;
+﻿using System;
+using System.Reflection;
 
 namespace ConvertApiDotNet.Constants
 {
@@ -6,13 +7,17 @@ namespace ConvertApiDotNet.Constants
     {
         static ConvertApiConstants()
         {
-            UploadTimeoutInSeconds = 600;
-            DownloadTimeoutInSeconds = 600;
+            UploadTimeout = TimeSpan.FromSeconds(600);
+            DownloadTimeout = TimeSpan.FromSeconds(600);
+            HttpClientTimeOut = TimeSpan.FromSeconds(1800);
+            ConversionTimeoutDelta = TimeSpan.FromSeconds(10);
             HttpUserAgent = $"convertapi-dotnet/{new AssemblyName(typeof(ConvertApiConstants).Assembly.FullName).Version}";
         }
 
-        public static int UploadTimeoutInSeconds { get; set; }
-        public static int DownloadTimeoutInSeconds { get; set; }
+        public static TimeSpan HttpClientTimeOut { get; set; }
+        public static TimeSpan UploadTimeout { get; set; }
+        public static TimeSpan DownloadTimeout { get; set; }
+        public static TimeSpan ConversionTimeoutDelta { get; set; }
         public static string HttpUserAgent { get; set; }
     }
 }

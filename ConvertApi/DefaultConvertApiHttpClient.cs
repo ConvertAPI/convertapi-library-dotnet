@@ -1,4 +1,5 @@
 ﻿using System.Net.Http;
+using ConvertApiDotNet.Constants;
 using ConvertApiDotNet.Interface;
 
 namespace ConvertApiDotNet
@@ -10,6 +11,7 @@ namespace ConvertApiDotNet
         public DefaultConvertApiHttpClient()
         {
             Client = new HttpClient();
+            Client.Timeout = ConvertApiConstants.HttpClientTimeOut;
         }
     }
 }

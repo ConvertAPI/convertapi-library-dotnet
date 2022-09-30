@@ -29,7 +29,7 @@ namespace ConvertApiDotNet
             return null;
         }
 
-        public static async Task<HttpResponseMessage> PostAsync(this IConvertApiHttpClient convertApiHttpClient, Uri url, int timeOut, HttpContent content)
+        public static async Task<HttpResponseMessage> PostAsync(this IConvertApiHttpClient convertApiHttpClient, Uri url, TimeSpan? timeOut, HttpContent content)
         {
             var request = new HttpRequestMessage
             {
@@ -37,21 +37,22 @@ namespace ConvertApiDotNet
                 Method = HttpMethod.Post,
                 Content = content
             };
-            request.SetTimeout(new TimeSpan(0, 0, timeOut));
+            if (timeOut != null)
+                request.SetTimeout(timeOut);
             request.Headers.Add("User-Agent", ConvertApiConstants.HttpUserAgent);
             request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
             return await convertApiHttpClient.Client.SendAsync(request);
         }
 
-        public static async Task<HttpResponseMessage> GetAsync(this IConvertApiHttpClient convertApiHttpClient, Uri url, int timeOut)
+        public static async Task<HttpResponseMessage> GetAsync(this IConvertApiHttpClient convertApiHttpClient, Uri url, TimeSpan timeOut)
         {
             var request = new HttpRequestMessage
             {
                 RequestUri = url,
                 Method = HttpMethod.Get
             };
-            request.SetTimeout(new TimeSpan(0, 0, timeOut));
+            request.SetTimeout(timeOut);
             request.Headers.Add("User-Agent", ConvertApiConstants.HttpUserAgent);
             return await convertApiHttpClient.Client.SendAsync(request);
         }
