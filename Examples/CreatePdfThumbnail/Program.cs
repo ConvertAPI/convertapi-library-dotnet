@@ -3,6 +3,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using ConvertApiDotNet;
+using ConvertApiDotNet.Exceptions;
 
 namespace CreatePdfThumbnail
 {
@@ -18,25 +19,31 @@ namespace CreatePdfThumbnail
         {
             //Get your secret at https://www.convertapi.com/a
             var convertApi = new ConvertApi("your api secret");
-            var pdfFile = @"..\..\..\TestFiles\test.pdf";
+            var pdfFile = @"..\..\..\TestFiles\test.pdf";           
 
-            var extractFirstPage = await convertApi.ConvertAsync("pdf", "extract",
-                new ConvertApiFileParam(pdfFile),
-                new ConvertApiParam("PageRange", "1")
-            );
+            try
+            {
+                var thumbnail = await convertApi.ConvertAsync("pdf", "jpg",
+                    new ConvertApiFileParam(pdfFile),
+                    new ConvertApiParam("ScaleImage", "true"),
+                    new ConvertApiParam("ScaleProportions", "true"),
+                    new ConvertApiParam("ImageHeight", "300"),
+                    new ConvertApiParam("ImageWidth", "300"),
+                    new ConvertApiParam("PageRange", "1")
+                );
 
-            var thumbnail = await convertApi.ConvertAsync("pdf", "jpg",
-                new ConvertApiFileParam(extractFirstPage),
-                new ConvertApiParam("ScaleImage", "true"),
-                new ConvertApiParam("ScaleProportions", "true"),
-                new ConvertApiParam("ImageHeight", "300"),
-                new ConvertApiParam("ImageWidth", "300")
-            );
 
-            var saveFiles = await thumbnail.SaveFilesAsync(Path.GetTempPath());
-            Console.WriteLine("The thumbnail saved to " + saveFiles.First());
-            var deletedCount = await thumbnail.Files.DeleteFilesAsync();
-            deletedCount = await thumbnail.Files.DeleteFilesAsync();
+                var saveFiles = await thumbnail.SaveFilesAsync(Path.GetTempPath());
+                Console.WriteLine("The thumbnail saved to " + saveFiles.First());
+                await thumbnail.Files.DeleteFilesAsync();
+            }
+            //Catch exceptions and write details
+            catch (ConvertApiException e)
+            {
+                Console.WriteLine("Status Code: " + e.StatusCode);
+                Console.WriteLine("Response: " + e.Response);
+            }
+
             Console.ReadLine();
         }
     }
