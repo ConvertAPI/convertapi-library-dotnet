@@ -1,9 +1,9 @@
 # ConvertAPI C# Client
 ## Convert your files with our online file conversion API
 
-The ConvertAPI helps converting various file formats. Creating PDF and Images from various sources like Word, Excel, Powerpoint, images, web pages or raw HTML codes. Merge, Encrypt, Split, Repair and Decrypt PDF files. And many others files manipulations. In just few minutes you can integrate it into your application and use it easily.
+ConvertAPI is a convenient REST API that simplifies the process of converting different file formats. You can easily create PDFs and images from sources like Word, Excel, PowerPoint, images, web pages, or raw HTML codes. Furthermore, it enables you to merge, encrypt, split, repair, and decrypt PDF files, along with other file manipulation options. With ConvertAPI, integrating it into your application takes only a few minutes, making it developer-friendly.
 
-The ConvertAPI.NET NuGet package makes it easier to use the Convert API from your .NET 2, 3.x, and 4.x projects without having to build your own API calls. You can get your free API secret at https://www.convertapi.com/a
+The ConvertAPI.NET NuGet package simplifies the usage of the Convert API in your .NET Framework, .NET Core, and .NET projects. You don't need to create your own API calls.
 
 ## Installation
 
