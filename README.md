@@ -27,7 +27,7 @@ ConvertApi convertApi = new ConvertApi("your-api-secret");
 
 #### Set conversion location (optional)
 
-There are several conversion locations available, and if you want to comply with GDPR, you can choose the EU API location. However, this option is not mandatory as ConvertAPI uses GEO DNS to detect the nearest server automatically.
+There are several conversion locations available, and if you want to comply with GDPR, you can choose the EU API location. However, this option is not mandatory as ConvertAPI uses GEO DNS to detect the nearest server automatically. More information at https://www.convertapi.com/doc/servers-location
 
 convertApi.ApiBaseUri = "https://v2.convertapi.com";
 
