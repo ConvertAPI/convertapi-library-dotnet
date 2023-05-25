@@ -36,7 +36,7 @@ convertApi.ApiBaseUri = "https://v2.convertapi.com";
 ### File conversion
 
 Example to convert file to PDF. All supported formats and options can be found 
-[here](https://www.convertapi.com).
+[here](https://www.convertapi.com/conversions).
 
 ```csharp
 ConvertApiResponse result = await convertApi.ConvertAsync("docx", "pdf", new[]
