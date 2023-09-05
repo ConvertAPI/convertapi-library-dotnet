@@ -78,7 +78,7 @@ parameters and explanations can be found [here](https://www.convertapi.com/conve
 ```csharp
 ConvertApiResponse result = await convertApi.ConvertAsync("pdf", "jpg", new[]
 {
-   new ConvertApiFileParam(@"c:\source\test.docx"),
+   new ConvertApiFileParam(@"c:\source\test.pdf"),
    new ConvertApiParam("ScaleImage","true"),
    new ConvertApiParam("ScaleProportions","true"),
    new ConvertApiParam("ImageHeight","300"),
