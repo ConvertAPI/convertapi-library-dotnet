@@ -1,66 +1,54 @@
-﻿using System;
+﻿/// <summary>
+/// The example shows how to watermark PDF with text and put overlay PDF.
+/// https://www.convertapi.com/pdf-to-watermark
+/// https://www.convertapi.com/pdf-to-watermark-overlay
+/// </summary>
+
 using System.Diagnostics;
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
 using ConvertApiDotNet;
 using ConvertApiDotNet.Exceptions;
 
-namespace WatermarkPdf
+try
 {
-    internal class Program
-    {
-        /// <summary>
-        /// The example shows how to watermark PDF with text and put overlay PDF.
-        /// https://www.convertapi.com/pdf-to-watermark
-        /// https://www.convertapi.com/pdf-to-watermark-overlay
-        /// </summary>
-        public static async Task Main(string[] args)
-        {
-            try
-            {
-                Console.WriteLine("The example shows how to watermark PDF with text and put overlay PDF");
-                var sw = new Stopwatch();
-                sw.Start();
-                //Get your secret at https://www.convertapi.com/a
-                var convertApi = new ConvertApi("your api secret");
+    Console.WriteLine("The example shows how to watermark PDF with text and put overlay PDF");
+    var sw = new Stopwatch();
+    sw.Start();
+    //Get your secret at https://www.convertapi.com/a
+    var convertApi = new ConvertApi("your api secret");
 
-                var destinationFileName = Path.Combine(Path.GetTempPath(), $"watermarked-{Guid.NewGuid()}.pdf");
+    var destinationFileName = Path.Combine(Path.GetTempPath(), $"watermarked-{Guid.NewGuid()}.pdf");
 
-                Console.WriteLine("PDF sent for text watermarking...");
+    Console.WriteLine("PDF sent for text watermarking...");
 
-                var pdfWatermark = await convertApi.ConvertAsync("pdf", "watermark",
-                    new ConvertApiFileParam("File", @"..\..\..\TestFiles\test-text.pdf"),
-                    new ConvertApiParam("VerticalAlignment", "bottom"),
-                    new ConvertApiParam("Text", "This is ConvertAPI watermark %DATETIME%"),
-                    new ConvertApiParam("FontSize", 15));
+    var pdfWatermark = await convertApi.ConvertAsync("pdf", "watermark",
+        new ConvertApiFileParam("File", @"..\..\..\TestFiles\test-text.pdf"),
+        new ConvertApiParam("VerticalAlignment", "bottom"),
+        new ConvertApiParam("Text", "This is ConvertAPI watermark %DATETIME%"),
+        new ConvertApiParam("FontSize", 15));
 
-                Console.WriteLine("PDF sent for overlay watermarking...");
+    Console.WriteLine("PDF sent for overlay watermarking...");
 
-                var pdfWatermarkOverlay = await convertApi.ConvertAsync("pdf", "watermark-overlay",
-                    new ConvertApiFileParam("File", pdfWatermark),
-                    new ConvertApiFileParam("OverlayFile", new FileInfo(@"..\..\..\TestFiles\pdf-overlay.pdf")),
-                    new ConvertApiParam("Style", "stamp"),
-                    new ConvertApiParam("Opacity", 50));
+    var pdfWatermarkOverlay = await convertApi.ConvertAsync("pdf", "watermark-overlay",
+        new ConvertApiFileParam("File", pdfWatermark),
+        new ConvertApiFileParam("OverlayFile", new FileInfo(@"..\..\..\TestFiles\pdf-overlay.pdf")),
+        new ConvertApiParam("Style", "stamp"),
+        new ConvertApiParam("Opacity", 50));
 
 
-                var saveFiles = await pdfWatermarkOverlay.Files.First().SaveFileAsync(destinationFileName);
+    var saveFiles = await pdfWatermarkOverlay.Files.First().SaveFileAsync(destinationFileName);
 
-                Console.WriteLine("The PDF saved to " + saveFiles);
-                sw.Stop();
+    Console.WriteLine("The PDF saved to " + saveFiles);
+    sw.Stop();
 
-                Console.WriteLine("Elapsed " + sw.Elapsed);
+    Console.WriteLine("Elapsed " + sw.Elapsed);
 
-                Process.Start(saveFiles.ToString());
-            }
-            //Catch exceptions from asynchronous methods
-            catch (ConvertApiException e)
-            {
-                Console.WriteLine("Status Code: " + e.StatusCode);
-                Console.WriteLine("Response: " + e.Response);
-            }
-
-            Console.ReadLine();
-        }
-    }
+    Process.Start(saveFiles.ToString());
 }
+//Catch exceptions from asynchronous methods
+catch (ConvertApiException e)
+{
+    Console.WriteLine("Status Code: " + e.StatusCode);
+    Console.WriteLine("Response: " + e.Response);
+}
+
+Console.ReadLine();
