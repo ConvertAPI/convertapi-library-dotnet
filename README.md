@@ -92,16 +92,17 @@ You can always check the remaining conversions amount and other account informat
 
 ```csharp
 ConvertApiUser user = await convert.GetUserAsync();
-int secondsLeft = user.SecondsLeft;
+int conversionsTotal = user.ConversionsTotal;
+int conversionsConsumed = user.ConversionsConsumed;
 ```
 
 ### More examples
 
 You can find more advanced examples in the [examples](https://github.com/ConvertAPI/convertapi-dotnet/tree/master/Examples) folder.
 
-#### Converting your first file, full example:
+#### Converting your first file, complete example:
 
-ConvertAPI is designed to make converting file super easy, the following snippet shows how easy it is to get started. Let's convert WORD DOCX file to PDF:
+ConvertAPI is designed to make converting files super easy. The following snippet shows how easy it is to get started. Let's convert the WORD DOCX file to PDF:
 
 ```csharp
 try
@@ -119,11 +120,11 @@ try
      Console.WriteLine("Response: " + e.Response);
 
       if (e.StatusCode == HttpStatusCode.Unauthorized)
-          Console.WriteLine("Secret is not provided or no additional seconds left in account to proceed conversion. More information https://www.convertapi.com/a");
+          Console.WriteLine("Secret is not provided or no additional seconds left in the account to proceed conversion. More information https://www.convertapi.com/a");
   }
 ```
 
-This is the bare-minimum to convert a file using the ConvertAPI client, but you can do a great deal more with the ConvertAPI .NET library. Take special note that you should replace `your-api-secret` with the secret you obtained in item two of the pre-requisites.
+This is the minimum to convert a file using the ConvertAPI client, but you can do much more with the ConvertAPI .NET library. Note that you should replace `your-api-secret` with the secret you obtained in item two of the prerequisites.
 
 ### Issues &amp; Comments
 Please leave all comments, bugs, requests, and issues on the Issues page. We'll respond to your request ASAP!
