@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using ConvertApiDotNet.Constants;
@@ -12,83 +11,6 @@ namespace ConvertApiDotNet
 
     public static class ConvertApiExtension
     {
-        #region Convert method extensions
-
-        /// <summary>
-        /// Waits for the task to complete, unwrapping any exceptions.
-        /// </summary>
-        /// <param name="task">The task. May not be <c>null</c>.</param>
-        private static void WaitAndUnwrapException(this Task task)
-        {
-            task.GetAwaiter().GetResult();
-        }
-
-        /// <summary>
-        /// Waits for the task to complete, unwrapping any exceptions.
-        /// </summary>
-        /// <param name="task">The task. May not be <c>null</c>.</param>
-        private static T WaitAndUnwrapException<T>(this Task<T> task)
-        {
-            return task.GetAwaiter().GetResult();
-        }
-
-        private static IEnumerable<ConvertApiBaseParam> JoinParameters(ConvertApiBaseParam convertApiFileParam, IEnumerable<ConvertApiBaseParam> parameters)
-        {
-            var paramsList = new List<ConvertApiBaseParam> { convertApiFileParam };
-            paramsList.AddRange(parameters);
-            return paramsList;
-        }
-
-        private static string GetPlainExtension(string fromFile)
-        {
-            return Path.GetExtension(fromFile).Replace(".", "");
-        }
-
-        private static Task<ConvertApiResponse> BindFile(ConvertApi convertApi, string fromFile, string outputExtension, IEnumerable<ConvertApiBaseParam> parameters)
-        {
-            return convertApi.ConvertAsync(GetPlainExtension(fromFile), outputExtension, JoinParameters(new ConvertApiFileParam(fromFile), parameters));
-        }
-
-        private static Task<ConvertApiResponse> BindFile(ConvertApi convertApi, Uri fileUrl, string outputExtension, IEnumerable<ConvertApiBaseParam> parameters)
-        {
-            return convertApi.ConvertAsync("*", outputExtension, JoinParameters(new ConvertApiFileParam(fileUrl), parameters));
-        }
-
-        public static FileInfo ConvertFile(this ConvertApi convertApi, string fromFile, string toFile, params ConvertApiBaseParam[] parameters)
-        {
-            var task = BindFile(convertApi, fromFile, GetPlainExtension(toFile), parameters);
-            return task.WaitAndUnwrapException().Files[0].SaveFileAsync(toFile).WaitAndUnwrapException();
-        }
-
-        public static IEnumerable<FileInfo> ConvertFile(this ConvertApi convertApi, string fromFile, string outputExtension, string outputDirectory, params ConvertApiBaseParam[] parameters)
-        {
-            var task = BindFile(convertApi, fromFile, outputExtension, parameters);
-            var parallelQuery = task.WaitAndUnwrapException().Files.AsParallel().WithDegreeOfParallelism(6)
-                .Select(s => s.SaveFileAsync(Path.Combine(outputDirectory, s.FileName)).WaitAndUnwrapException());
-
-            var l = new List<FileInfo>();
-            l.AddRange(parallelQuery);
-
-            return l;
-        }
-
-        public static FileInfo ConvertRemoteFile(this ConvertApi convertApi, string fileUrl, string toFile, params ConvertApiBaseParam[] parameters)
-        {
-            var task = BindFile(convertApi, new Uri(fileUrl), GetPlainExtension(toFile), parameters);
-            return task.WaitAndUnwrapException().Files[0].SaveFileAsync(toFile).WaitAndUnwrapException();
-        }
-
-        public static FileInfo ConvertUrl(this ConvertApi convertApi, string url, string toFile, params ConvertApiBaseParam[] parameters)
-        {
-            var outputExtension = GetPlainExtension(toFile);
-            var task = convertApi.ConvertAsync("web", outputExtension, JoinParameters(new ConvertApiParam("url", url), parameters));
-            return task.WaitAndUnwrapException().Files[0].SaveFileAsync(toFile).WaitAndUnwrapException();
-        }
-
-        #endregion
-
-
-
         /// <summary>
         /// Return the count of converted files
         /// </summary>        
