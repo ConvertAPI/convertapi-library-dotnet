@@ -7,7 +7,8 @@
         public bool Active { get; set; }        
         public string FullName { get; set; }        
         public string Email { get; set; }        
-        public int SecondsLeft { get; set; }        
+        public int ConversionsTotal { get; set; }
+        public int ConversionsConsumed { get; set; }
         public string Status { get; set; }
     }
 }

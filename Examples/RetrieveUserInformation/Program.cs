@@ -22,7 +22,8 @@ namespace RetrieveUserInformation
             Console.WriteLine("Active={0}", convertApiUser.Active);
             Console.WriteLine("FullName={0}", convertApiUser.FullName);
             Console.WriteLine("Email={0}", convertApiUser.Email);
-            Console.WriteLine("SecondsLeft={0}", convertApiUser.SecondsLeft);
+            Console.WriteLine("ConversionsTotal={0}", convertApiUser.ConversionsTotal);
+            Console.WriteLine("ConversionsConsumed={0}", convertApiUser.ConversionsConsumed);
 
             Console.ReadLine();
         }
