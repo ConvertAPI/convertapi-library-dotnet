@@ -7,18 +7,18 @@ on:
 
 jobs:
   build:
-    runs-on: mcr.microsoft.com/dotnet/core/sdk:3.1-bionic
+    runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
       - name: Checkout
         uses: actions/checkout@master
         with:
           ref: ${{ github.ref }}
-#      - name: Setup .NET SDK
-#        uses: actions/setup-dotnet@v1
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@v1
       - name: Build
         run: dotnet build -c Release
-#      - name: Pack nugets
-#        run: dotnet pack -c Release --no-build --property:PackageOutputPath=.
-#      - name: Push to NuGet
-#        run: dotnet nuget push "./ConvertApi/*.nupkg" --api-key ${{secrets.NUGET_API_KEY}} --source https://api.nuget.org/v3/index.json --skip-duplicate
+      - name: Pack nugets
+        run: dotnet pack -c Release --no-build --property:PackageOutputPath=.
+      - name: Push to NuGet
+        run: dotnet nuget push "./ConvertApi/*.nupkg" --api-key ${{secrets.NUGET_API_KEY}} --source https://api.nuget.org/v3/index.json --skip-duplicate
