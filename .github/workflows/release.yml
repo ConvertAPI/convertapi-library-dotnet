@@ -1,0 +1,24 @@
+name: Release to NuGet
+
+on:
+  push:
+    tags:
+      - '*'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout
+        uses: actions/checkout@master
+        with:
+          ref: ${{ github.ref }}
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@v1
+      - name: Build
+        run: dotnet build ConvertApi -c Release
+      - name: Pack nugets
+        run: dotnet pack ConvertApi -c Release --no-build --property:PackageOutputPath=.
+      - name: Push to NuGet
+        run: dotnet nuget push "./ConvertApi/*.nupkg" --api-key ${{secrets.NUGET_API_KEY}} --source https://api.nuget.org/v3/index.json --skip-duplicate
