@@ -10,8 +10,8 @@ namespace FromStreamToStream
     class Program
     {
         /// <summary>
-        /// Example of converting HTML document from stream and getting back PDF stream
-        /// https://www.convertapi.com/docx-to-pdf        
+        /// A demo demonstrate the process of converting an HTML document from a stream(string HTML) and obtaining a PDF stream in return.
+        /// https://www.convertapi.com/html-to-pdf        
         /// </summary>
         static async Task Main(string[] args)
         {
