@@ -30,7 +30,7 @@ ConvertApi convertApi = new ConvertApi("your-api-secret");
 You have multiple options for conversion locations, and you can select your region to convert files. For instance, if you must comply with GDPR, you can choose the EU API location. Nevertheless, this choice is optional because ConvertAPI uses GEO DNS to detect the closest server automatically. For additional details, please visit https://www.convertapi.com/doc/servers-location
 
 ```csharp
-convertApi.ApiBaseUri = "https://v2.convertapi.com";
+ConvertApi.ApiBaseUri = "https://v2.convertapi.com";
 ```
 
 ### File conversion
