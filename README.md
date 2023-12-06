@@ -109,16 +109,16 @@ try
       new ConvertApiFileParam(@"c:\source\test.docx")
   );
   var fileSaved = await conversionTask.Files.SaveFilesAsync(@"c:\");
-  }
-  //Catch exceptions from asynchronous methods
-  catch (ConvertApiException e)
-  {
-     Console.WriteLine("Status Code: " + e.StatusCode);
-     Console.WriteLine("Response: " + e.Response);
+}
+//Catch exceptions from asynchronous methods
+catch (ConvertApiException e)
+{
+  Console.WriteLine("Status Code: " + e.StatusCode);
+  Console.WriteLine("Response: " + e.Response);
 
-      if (e.StatusCode == HttpStatusCode.Unauthorized)
-          Console.WriteLine("Secret is not provided or no additional seconds left in the account to proceed conversion. More information https://www.convertapi.com/a");
-  }
+   if (e.StatusCode == HttpStatusCode.Unauthorized)
+       Console.WriteLine("Secret is not provided or no additional seconds left in the account to proceed conversion. More information https://www.convertapi.com/a");
+}
 ```
 
 This is the minimum to convert a file using the ConvertAPI client, but you can do much more with the ConvertAPI .NET library. Note that you should replace `your-api-secret` with the secret you obtained in item two of the prerequisites.
