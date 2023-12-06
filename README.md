@@ -39,10 +39,9 @@ Example to convert file to PDF. All supported formats and options can be found
 [here](https://www.convertapi.com/conversions).
 
 ```csharp
-ConvertApiResponse result = await convertApi.ConvertAsync("docx", "pdf", new[]
-{
+ConvertApiResponse result = await convertApi.ConvertAsync("docx", "pdf",
    new ConvertApiFileParam(@"c:\source\test.docx")   
-});
+);
 
 // save to file
  var fileInfo = await result.SaveFileAsync(@"\result\test.pdf");
@@ -64,10 +63,9 @@ int cost = result.ConversionCost;
 #### Convert file url
 
 ```csharp
-ConvertApiResponse result = await convertApi.ConvertAsync("pptx", "pdf", new[]
-{
+ConvertApiResponse result = await convertApi.ConvertAsync("pptx", "pdf",
    new ConvertApiFileParam(new Uri("https://cdn.convertapi.com/cara/testfiles/presentation.pptx"))
-});
+);
 ```
 
 #### Additional conversion parameters
@@ -76,14 +74,13 @@ ConvertAPI accepts extra conversion parameters depending on converted formats. A
 parameters and explanations can be found [here](https://www.convertapi.com/conversions).
 
 ```csharp
-ConvertApiResponse result = await convertApi.ConvertAsync("pdf", "jpg", new[]
-{
+ConvertApiResponse result = await convertApi.ConvertAsync("pdf", "jpg",
    new ConvertApiFileParam(@"c:\source\test.pdf"),
    new ConvertApiParam("ScaleImage","true"),
    new ConvertApiParam("ScaleProportions","true"),
    new ConvertApiParam("ImageHeight","300"),
    new ConvertApiParam("ImageWidth","300")
-});
+);
 ```
 
 ### User information
@@ -110,7 +107,7 @@ try
   var convertApi = new ConvertApi("your-api-secret");  
   var conversionTask = await convertApi.ConvertAsync("docx", "pdf", 
       new ConvertApiFileParam(@"c:\source\test.docx")
-      );
+  );
   var fileSaved = await conversionTask.Files.SaveFilesAsync(@"c:\");
   }
   //Catch exceptions from asynchronous methods
