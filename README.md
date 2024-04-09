@@ -23,6 +23,8 @@ You can get your secret at https://www.convertapi.com/a
 
 ```csharp
 ConvertApi convertApi = new ConvertApi("your-api-secret");
+// or token authentication
+ConvertApi convertApi = new ConvertApi("your-token", "your-api-key");
 ```
 
 #### Set conversion location (optional)
