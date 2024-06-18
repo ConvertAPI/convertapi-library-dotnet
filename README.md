@@ -1,9 +1,17 @@
 # ConvertAPI C# Client
-## Convert your files with our online file conversion API
+## Overview
 
-ConvertAPI is a convenient REST API that simplifies the process of converting different file formats. You can easily create PDFs and images from sources like Word, Excel, PowerPoint, images, web pages, or raw HTML codes. Furthermore, it enables you to merge, encrypt, split, repair, and decrypt PDF files, along with other file manipulation options. With ConvertAPI, integrating it into your application takes only a few minutes, making it developer-friendly.
+The ConvertAPI library provides a simple and efficient way to integrate the [ConvertAPI](https://www.convertapi.com) service into your .NET Framework, .NET Core, and .NET projects. ConvertAPI enables you to easily convert various file formats by leveraging its robust API. Whether you need to convert documents, images, spreadsheets, or other file types, the ConvertAPI library streamlines the process with minimal code and maximum efficiency.
 
-The ConvertAPI.NET NuGet package simplifies the usage of the Convert API in your .NET Framework, .NET Core, and .NET projects. You don't need to create your own API calls.
+## Features
+
+- **Wide Range of Conversions:** Convert documents, images, spreadsheets, and more between numerous formats, including PDF, DOCX, JPG, PNG, XLSX, PPTX, HTML, CSV, TXT, and others. Perform specialized PDF manipulations such as merging, encrypting, splitting, repairing, and decrypting PDF files. Key conversions include Office to PDF, PDF to Word, PDF to PowerPoint, and PDF to Excel.
+- **Ease of Integration:** Simple and intuitive API that allows quick setup and integration into your .NET applications.
+- **Asynchronous Support:** Perform conversions asynchronously to ensure your application remains responsive.
+- **Customizable Options:** Configure various conversion options to tailor the output to your specific needs.
+- **Reliable and Secure:** Built on ConvertAPI's robust infrastructure, ensuring reliable and secure file conversions.
+
+All supported file conversions and manipulations can be found at [ConvertAPI API](https://www.convertapi.com/api).
 
 ## Installation
 
