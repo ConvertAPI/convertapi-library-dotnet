@@ -12,12 +12,7 @@
     <Copyright>2012-2023 Baltsoft</Copyright>
     <PackageLicenseUrl>https://www.convertapi.com/terms</PackageLicenseUrl>
     <PackageIconUrl>https://www.convertapi.com/favicon/android-chrome-192x192.png</PackageIconUrl>
-    <Description>High-Performance File Conversion API. Convert various files like MS Word, Excel, PowerPoint, Images to PDF and Images. Create PDF and Images from url and raw HTML. Extract and create PowerPoint presentation from PDF. Merge, Encrypt, Split, Repair and Decrypt PDF files. 
-
-All supported files conversions and manipulations can be found at https://www.convertapi.com/conversions
-
-The Git repository can be found at 
-https://github.com/ConvertAPI/convertapi-dotnet</Description>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageId>ConvertApi</PackageId>
     <Product>ConvertApi</Product>
     <AssemblyName>ConvertApi</AssemblyName>
@@ -26,11 +21,17 @@ https://github.com/ConvertAPI/convertapi-dotnet</Description>
     <FileVersion>3.0.14.0</FileVersion>
     <PackageReleaseNotes>Added file parameter overrides to fit Watermark PDF implementation. </PackageReleaseNotes>
     <TargetFrameworks>netstandard2.0;netcoreapp3.1</TargetFrameworks>
-    <PackageVersion>3.0.14</PackageVersion>
+    <PackageVersion>3.0.14-dev</PackageVersion>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="docs\README.md" Pack="true" PackagePath="\">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
 </Project>
