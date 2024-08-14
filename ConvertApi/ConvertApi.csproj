@@ -9,7 +9,7 @@
     <RepositoryUrl>https://github.com/ConvertAPI/convertapi-dotnet</RepositoryUrl>
     <RepositoryType>GIT</RepositoryType>
     <PackageTags>pdf convert word excel powerpoint text compress c# pdf-library images web msoffice office openoffice postscript iworks convertapi</PackageTags>
-    <Copyright>2012-2023 Baltsoft</Copyright>
+    <Copyright>2012-2024 ConvertApi</Copyright>
     <PackageLicenseUrl>https://www.convertapi.com/terms</PackageLicenseUrl>
     <PackageIconUrl>https://www.convertapi.com/favicon/android-chrome-192x192.png</PackageIconUrl>
     <PackageReadmeFile>README.md</PackageReadmeFile>
