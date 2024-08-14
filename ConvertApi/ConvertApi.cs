@@ -14,9 +14,7 @@ namespace ConvertApiDotNet
 {
     public class ConvertApi
     {
-        public static string Secret;
-        public static string Token;
-        public static int ApiKey;
+        public static string AuthCredentials;
         public static string ApiBaseUri = "https://v2.convertapi.com";
         private static IConvertApiHttpClient _convertApiHttpClient;
 
@@ -24,32 +22,28 @@ namespace ConvertApiDotNet
         {
         }
 
+
         /// <summary>
-        /// Initiate new instance of ConvertAPI client
+        /// Initializes a new instance of the ConvertApi class.
         /// </summary>
-        /// <param name="secret">Secret to authorize conversion can be found https://www.convertapi.com/a</param>
-        /// <param name="convertApiHttpClient">Inject your own HttpClient</param>
-        public ConvertApi(string secret, IConvertApiHttpClient convertApiHttpClient)
+        /// <param name="authCredentials">The authentication credentials, either a Secret or Token, for ConvertApi: https://www.convertapi.com/a</param>
+        /// <param name="convertApiHttpClient">The HTTP client for making API requests.</param>
+        public ConvertApi(string authCredentials, IConvertApiHttpClient convertApiHttpClient)
         {
-            Secret = secret;
+            AuthCredentials = authCredentials;
             _convertApiHttpClient = convertApiHttpClient;
         }
 
-        public ConvertApi(string secret)
+        /// <summary>
+        /// Initializes a new instance of the ConvertApi class.
+        /// </summary>
+        /// <param name="authCredentials">The authentication credentials, either a Secret or Token, for ConvertApi: https://www.convertapi.com/a</param>
+        public ConvertApi(string authCredentials)
         {
-            if (string.IsNullOrEmpty(secret))
-                throw new ArgumentNullException(nameof(secret));
+            if (string.IsNullOrEmpty(authCredentials))
+                throw new ArgumentNullException(nameof(authCredentials));
 
-            Secret = secret;
-        }
-
-        public ConvertApi(string token, int apiKey)
-        {
-            if (string.IsNullOrEmpty(token))
-                throw new ArgumentNullException(nameof(token));
-
-            Token = token;
-            ApiKey = apiKey;
+            AuthCredentials = authCredentials;
         }
 
         public static IConvertApiHttpClient GetClient()
@@ -131,7 +125,7 @@ namespace ConvertApiDotNet
             {
                 Path = $"convert/{fromFormat}/to/{toFormat}{converter}",
                 //We give Token authentication priority if token provided and then Secret
-                Query = !string.IsNullOrEmpty(Token) ? $"token={Token}&apikey={ApiKey}" : $"secret={Secret}"
+                /*Query = !string.IsNullOrEmpty(Token) ? $"token={Token}&apikey={ApiKey}" : $"secret={AuthCredentials}"*/
             };
 
             TimeSpan? requestTimeOut = null;
@@ -142,7 +136,7 @@ namespace ConvertApiDotNet
             }
 
 
-            var response = await GetClient().PostAsync(url.Uri, requestTimeOut, content);
+            var response = await GetClient().PostAsync(url.Uri, requestTimeOut, content, AuthCredentials);
             var result = await response.Content.ReadAsStringAsync();
             if (response.StatusCode != HttpStatusCode.OK)
                 throw new ConvertApiException(response.StatusCode,
@@ -158,11 +152,10 @@ namespace ConvertApiDotNet
         {
             var url = new UriBuilder(ApiBaseUri)
             {
-                Path = "user",
-                Query = $"secret={Secret}"
+                Path = "user"
             };
 
-            var response = await GetClient().GetAsync(url.Uri, ConvertApiConstants.DownloadTimeout);
+            var response = await GetClient().GetAsync(url.Uri, ConvertApiConstants.DownloadTimeout, AuthCredentials);
             var result = await response.Content.ReadAsStringAsync();
             if (response.StatusCode != HttpStatusCode.OK)
                 throw new ConvertApiException(response.StatusCode, $"Retrieve user information failed. {response.ReasonPhrase}", result);
