@@ -3,7 +3,7 @@ name: Release to NuGet
 on:
   push:
     tags:
-      - '*'
+      - 'v*'
 
 jobs:
   build:
