@@ -1,7 +1,7 @@
-# ConvertAPI NuGet Package
+# ConvertAPI C# Client
 ## Overview
 
-The ConvertAPI NuGet package provides a simple and efficient way to integrate the [ConvertAPI](https://www.convertapi.com) service into your .NET applications. ConvertAPI enables you to easily convert various file formats by leveraging its robust API. Whether you need to convert documents, images, spreadsheets, or other file types, the ConvertAPI NuGet package streamlines the process with minimal code and maximum efficiency.
+The ConvertAPI library provides a simple and efficient way to integrate the [ConvertAPI](https://www.convertapi.com) service into your .NET Framework, .NET Core, and .NET projects. ConvertAPI enables you to easily convert various file formats by leveraging its robust API. Whether you need to convert documents, images, spreadsheets, or other file types, the ConvertAPI library streamlines the process with minimal code and maximum efficiency.
 
 ## Features
 
@@ -15,53 +15,126 @@ All supported file conversions and manipulations can be found at [ConvertAPI API
 
 ## Installation
 
-Install the ConvertAPI package via NuGet Package Manager:
+Run this line from Package Manager Console:
 
-```sh
+```csharp
 Install-Package ConvertApi
 ```
 
-Or use the .NET CLI:
+## Usage
 
-```sh
-dotnet add package ConvertApi
-```
+### Configuration
 
-## Getting Started
+#### Set credentials
 
-1. **Set up ConvertAPI:**
-   Sign up for a ConvertAPI account and obtain your API secret.
-
-2. **Configure the API client:**
-   Initialize the API client in your .NET application with your secret key.
+You can get your secret at https://www.convertapi.com/a
 
 ```csharp
-using ConvertApiDotNet;
-
-var convertApi = new ConvertApi("your-api-secret");
+ConvertApi convertApi = new ConvertApi("your-api-secret");
+// or token authentication
+ConvertApi convertApi = new ConvertApi("your-token", "your-api-key");
 ```
 
-3. **Perform a conversion:**
-   Use the client to convert files by specifying the source and target formats.
+#### Set conversion location (optional)
+
+You can choose from multiple conversion locations, including the EU API location for GDPR compliance. However, this selection is optional as ConvertAPI automatically detects the nearest server using GEO DNS. For more details, visit [ConvertAPI Servers Location](https://www.convertapi.com/doc/servers-location).
 
 ```csharp
-var convertApi = new ConvertApi("your-api-secret");
-var convertResult = await convertApi.ConvertAsync("pdf", "docx", new ConvertApiFileParam("file", "path/to/your/file.pdf"));
-
-var convertedFile = convertResult.Files[0];
-await convertedFile.SaveFileAsync("path/to/save/converted/file.docx");
+ConvertApi.ApiBaseUri = "https://v2.convertapi.com";
 ```
 
-## Documentation
+### File conversion
 
-For more detailed documentation, visit the [ConvertAPI Documentation](https://www.convertapi.com/doc).
+Example to convert file to PDF. All supported formats and options can be found 
+[here](https://www.convertapi.com/api).
 
-## Support
+```csharp
+ConvertApiResponse result = await convertApi.ConvertAsync("docx", "pdf",
+   new ConvertApiFileParam(@"c:\source\test.docx")   
+);
 
-If you encounter any issues or have questions, please visit the [ConvertAPI Support](https://www.convertapi.com/support) page for assistance.
+// save to file
+ var fileInfo = await result.SaveFileAsync(@"\result\test.pdf");
+```
 
-## License
+Other result operations:
 
-The ConvertAPI NuGet package is licensed under the [MIT License](https://opensource.org/licenses/MIT).
+```csharp
+// save all result files to folder
+result.SaveFilesAsync(@"\result\");
 
-Integrate ConvertAPI into your .NET applications today and enjoy seamless and efficient file conversions with minimal effort!
+// get result files
+ProcessedFile[] files = result.Files;
+
+// get conversion cost
+int cost = result.ConversionCost; 
+```
+
+#### Convert file url
+
+```csharp
+ConvertApiResponse result = await convertApi.ConvertAsync("pptx", "pdf",
+   new ConvertApiFileParam(new Uri("https://cdn.convertapi.com/cara/testfiles/presentation.pptx"))
+);
+```
+
+#### Additional conversion parameters
+
+ConvertAPI accepts extra conversion parameters depending on converted formats. All conversion 
+parameters and explanations can be found [here](https://www.convertapi.com/conversions).
+
+```csharp
+ConvertApiResponse result = await convertApi.ConvertAsync("pdf", "jpg",
+   new ConvertApiFileParam(@"c:\source\test.pdf"),
+   new ConvertApiParam("ScaleImage","true"),
+   new ConvertApiParam("ScaleProportions","true"),
+   new ConvertApiParam("ImageHeight","300"),
+   new ConvertApiParam("ImageWidth","300")
+);
+```
+
+### User information
+
+You can always check the remaining conversions amount and other account information by fetching [user information](https://www.convertapi.com/doc/user).
+
+```csharp
+ConvertApiUser user = await convert.GetUserAsync();
+int conversionsTotal = user.ConversionsTotal;
+int conversionsConsumed = user.ConversionsConsumed;
+```
+
+### More examples
+
+You can find more advanced examples in the [examples](https://github.com/ConvertAPI/convertapi-dotnet/tree/master/Examples) folder.
+
+#### Converting your first file, complete example:
+
+ConvertAPI is designed to make converting files super easy. The following snippet shows how easy it is to get started. Let's convert the WORD DOCX file to PDF:
+
+```csharp
+try
+{
+  var convertApi = new ConvertApi("your-api-secret");  
+  var conversionTask = await convertApi.ConvertAsync("docx", "pdf", 
+      new ConvertApiFileParam(@"c:\source\test.docx")
+  );
+  var fileSaved = await conversionTask.Files.SaveFilesAsync(@"c:\");
+}
+//Catch exceptions from asynchronous methods
+catch (ConvertApiException e)
+{
+  Console.WriteLine("Status Code: " + e.StatusCode);
+  Console.WriteLine("Response: " + e.Response);
+
+   if (e.StatusCode == HttpStatusCode.Unauthorized)
+       Console.WriteLine("Secret is not provided or no additional seconds left in the account to proceed conversion. More information https://www.convertapi.com/a");
+}
+```
+
+This is the minimum to convert a file using the ConvertAPI client, but you can do much more with the ConvertAPI .NET library. Note that you should replace `your-api-secret` with the secret you obtained in item two of the prerequisites.
+
+### Issues &amp; Comments
+Please leave all comments, bugs, requests, and issues on the Issues page. We'll respond to your request ASAP!
+
+### License
+The ConvertAPI .NET Library is licensed under the [MIT](http://www.opensource.org/licenses/mit-license.php "Read more about the MIT license form") license. Refere to the [LICENSE](https://github.com/ConvertAPI/convertapi-dotnet/blob/master/LICENSE) file for more information.
