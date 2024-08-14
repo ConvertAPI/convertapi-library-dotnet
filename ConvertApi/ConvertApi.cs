@@ -115,15 +115,10 @@ namespace ConvertApiDotNet
                         break;
                 }
             }
-
-            var converter = dicList.Find("converter");
-
-            if (!string.IsNullOrEmpty(converter))
-                converter = $"/converter/{converter}";
-
+            
             var url = new UriBuilder(ApiBaseUri)
             {
-                Path = $"convert/{fromFormat}/to/{toFormat}{converter}",
+                Path = $"convert/{fromFormat}/to/{toFormat}",
                 //We give Token authentication priority if token provided and then Secret
                 /*Query = !string.IsNullOrEmpty(Token) ? $"token={Token}&apikey={ApiKey}" : $"secret={AuthCredentials}"*/
             };
