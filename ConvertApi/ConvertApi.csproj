@@ -17,11 +17,11 @@
     <Product>ConvertApi</Product>
     <AssemblyName>ConvertApi</AssemblyName>
     <RootNamespace>ConvertApiDotNet</RootNamespace>
-    <AssemblyVersion>3.1.0.0</AssemblyVersion>
-    <FileVersion>3.1.0.0</FileVersion>
+    <AssemblyVersion>3.1.1.0</AssemblyVersion>
+    <FileVersion>3.1.1.0</FileVersion>
     <PackageReleaseNotes>Added file parameter overrides to fit Watermark PDF implementation. </PackageReleaseNotes>
     <TargetFrameworks>netstandard2.0;netcoreapp3.1</TargetFrameworks>
-    <PackageVersion>3.1.0</PackageVersion>
+    <PackageVersion>3.1.1</PackageVersion>
   </PropertyGroup>
 
   <ItemGroup>
