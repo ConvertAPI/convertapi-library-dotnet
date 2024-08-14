@@ -88,7 +88,7 @@
     <FileVersion>3.0.14.0</FileVersion>
     <PackageReleaseNotes>Added file parameter overrides to fit Watermark PDF implementation. </PackageReleaseNotes>
     <TargetFrameworks>netstandard2.0;netcoreapp3.1</TargetFrameworks>
-    <PackageVersion>3.0.14</PackageVersion>
+    <PackageVersion>3.0.14-dev</PackageVersion>
   </PropertyGroup>
 
   <ItemGroup>
