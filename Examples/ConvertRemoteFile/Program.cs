@@ -18,7 +18,7 @@ namespace ConvertRemoteFile
                 //Get your secret at https://www.convertapi.com/a
                 var convertApi = new ConvertApi("your api secret");
 
-                var sourceFile = new Uri("https://cdn.convertapi.com/test-files/presentation.pptx");
+                var sourceFile = new Uri("https://cdn.convertapi.com/public/files/demo.pptx");
 
                 Console.WriteLine($"Converting online PowerPoint file {sourceFile} to PDF...");
 
