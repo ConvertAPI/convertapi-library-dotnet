@@ -27,12 +27,10 @@ Install-Package ConvertApi
 
 #### Set credentials
 
-You can get your secret at https://www.convertapi.com/a
+You can get your credentials at https://www.convertapi.com/a/auth
 
 ```csharp
 ConvertApi convertApi = new ConvertApi("your-api-secret");
-// or token authentication
-ConvertApi convertApi = new ConvertApi("your-token", "your-api-key");
 ```
 
 #### Set conversion location (optional)
