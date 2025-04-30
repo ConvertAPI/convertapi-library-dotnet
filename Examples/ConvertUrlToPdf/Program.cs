@@ -17,8 +17,8 @@ namespace ConvertUrlToPdf
         {            
             try
             {
-                //Get your secret at https://www.convertapi.com/a
-                var convertApi = new ConvertApi("your api secret");
+                //Get your api token at https://www.convertapi.com/a
+                var convertApi = new ConvertApi("api_token");
 
                 Console.WriteLine("Converting web page https://en.wikipedia.org/wiki/Data_conversion to PDF...");
 

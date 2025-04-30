@@ -13,8 +13,8 @@ namespace RetrieveUserInformation
         /// </summary>
         static async Task Main(string[] args)
         {
-            //Get your secret at https://www.convertapi.com/a
-            var convertApi = new ConvertApi("your api secret");
+            //Get your api token at https://www.convertapi.com/a
+            var convertApi = new ConvertApi("api_token");
             var convertApiUser = await convertApi.GetUserAsync();
 
             Console.WriteLine("Secret={0}", convertApiUser.Secret);

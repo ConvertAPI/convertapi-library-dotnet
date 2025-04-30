@@ -7,7 +7,7 @@ using ConvertApiDotNet.Exceptions;
 
 try
 {
-    var convertApi = new ConvertApi("your api secret");
+    var convertApi = new ConvertApi("api_token");
     const string sourceFile = @"..\..\..\TestFiles\test.docx";
 
     var convert = await convertApi.ConvertAsync("pdf", "split",
