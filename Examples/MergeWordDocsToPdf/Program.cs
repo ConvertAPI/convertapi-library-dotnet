@@ -22,8 +22,8 @@ namespace MergeWordDocsToPdf
                 Console.WriteLine("The example shows how to merge Word and Powerpoint documents to one PDF by converting them to PDFs and then merging. Please wait...");
                 var sw = new Stopwatch();
                 sw.Start();
-                //Get your secret at https://www.convertapi.com/a
-                var convertApi = new ConvertApi("your api secret");
+                //Get your api token at https://www.convertapi.com/a
+                var convertApi = new ConvertApi("api_token");
 
                 var destinationFileName = Path.Combine(Path.GetTempPath(), $"test-merged-{Guid.NewGuid()}.pdf");
 

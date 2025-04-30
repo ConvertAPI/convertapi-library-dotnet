@@ -31,7 +31,7 @@ dotnet add package ConvertApi
 ## Getting Started
 
 1. **Set up ConvertAPI:**
-   [Sign In](https://www.convertapi.com/a/signin) / [Sign Up](https://www.convertapi.com/a/signup) for a ConvertAPI account and obtain your API secret.
+   [Sign In](https://www.convertapi.com/a/signin) / [Sign Up](https://www.convertapi.com/a/signup) for a ConvertAPI account and obtain your API token.
 
 2. **Configure the API client:**
    Initialize the API client in your .NET application with your secret key.

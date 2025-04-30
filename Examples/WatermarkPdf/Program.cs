@@ -13,8 +13,8 @@ try
     Console.WriteLine("The example shows how to watermark PDF with text and put overlay PDF");
     var sw = new Stopwatch();
     sw.Start();
-    //Get your secret at https://www.convertapi.com/a
-    var convertApi = new ConvertApi("your api secret");
+    //Get your api token at https://www.convertapi.com/a
+    var convertApi = new ConvertApi("api_token");
 
     var destinationFileName = Path.Combine(Path.GetTempPath(), $"watermarked-{Guid.NewGuid()}.pdf");
 
