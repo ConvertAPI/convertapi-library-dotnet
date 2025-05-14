@@ -4,11 +4,11 @@
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <Version>3.0.14</Version>
     <Company>Baltsoft</Company>
-    <Authors>Baltsoft</Authors>
+    <Authors>ConvertApi</Authors>
     <PackageProjectUrl>https://www.convertapi.com</PackageProjectUrl>
     <RepositoryUrl>https://github.com/ConvertAPI/convertapi-dotnet</RepositoryUrl>
     <RepositoryType>GIT</RepositoryType>
-    <PackageTags>pdf convert word excel powerpoint text compress c# pdf-library images web msoffice office openoffice postscript iworks convertapi</PackageTags>
+    <PackageTags>pdf convert file files word excel powerpoint text compress c# pdf-library image images web msoffice office openoffice iworks convertapi docx xlsx pptx png jpg html document documents email</PackageTags>
     <Copyright>2012-2024 ConvertApi</Copyright>
     <PackageLicenseUrl>https://www.convertapi.com/terms</PackageLicenseUrl>
     <PackageIconUrl>https://www.convertapi.com/favicon/android-chrome-192x192.png</PackageIconUrl>
@@ -17,11 +17,12 @@
     <Product>ConvertApi</Product>
     <AssemblyName>ConvertApi</AssemblyName>
     <RootNamespace>ConvertApiDotNet</RootNamespace>
-    <AssemblyVersion>3.1.1.0</AssemblyVersion>
-    <FileVersion>3.1.1.0</FileVersion>
+    <AssemblyVersion>3.1.2.0</AssemblyVersion>
+    <FileVersion>3.1.2.0</FileVersion>
     <PackageReleaseNotes>Added file parameter overrides to fit Watermark PDF implementation. </PackageReleaseNotes>
     <TargetFrameworks>netstandard2.0;netcoreapp3.1</TargetFrameworks>
-    <PackageVersion>3.1.1</PackageVersion>
+    <PackageVersion>3.1.2</PackageVersion>
+    <Description>The ConvertAPI NuGet package simplifies integration with the ConvertAPI service, enabling seamless file format conversions (PDF, DOCX, images, etc.) in .NET applications with minimal code.</Description>
   </PropertyGroup>
 
   <ItemGroup>
