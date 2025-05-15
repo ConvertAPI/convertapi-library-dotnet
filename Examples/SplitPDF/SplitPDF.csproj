@@ -12,11 +12,11 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="Files\" />
+      <Folder Include="files\" />
     </ItemGroup>
 
     <ItemGroup>
-      <None Update="Files\**">
+      <None Update="files\**">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </None>
     </ItemGroup>
