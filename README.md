@@ -27,10 +27,10 @@ Install-Package ConvertApi
 
 #### Set credentials
 
-You can get your credentials at https://www.convertapi.com/a/auth
+You can get your credentials at https://www.convertapi.com/a/authentication
 
 ```csharp
-ConvertApi convertApi = new ConvertApi("your-api-secret");
+ConvertApi convertApi = new ConvertApi("api_token");
 ```
 
 #### Set conversion location (optional)
@@ -112,7 +112,7 @@ ConvertAPI is designed to make converting files super easy. The following snippe
 ```csharp
 try
 {
-  var convertApi = new ConvertApi("your-api-secret");  
+  var convertApi = new ConvertApi("api_token");  
   var conversionTask = await convertApi.ConvertAsync("docx", "pdf", 
       new ConvertApiFileParam(@"c:\source\test.docx")
   );
