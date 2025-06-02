@@ -14,7 +14,7 @@ namespace ConvertApiDotNet
 {
     public class ConvertApi
     {
-        public static string AuthCredentials;
+        public static string ApiToken;
         public static string ApiBaseUri = "https://v2.convertapi.com";
         private static IConvertApiHttpClient _convertApiHttpClient;
 
@@ -26,24 +26,24 @@ namespace ConvertApiDotNet
         /// <summary>
         /// Initializes a new instance of the ConvertApi class.
         /// </summary>
-        /// <param name="authCredentials">The authentication credentials, either a Secret or Token, for ConvertApi: https://www.convertapi.com/a</param>
+        /// <param name="apiToken">The authentication credentials token for ConvertApi. Can be obtained from https://www.convertapi.com/a/authentication</param>
         /// <param name="convertApiHttpClient">The HTTP client for making API requests.</param>
-        public ConvertApi(string authCredentials, IConvertApiHttpClient convertApiHttpClient)
+        public ConvertApi(string apiToken, IConvertApiHttpClient convertApiHttpClient)
         {
-            AuthCredentials = authCredentials;
+            ApiToken = apiToken;
             _convertApiHttpClient = convertApiHttpClient;
         }
 
         /// <summary>
         /// Initializes a new instance of the ConvertApi class.
         /// </summary>
-        /// <param name="authCredentials">The authentication credentials, either a Secret or Token, for ConvertApi: https://www.convertapi.com/a</param>
-        public ConvertApi(string authCredentials)
+        /// <param name="apiToken">The authentication credentials token for ConvertApi. Can be obtained from https://www.convertapi.com/a/authentication</param>
+        public ConvertApi(string apiToken)
         {
-            if (string.IsNullOrEmpty(authCredentials))
-                throw new ArgumentNullException(nameof(authCredentials));
+            if (string.IsNullOrEmpty(apiToken))
+                throw new ArgumentNullException(nameof(apiToken));
 
-            AuthCredentials = authCredentials;
+            ApiToken = apiToken;
         }
 
         public static IConvertApiHttpClient GetClient()
@@ -131,7 +131,7 @@ namespace ConvertApiDotNet
             }
 
 
-            var response = await GetClient().PostAsync(url.Uri, requestTimeOut, content, AuthCredentials);
+            var response = await GetClient().PostAsync(url.Uri, requestTimeOut, content, ApiToken);
             var result = await response.Content.ReadAsStringAsync();
             if (response.StatusCode != HttpStatusCode.OK)
                 throw new ConvertApiException(response.StatusCode,
@@ -150,7 +150,7 @@ namespace ConvertApiDotNet
                 Path = "user"
             };
 
-            var response = await GetClient().GetAsync(url.Uri, ConvertApiConstants.DownloadTimeout, AuthCredentials);
+            var response = await GetClient().GetAsync(url.Uri, ConvertApiConstants.DownloadTimeout, ApiToken);
             var result = await response.Content.ReadAsStringAsync();
             if (response.StatusCode != HttpStatusCode.OK)
                 throw new ConvertApiException(response.StatusCode, $"Retrieve user information failed. {response.ReasonPhrase}", result);

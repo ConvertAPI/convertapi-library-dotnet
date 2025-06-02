@@ -174,7 +174,7 @@ namespace ConvertApiDotNet
                     Path = "/upload",
                 };
 
-                responseMessage = await ConvertApi.GetClient().PostAsync(url.Uri, ConvertApiConstants.UploadTimeout, content, ConvertApi.AuthCredentials);
+                responseMessage = await ConvertApi.GetClient().PostAsync(url.Uri, ConvertApiConstants.UploadTimeout, content, ConvertApi.ApiToken);
             }
 
             var result = await responseMessage.Content.ReadAsStringAsync();
@@ -194,7 +194,7 @@ namespace ConvertApiDotNet
                 Query = $"url={WebUtility.UrlEncode(remoteFileUrl.ToString())}"
             };
 
-            var responseMessage = await ConvertApi.GetClient().PostAsync(url.Uri, ConvertApiConstants.UploadTimeout, null, ConvertApi.AuthCredentials);
+            var responseMessage = await ConvertApi.GetClient().PostAsync(url.Uri, ConvertApiConstants.UploadTimeout, null, ConvertApi.ApiToken);
             var result = await responseMessage.Content.ReadAsStringAsync();
             if (responseMessage.StatusCode != HttpStatusCode.OK)
             {
