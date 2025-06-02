@@ -31,7 +31,7 @@ dotnet add package ConvertApi
 ## Getting Started
 
 1. **Set up ConvertAPI:**
-   [Sign In](https://www.convertapi.com/a/signin) / [Sign Up](https://www.convertapi.com/a/signup) for a ConvertAPI account and obtain your API secret.
+   [Sign In](https://www.convertapi.com/a/signin) / [Sign Up](https://www.convertapi.com/a/signup) for a ConvertAPI account and obtain API Token.
 
 2. **Configure the API client:**
    Initialize the API client in your .NET application with your secret key.
@@ -39,14 +39,14 @@ dotnet add package ConvertApi
 ```csharp
 using ConvertApiDotNet;
 
-var convertApi = new ConvertApi("your-api-secret");
+var convertApi = new ConvertApi("api_token");
 ```
 
 3. **Perform a conversion:**
    Use the client to convert files by specifying the source and target formats.
 
 ```csharp
-var convertApi = new ConvertApi("your-api-secret");
+var convertApi = new ConvertApi("api_token");
 var convertResult = await convertApi.ConvertAsync("pdf", "docx", new ConvertApiFileParam("file", "path/to/your/file.pdf"));
 
 var convertedFile = convertResult.Files[0];
@@ -55,7 +55,7 @@ await convertedFile.SaveFileAsync("path/to/save/converted/file.docx");
 
 ## Documentation
 
-For more detailed documentation, visit the [ConvertAPI Documentation](https://www.convertapi.com/doc).
+For more detailed documentation, visit the [ConvertAPI Documentation](https://www.convertapi.com/integration).
 
 ## Support
 

@@ -15,8 +15,8 @@ namespace ConvertRemoteFile
         {
             try
             {
-                //Get your secret at https://www.convertapi.com/a
-                var convertApi = new ConvertApi("your api secret");
+                //Get your API Token at https://www.convertapi.com/a/authentication
+                var convertApi = new ConvertApi("api_token");
 
                 var sourceFile = new Uri("https://cdn.convertapi.com/public/files/demo.pptx");
 

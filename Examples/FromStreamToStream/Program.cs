@@ -15,8 +15,8 @@ namespace FromStreamToStream
         /// </summary>
         static async Task Main(string[] args)
         {
-            //Get your secret at https://www.convertapi.com/a
-            var convertApi = new ConvertApi("your api secret");
+            //Get your API Token at https://www.convertapi.com/a/authentication
+            var convertApi = new ConvertApi("api_token");
             const string htmlString = "<!DOCTYPE html><html><body><h1>My First Heading</h1><p>My first paragraph.</p></body></html>";
 
             var stream = new MemoryStream(Encoding.UTF8.GetBytes(htmlString));

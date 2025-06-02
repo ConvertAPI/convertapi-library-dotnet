@@ -13,8 +13,8 @@ namespace ConvertPdfToPptx
         {            
             try
             {
-                //Get your secret at https://www.convertapi.com/a
-                var convertApi = new ConvertApi("your api secret");
+                //Get your API Token at https://www.convertapi.com/a/authentication
+                var convertApi = new ConvertApi("api_token");
 
                 const string sourceFile = @"..\..\..\..\TestFiles\test.pdf";
 
