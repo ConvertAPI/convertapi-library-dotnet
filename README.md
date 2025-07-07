@@ -180,8 +180,6 @@ catch (ConvertApiException e)
 }
 ```
 
-This is the minimum to convert a file using the ConvertAPI client, but you can do much more with the ConvertAPI .NET library. Note that you should replace `your-api-secret` with the secret you obtained in item two of the prerequisites.
-
 ### Issues &amp; Comments
 Please leave all comments, bugs, requests, and issues on the Issues page. We'll respond to your request ASAP!
 
