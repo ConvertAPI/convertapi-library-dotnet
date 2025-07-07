@@ -5,13 +5,64 @@ The ConvertAPI library provides a simple and efficient way to integrate the [Con
 
 ## Features
 
-- **Wide Range of Conversions:** Convert documents, images, spreadsheets, and more between numerous formats, including PDF, DOCX, JPG, PNG, XLSX, PPTX, HTML, CSV, TXT, and others. Perform specialized PDF manipulations such as merging, encrypting, splitting, repairing, and decrypting PDF files. Key conversions include Office to PDF, PDF to Word, PDF to PowerPoint, and PDF to Excel.
-- **Ease of Integration:** Simple and intuitive API that allows quick setup and integration into your .NET applications.
-- **Asynchronous Support:** Perform conversions asynchronously to ensure your application remains responsive.
-- **Customizable Options:** Configure various conversion options to tailor the output to your specific needs.
-- **Reliable and Secure:** Built on ConvertAPI's robust infrastructure, ensuring reliable and secure file conversions.
+Below is an overview of the key functionalities:
 
-All supported file conversions and manipulations can be found at [ConvertAPI API](https://www.convertapi.com/api).
+### Document Conversion
+
+* **Office to PDF**: Convert Word (DOC, DOCX), Excel (XLS, XLSX), and PowerPoint (PPT, PPTX) documents to PDF or PDF/A formats.
+* **PDF to Office**: Transform PDFs into editable Word, Excel, and PowerPoint documents.
+* **HTML/Web to PDF**: Convert HTML files or web pages to PDF using a headless Chrome browser.
+* **Image to PDF**: Convert various image formats (e.g., JPG, PNG, BMP) to PDF.
+* **PDF to Image**: Convert PDFs to image formats such as JPG, PNG, TIFF, SVG, and WebP.
+* **eBook Conversion**: Convert DJVU and other eBook formats to PDF or images.
+* **Email Conversion**: Convert EML and MSG email files to PDF or image formats.
+
+### Document Processing & Transformation
+
+* **Merge & Split PDF**: Combine multiple PDF document into one or split a PDF into several parts.
+* **Rotate & Delete Pages**: Rotate pages or remove unwanted pages from PDF.
+* **Watermarking**: Add text or image watermarks to PDF and images.
+* **Flatten PDFs**: Flatten PDF layers to prevent further editing.
+* **Repair Documents**: Recover corrupted or damaged PDF and DOCX files.
+* **Rasterize PDFs**: Convert vector PDFs into raster images.
+
+### Security & Optimization
+
+* **Password Protection**: Encrypt PDF and Office documents with passwords and AES-256 encryption.
+* **Remove Protection**: Unlock password-protected PDFs.
+* **Redact PDF**: Automatically detect and redact sensitive information in PDF files using AI.
+* **Compress PDF**: Reduce PDF sizes by up to 90% without compromising quality.
+* **PDF/A Conversion**: Convert PDFs to PDF/A format for long-term archiving.
+* **Metadata Management**: Edit or remove metadata from PDF documents.
+
+### Data Extraction & OCR
+
+* **Text Extraction**: Extract text content from PDFs, with optional OCR for scanned documents.
+* **Table Extraction**: Extract tabular data from PDFs into CSV or Excel formats.
+* **Image Extraction**: Extract images from PDFs into various image formats.
+* **Form Data Extraction**: Extract form field data from PDFs into FDF format.
+* **Email Attachments**: Extract attachments from EML and MSG email files.
+
+### Advanced Tools
+
+* **Document Generation**: Create DOCX or PDF documents dynamically using templates and JSON data.
+* **Format Comparison**: Compare DOCX documents to identify differences in content and formatting.
+* **ZIP Archiving**: Create ZIP archives from multiple files, with optional password protection.
+* **Asynchronous Processing**: Handle large or time-consuming conversions asynchronously.
+
+For a complete list of supported conversions and tools, visit the [ConvertAPI API Reference](https://www.convertapi.com/api).
+
+## Compatibility
+The ConvertAPI .NET library is compatible with a wide range of platforms that support .NET Standard 2.0+ or .NET Framework 4.0+. Supported environments include:
+
+- .NET Core 5, 6, 7, 8, 9, and above
+- .NET Standard 2.0 and above
+- .NET Framework 4.0, 4.6.1, 4.7.2, 4.8.1 and above
+- Windows, Linux, macOS
+- Microsoft Azure, Azure App Service, Azure Functions
+- Xamarin (iOS, macOS, Android)
+- Universal Windows Platform (UWP)
+- Web, Console, and Desktop applications
 
 ## Installation
 
