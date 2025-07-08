@@ -280,7 +280,8 @@ Redact sensitive information in a PDF:
 
 ```csharp
 var result = await convertApi.ConvertAsync("pdf", "redact",
-    new ConvertApiFileParam(@"C:\files\document.pdf"));   
+    new ConvertApiFileParam(@"C:\files\document.pdf"),
+    new ConvertApiParam("Preset", "gdpr"));   
 await result.SaveFilesAsync(@"C:\output\");
 ```
 
@@ -301,7 +302,8 @@ Convert a PDF to PDF/A format for archiving:
 
 ```csharp
 var result = await convertApi.ConvertAsync("pdf", "pdfa",
-    new ConvertApiFileParam(@"C:\files\document.pdf"));
+    new ConvertApiFileParam(@"C:\files\document.pdf"),
+    new ConvertApiParam("PdfaVersion", "pdfa2"));
 await result.SaveFilesAsync(@"C:\output\");
 ```
 
@@ -346,7 +348,8 @@ Extract images from a PDF:
 
 ```csharp
 var result = await convertApi.ConvertAsync("pdf", "extract-images",
-    new ConvertApiFileParam(@"C:\files\document.pdf"));
+    new ConvertApiFileParam(@"C:\files\document.pdf"),
+    new ConvertApiParam("ImageOutputFormat", "png"));
 await result.SaveFilesAsync(@"C:\output\");
 ```
 
