@@ -17,11 +17,11 @@
     <Product>ConvertApi</Product>
     <AssemblyName>ConvertApi</AssemblyName>
     <RootNamespace>ConvertApiDotNet</RootNamespace>
-    <AssemblyVersion>3.1.2.0</AssemblyVersion>
-    <FileVersion>3.1.2.0</FileVersion>
+    <AssemblyVersion>3.1.3.0</AssemblyVersion>
+    <FileVersion>3.1.3.0</FileVersion>
     <PackageReleaseNotes>Added file parameter overrides to fit Watermark PDF implementation. </PackageReleaseNotes>
     <TargetFrameworks>netstandard2.0;netcoreapp3.1</TargetFrameworks>
-    <PackageVersion>3.1.2</PackageVersion>
+    <PackageVersion>3.1.3</PackageVersion>
     <Description>The ConvertAPI NuGet package simplifies integration with the ConvertAPI service, enabling seamless file format conversions (PDF, DOCX, images, etc.) in .NET applications with minimal code.</Description>
   </PropertyGroup>
 
