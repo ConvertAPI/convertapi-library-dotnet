@@ -8,7 +8,7 @@
     <PackageProjectUrl>https://www.convertapi.com</PackageProjectUrl>
     <RepositoryUrl>https://github.com/ConvertAPI/convertapi-dotnet</RepositoryUrl>
     <RepositoryType>GIT</RepositoryType>
-    <PackageTags>pdf convert file files word excel powerpoint text compress c# pdf-library image images web msoffice office openoffice iworks convertapi docx xlsx pptx png jpg html document documents email</PackageTags>
+    <PackageTags>file-converter document-converter office-to-pdf office2pdf docx-to-pdf docx2pdf xlsx-to-pdf xlsx2pdf pptx-to-pdf ppt2pdf pdf-merge pdf-split pdf-compress pdf-watermark prdf-extract pdf2extract pdf-protect pdfa ocr redact html-to-pdf web-to-pdf image-to-pdf jpg-to-pdf png-to-pdf email-to-pdf eml-to-pdf msg-to-pdf convertapi pdf docx xlsx pptx office converter csharp dotnet sdk </PackageTags>
     <Copyright>2012-2025 ConvertApi</Copyright>
     <PackageLicenseUrl>https://www.convertapi.com/terms</PackageLicenseUrl>
     <PackageIconUrl>https://www.convertapi.com/favicon/android-chrome-192x192.png</PackageIconUrl>
@@ -22,7 +22,7 @@
     <PackageReleaseNotes>Added file parameter overrides to fit Watermark PDF implementation. </PackageReleaseNotes>
     <TargetFrameworks>netstandard2.0;netcoreapp3.1</TargetFrameworks>
     <PackageVersion>3.1.4</PackageVersion>
-    <Description>The ConvertAPI NuGet package simplifies integration with the ConvertAPI service, enabling seamless file format conversions (PDF, DOCX, images, etc.) in .NET applications with minimal code.</Description>
+    <Description>ConvertAPI for .NET — one call to turn Office files into PDF or back again (DOCX ⇄ PDF, XLSX ⇄ PDF, PPTX ⇄ PDF). Convert HTML, images, ebooks, email, zip; merge, split, watermark, compress, OCR, redact, protect or repair PDF. Async, cross-platform, .NET Standard 2.0+ / .NET Core 5-9</Description>
   </PropertyGroup>
 
   <ItemGroup>
