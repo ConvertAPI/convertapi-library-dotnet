@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Version>3.0.14</Version>
+    <Version>3.1.6</Version>
     <Company>Baltsoft</Company>
     <Authors>ConvertApi</Authors>
     <PackageProjectUrl>https://www.convertapi.com</PackageProjectUrl>
@@ -17,11 +17,11 @@
     <Product>ConvertApi</Product>
     <AssemblyName>ConvertApi</AssemblyName>
     <RootNamespace>ConvertApiDotNet</RootNamespace>
-    <AssemblyVersion>3.1.5.0</AssemblyVersion>
-    <FileVersion>3.1.5.0</FileVersion>
-    <PackageReleaseNotes>Added file parameter overrides to fit Watermark PDF implementation. </PackageReleaseNotes>
+    <AssemblyVersion>3.1.6.0</AssemblyVersion>
+    <FileVersion>3.1.6.0</FileVersion>
+    <PackageReleaseNotes>New examples (UploadOnceReuseTwice, GetConverterInfoDemo, DeleteFiles); new APIs (GetConverterInfo, DeleteFilesAsync); make CopyToAsync awaitable; rename GetValueAsync to GetUploadedFileAsync (obsolete alias kept); improve ConvertApiFileParam validation; examples upgraded to .NET 6.</PackageReleaseNotes>
     <TargetFrameworks>netstandard2.0;netcoreapp3.1</TargetFrameworks>
-    <PackageVersion>3.1.5</PackageVersion>
+    <PackageVersion>3.1.6</PackageVersion>
     <Description>ConvertAPI for .NET — one call to turn Office files into PDF or back again (DOCX ⇄ PDF, XLSX ⇄ PDF, PPTX ⇄ PDF). Convert HTML, images, ebooks, email, zip; merge, split, watermark, compress, OCR, redact, protect or repair PDF. Async, cross-platform, .NET Standard 2.0+ / .NET Core 5-9</Description>
   </PropertyGroup>
 
