@@ -199,14 +199,6 @@ namespace ConvertApiDotNet.Services
         private static List<string> CollectTags(OpenApiDocument doc, OpenApiOperation op, OpenApiPathItem item)
         {
             var set = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-            // From operation tag names
-            if (op?.Tags != null)
-            {
-                foreach (var t in op.Tags)
-                {
-                    if (!string.IsNullOrWhiteSpace(t.Name)) set.Add(t.Name.Trim());
-                }
-            }
             // From custom extension array
             foreach (var extDict in new[] { op?.Extensions, item?.Extensions })
             {
@@ -250,9 +242,9 @@ namespace ConvertApiDotNet.Services
                                 Name = name,
                                 Label = GetExtensionString(s.Extensions, "x-ca-label") ?? name,
                                 Description = s.Description,
-                                GroupName = GetExtensionString(s.Extensions, "x-ca-group") ?? "General",
+                                GroupName = GetExtensionString(s.Extensions, "x-ca-group"),
                                 Type = s.Type,
-                                Representation = s.Format,
+                                Representation = GetExtensionString(s.Extensions, "x-ca-representation"),
                                 Default = s.Default is IOpenApiPrimitive prim ? GetPrimitiveValue(prim) : null,
                                 Values = ToEnumDictionary(s.Enum),
                                 Range = GetRange(s),
@@ -332,22 +324,43 @@ namespace ConvertApiDotNet.Services
         private static List<TagDto> ParseTags(OpenApiDocument doc)
         {
             var list = new List<TagDto>();
-            if (doc.Tags == null) return list;
-            foreach (var t in doc.Tags)
+            if (doc.Info.Extensions.TryGetValue("x-ca-converter-tags", out var ext))
             {
-                var tag = new TagDto
+                IEnumerable<IOpenApiAny> items = null;
+                if (ext is OpenApiArray arr)
+                    items = arr;
+                else if (ext is OpenApiObject obj)
+                    items = obj.Values;
+
+                if (items != null)
                 {
-                    Name = t.Name,
-                    Summary = GetExtensionString(t.Extensions, "x-summary"),
-                    Description = t.Description,
-                    PageTitle = GetExtensionString(t.Extensions, "x-ca-page-title"),
-                    FriendlyName = GetExtensionString(t.Extensions, "x-ca-friendly-name"),
-                    MetaTitle = GetExtensionString(t.Extensions, "x-ca-meta-title"),
-                    MetaDescription = GetExtensionString(t.Extensions, "x-ca-meta-description")
-                };
-                list.Add(tag);
+                    foreach (var item in items)
+                    {
+                        if (item is OpenApiObject obj)
+                        {
+                            var tag = new TagDto
+                            {
+                                Name = GetStringProperty(obj, "name"),
+                                Summary = GetStringProperty(obj, "summary"),
+                                Description = GetStringProperty(obj, "description"),
+                                PageTitle = GetStringProperty(obj, "pageTitle"),
+                                FriendlyName = GetStringProperty(obj, "friendlyName"),
+                                MetaTitle = GetStringProperty(obj, "metaTitle"),
+                                MetaDescription = GetStringProperty(obj, "metaDescription")
+                            };
+                            list.Add(tag);
+                        }
+                    }
+                }
             }
             return list;
+        }
+
+        private static string GetStringProperty(OpenApiObject obj, string key)
+        {
+            if (obj.TryGetValue(key, out var val) && val is OpenApiString s)
+                return s.Value;
+            return null;
         }
 
         private static List<string> ParseExtensionsFrom(IDictionary<string, IOpenApiExtension> opExt, IDictionary<string, IOpenApiExtension> pathExt, IEnumerable<string> defaultTo = null)
