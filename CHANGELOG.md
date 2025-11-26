@@ -4,14 +4,23 @@ All notable changes to this project will be documented in this file.
 
 The format is based on Keep a Changelog and this project adheres to Semantic Versioning.
 
+## [3.1.8-dev] — 2025-11-26
+
+### Changed
+- Start next development cycle as `-dev` prerelease: bump version to `3.1.8-dev` (assembly/file version `3.1.8.0`).
+
 ## [3.1.7-dev] — 2025-11-25
 
 ### Added
 - Add `ConverterCatalog` service and demo project for handling ConvertAPI converters.
 
 ### Changed
+- Downgrade `GetConverterInfoDemo` target framework to .NET 6.0.
 - Start next development cycle as `-dev` prerelease: bump version to `3.1.7-dev` (assembly/file version `3.1.7.0`).
 - This is a development snapshot; entries will accumulate here until the next stable release.
+
+### Fixed
+- Fix `Representation` parameter handling in `ConverterCatalog` (#67).
 
 ## [3.1.6] — 2025-11-12
 
