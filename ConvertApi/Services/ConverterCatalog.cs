@@ -244,6 +244,7 @@ namespace ConvertApiDotNet.Services
                                 Description = s.Description,
                                 GroupName = GetExtensionString(s.Extensions, "x-ca-group"),
                                 Type = s.Type,
+                                XType = GetExtensionString(s.Extensions, "x-ca-type"),
                                 Representation = GetExtensionString(s.Extensions, "x-ca-representation"),
                                 Default = s.Default is IOpenApiPrimitive prim ? GetPrimitiveValue(prim) : null,
                                 Values = ToEnumDictionary(s.Enum),
