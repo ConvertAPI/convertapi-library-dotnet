@@ -185,8 +185,8 @@ namespace ConvertApiDotNet.Services
                     MetaTitle = GetExtensionString(op.Extensions, "x-ca-meta-title") ?? GetExtensionString(item.Extensions, "x-ca-meta-title"),
                     MetaDescription = GetExtensionString(op.Extensions, "x-ca-meta-description") ?? GetExtensionString(item.Extensions, "x-ca-meta-description"),
                     Tags = CollectTags(doc, op, item),
-                    SourceExtensions = ParseExtensionsFrom(op.Extensions, item.Extensions, defaultTo: new[] { "." + src }),
-                    DestinationExtensions = new List<string> { "." + dst },
+                    SourceExtensions = ParseExtensionsFrom("x-ca-source-formats", op.Extensions, item.Extensions, defaultTo: new[] { src }),
+                    DestinationExtensions = ParseExtensionsFrom("x-ca-destination-formats", op.Extensions, item.Extensions, defaultTo: new[] { dst }),
                     ConverterParameterGroups = ParseParameterGroups(op)
                 };
 
@@ -364,9 +364,9 @@ namespace ConvertApiDotNet.Services
             return null;
         }
 
-        private static List<string> ParseExtensionsFrom(IDictionary<string, IOpenApiExtension> opExt, IDictionary<string, IOpenApiExtension> pathExt, IEnumerable<string> defaultTo = null)
+        private static List<string> ParseExtensionsFrom(string key, IDictionary<string, IOpenApiExtension> opExt, IDictionary<string, IOpenApiExtension> pathExt, IEnumerable<string> defaultTo = null)
         {
-            var str = GetExtensionString(opExt, "x-ca-source-formats") ?? GetExtensionString(pathExt, "x-ca-source-formats");
+            var str = GetExtensionString(opExt, key) ?? GetExtensionString(pathExt, key);
             if (!string.IsNullOrWhiteSpace(str))
             {
                 return SplitExtensions(str).ToList();
@@ -380,7 +380,6 @@ namespace ConvertApiDotNet.Services
                 .Split(new[] { ',', ';' }, StringSplitOptions.RemoveEmptyEntries)
                 .Select(s => s.Trim())
                 .Where(s => !string.IsNullOrWhiteSpace(s))
-                .Select(s => s.StartsWith(".") ? s : "." + s)
                 .Distinct(StringComparer.OrdinalIgnoreCase);
         }
 

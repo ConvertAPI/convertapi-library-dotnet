@@ -50,6 +50,7 @@ internal class Program
             if (c != null)
             {
                 Console.WriteLine($"Found: {c.SourceFormat} -> {c.DestinationFormat} | {Trim(c.Summary, 60)}");
+                Console.WriteLine($"Source extensions: {string.Join(",", c.SourceExtensions)} -> Destination extensions: {string.Join(",", c.DestinationExtensions)}");
             }
             else
             {
