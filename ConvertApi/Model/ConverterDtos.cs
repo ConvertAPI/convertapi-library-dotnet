@@ -210,5 +210,10 @@ namespace ConvertApiDotNet.Model
         /// Meta description for the tag page
         /// </summary>
         public string MetaDescription { get; set; }
+        
+        /// <summary>
+        /// Category of the tag
+        /// </summary>
+        public string Category { get; set; }
     }
 }

@@ -347,7 +347,8 @@ namespace ConvertApiDotNet.Services
                                 PageTitle = GetStringProperty(obj, "pageTitle"),
                                 FriendlyName = GetStringProperty(obj, "friendlyName"),
                                 MetaTitle = GetStringProperty(obj, "metaTitle"),
-                                MetaDescription = GetStringProperty(obj, "metaDescription")
+                                MetaDescription = GetStringProperty(obj, "metaDescription"),
+                                Category = GetStringProperty(obj, "category")
                             };
                             list.Add(tag);
                         }
