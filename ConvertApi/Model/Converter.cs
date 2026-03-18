@@ -1,10 +1,12 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace ConvertApiDotNet.Model
 {
     /// <summary>
     /// Strongly typed metadata for a converter endpoint, derived from OpenAPI.
     /// </summary>
+    [Obsolete("Use ConverterDto instead")]
     public class Converter
     {
         public string Title { get; set; }

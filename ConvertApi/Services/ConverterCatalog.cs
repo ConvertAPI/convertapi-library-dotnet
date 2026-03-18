@@ -458,7 +458,7 @@ namespace ConvertApiDotNet.Services
                                 XType = GetExtensionString(s.Extensions, "x-ca-type"),
                                 Representation = GetExtensionString(s.Extensions, "x-ca-representation"),
                                 Default = s.Default is IOpenApiPrimitive prim ? GetPrimitiveValue(prim) : null,
-                                Values = ToEnumDictionary(s.Enum),
+                                Values = ToValuesDictionary(s.Enum, s.Extensions),
                                 Range = GetRange(s),
                                 Required = required.Contains(name),
                                 Featured = GetExtensionBool(s.Extensions, "x-ca-featured") ?? false,
@@ -501,6 +501,24 @@ namespace ConvertApiDotNet.Services
                           ?? GetExtensionString(s.Extensions, "x-ca-source-formats");
             if (string.IsNullOrWhiteSpace(formats)) return null;
             return SplitExtensions(formats).ToArray();
+        }
+
+        private static Dictionary<string, string> ToValuesDictionary(IList<IOpenApiAny> @enum, IDictionary<string, IOpenApiExtension> extensions)
+        {
+            // Try x-ca-values first for human-readable display values
+            if (extensions != null && extensions.TryGetValue("x-ca-values", out var ext) && ext is OpenApiObject obj && obj.Count > 0)
+            {
+                var dict = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+                foreach (var entry in obj)
+                {
+                    if (entry.Value is OpenApiString valStr)
+                        dict[entry.Key] = valStr.Value;
+                }
+                if (dict.Count > 0) return dict;
+            }
+
+            // Fallback to enum key=key
+            return ToEnumDictionary(@enum);
         }
 
         private static Dictionary<string, string> ToEnumDictionary(IList<IOpenApiAny> @enum)

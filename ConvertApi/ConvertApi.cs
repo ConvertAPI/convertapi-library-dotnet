@@ -175,6 +175,7 @@ namespace ConvertApiDotNet
         /// <param name="dst">Destination format, e.g. "pdf".</param>
         /// <param name="ct">Cancellation token.</param>
         /// <returns>Returns converter metadata model to build dynamic forms/UI.</returns>
+        [Obsolete("Use ConverterCatalog instead")]
         public async Task<Converter> GetConverterInfo(string src, string dst, System.Threading.CancellationToken ct = default)
         {
             if (string.IsNullOrWhiteSpace(src)) throw new ArgumentNullException(nameof(src));
