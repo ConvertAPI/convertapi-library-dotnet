@@ -21,6 +21,12 @@ namespace ConvertApiDotNet.Model
         /// Detailed description of the converter
         /// </summary>
         public string Overview { get; set; }
+        
+        /// <summary>
+        /// Detailed description of the converter in md format
+        /// </summary>
+        public string OverviewMarkdown { get; set; }
+        
 
         /// <summary>
         /// Meta title for SEO purposes
@@ -61,6 +67,7 @@ namespace ConvertApiDotNet.Model
         /// Collection of converter parameter groups
         /// </summary>
         public IEnumerable<ConverterParameterGroupDto> ConverterParameterGroups { get; set; }
+
     }
 
     /// <summary>

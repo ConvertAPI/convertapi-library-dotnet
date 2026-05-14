@@ -15,6 +15,8 @@ internal class Program
         Console.WriteLine("=== ConvertAPI Converter Catalog Demo ===");
         Console.WriteLine($"Base URI: {ConvertApiDotNet.ConvertApi.ApiBaseUri}");
         Console.WriteLine();
+        
+        ConvertApiDotNet.ConvertApi.ApiBaseUri = "https://stag-v2.convertapi.com";
 
         var catalog = new ConverterCatalog();
 
@@ -40,6 +42,7 @@ internal class Program
         Console.WriteLine("\n--- GetConverter(src, dst) ---");
         var samples = new (string src, string dst)[]
         {
+            ("md", "html"),
             ("pdf", "docx"),
             ("docx", "pdf"),
             ("pdf", "merge"),

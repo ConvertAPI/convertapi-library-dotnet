@@ -201,6 +201,7 @@ namespace ConvertApiDotNet.Services
                     Summary = item.Summary ?? op.Summary,
                     Description = item.Description ?? op.Description,
                     Overview = GetExtensionString(op.Extensions, "x-ca-overview") ?? GetExtensionString(item.Extensions, "x-ca-overview"),
+                    OverviewMarkdown = GetExtensionString(op.Extensions, "x-ca-overview-markdown") ?? GetExtensionString(item.Extensions, "x-ca-overview-markdown"),
                     MetaTitle = GetExtensionString(op.Extensions, "x-ca-meta-title") ?? GetExtensionString(item.Extensions, "x-ca-meta-title"),
                     MetaDescription = GetExtensionString(op.Extensions, "x-ca-meta-description") ?? GetExtensionString(item.Extensions, "x-ca-meta-description"),
                     Tags = CollectTags(doc, op, item),
