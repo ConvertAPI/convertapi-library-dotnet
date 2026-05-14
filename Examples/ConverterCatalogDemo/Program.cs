@@ -64,11 +64,14 @@ internal class Program
         Console.WriteLine($"Converters with tag 'pdf': {pdfTagged.Count}");
         PrintConverters(pdfTagged.Take(10));
 
-        // 4) SearchConverters(terms)
-        Console.WriteLine("\n--- SearchConverters([\"watermark\", \"pdf\"]) ---");
-        var search = SafeCall(() => catalog.SearchConverters(new[] { "watermark", "pdf" }));
-        Console.WriteLine($"Search results: {search.Count}");
-        PrintConverters(search.Take(10));
+        // 4) SearchConverters(query) — now hits /info/openapi?q=... on every call
+        foreach (var q in new[] { "pdf to docx", "pdf to word", "heic to pdf" })
+        {
+            Console.WriteLine($"\n--- SearchConverters(\"{q}\") ---");
+            var search = SafeCall(() => catalog.SearchConverters(q));
+            Console.WriteLine($"Search results: {search.Count}");
+            PrintConverters(search.Take(10));
+        }
 
         // 5) GetTags()
         Console.WriteLine("\n--- GetTags() ---");

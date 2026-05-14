@@ -4,6 +4,28 @@ All notable changes to this project will be documented in this file.
 
 The format is based on Keep a Changelog and this project adheres to Semantic Versioning.
 
+## [3.1.15-dev] — 2026-05-14
+
+### Added
+- `IConverterCatalog.SearchConvertersAsync(string query)` — async-canonical form of search.
+- `IConverterCatalog.SearchConverters(string query)` — sync overload taking a single string.
+
+### Changed
+- **Search is now server-side.** `SearchConverters` and `SearchConvertersAsync` hit the
+  server's `/info/openapi?q=...` endpoint on every call instead of running a local scorer
+  against the cached OpenAPI document. Results are returned in server-computed relevance
+  order. This consolidates ranking logic in one place so SDKs and direct API consumers
+  see the same results, and lets scoring tweaks ship without an SDK release. Requires a
+  ConvertAPI server build that supports the `?q=` filter; older self-hosted servers will
+  not return useful results.
+- The existing `SearchConverters(string[] terms)` overload now joins terms with spaces and
+  delegates to the new server-backed implementation. Callers don't need to change code,
+  but ranking and result count may differ from the previous local scorer.
+
+### Removed
+- The in-SDK search scorer (token weighting, format-pair bonuses, virtual converter
+  synthesis). Moved to the server.
+
 ## [3.1.8-dev] — 2025-11-26
 
 ### Changed

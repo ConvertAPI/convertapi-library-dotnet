@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using ConvertApiDotNet.Model;
 
@@ -26,9 +26,28 @@ namespace ConvertApiDotNet.Interface
         List<ConverterDto> GetConvertersByTags(List<string> tags = null);
 
         /// <summary>
-        /// Searches for converters by the provided search terms.
+        /// Searches converters by hitting the server's <c>/info/openapi?q=...</c> endpoint.
+        /// Terms are joined with spaces. Results are returned in server-computed relevance
+        /// order (highest first). Empty or null input returns an empty list without a
+        /// network call.
         /// </summary>
+        /// <remarks>
+        /// Requires a ConvertAPI server build that supports server-side search filtering.
+        /// </remarks>
         List<ConverterDto> SearchConverters(string[] terms);
+
+        /// <summary>
+        /// Searches converters by hitting the server's <c>/info/openapi?q=...</c> endpoint.
+        /// Results are returned in server-computed relevance order (highest first). Empty
+        /// or whitespace input returns an empty list without a network call.
+        /// </summary>
+        List<ConverterDto> SearchConverters(string query);
+
+        /// <summary>
+        /// Async-canonical form of <see cref="SearchConverters(string)"/>. The synchronous
+        /// overloads block on this.
+        /// </summary>
+        Task<List<ConverterDto>> SearchConvertersAsync(string query);
 
         /// <summary>
         /// Gets the list of available tags.

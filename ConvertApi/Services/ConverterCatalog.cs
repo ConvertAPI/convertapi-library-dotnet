@@ -70,225 +70,34 @@ namespace ConvertApiDotNet.Services
 
         public List<ConverterDto> SearchConverters(string[] terms)
         {
-            EnsureLoaded();
-
             if (terms == null || terms.Length == 0)
                 return new List<ConverterDto>();
+            return SearchConverters(string.Join(" ", terms));
+        }
 
-            var stop = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
-                { "to", "into", "in", "as", "from", "->", "-", "–", "—" };
+        public List<ConverterDto> SearchConverters(string query)
+        {
+            return SearchConvertersAsync(query).GetAwaiter().GetResult();
+        }
 
-            var tokens = terms
-                .Where(t => !string.IsNullOrWhiteSpace(t))
-                .Select(t => t.Trim().Trim('-', '>', '<', '.', ',', ';', ':', '/', '\\'))
-                .Where(t => t.Length > 0 && !stop.Contains(t))
-                .Distinct(StringComparer.OrdinalIgnoreCase)
-                .ToArray();
-
-            if (tokens.Length == 0)
+        public async Task<List<ConverterDto>> SearchConvertersAsync(string query)
+        {
+            // Short-circuit empty input — preserves the old SDK contract and saves a
+            // round-trip. The server treats no-query as "return everything", which
+            // would be surprising for a method named SearchConverters.
+            if (string.IsNullOrWhiteSpace(query))
                 return new List<ConverterDto>();
 
-            var allConverters = GetAllConverters();
+            var doc = await TryFetchOpenApiAsync("info/openapi", query).ConfigureAwait(false)
+                      ?? await TryFetchOpenApiAsync("info/openApi", query).ConfigureAwait(false);
+            if (doc == null)
+                throw new InvalidOperationException(
+                    "OpenAPI search response could not be retrieved. The server may not support " +
+                    "the ?q= search filter — upgrade ConvertAPI server to a build that includes it.");
 
-            var knownFormats = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-            foreach (var c in allConverters)
-            {
-                if (!string.IsNullOrEmpty(c.SourceFormat)) knownFormats.Add(c.SourceFormat);
-                if (!string.IsNullOrEmpty(c.DestinationFormat)) knownFormats.Add(c.DestinationFormat);
-                if (c.SourceExtensions != null) foreach (var e in c.SourceExtensions) knownFormats.Add(e.TrimStart('.'));
-                if (c.DestinationExtensions != null) foreach (var e in c.DestinationExtensions) knownFormats.Add(e.TrimStart('.'));
-            }
-
-            var formatTokens = tokens.Where(t => knownFormats.Contains(t)).Distinct(StringComparer.OrdinalIgnoreCase).ToArray();
-
-            bool SupportsFormat(string format, List<string> extensions, string token)
-            {
-                if (string.Equals(format, token, StringComparison.OrdinalIgnoreCase)) return true;
-                if (extensions != null)
-                {
-                    return extensions.Any(e => string.Equals(e.TrimStart('.'), token, StringComparison.OrdinalIgnoreCase));
-                }
-                return false;
-            }
-
-            bool MatchesToken(ConverterDto c, string t)
-            {
-                return SupportsFormat(c.SourceFormat, c.SourceExtensions, t) ||
-                       SupportsFormat(c.DestinationFormat, c.DestinationExtensions, t) ||
-                       (c.Summary != null && Helper.ContainsIgnoreCase(c.Summary, t)) ||
-                       (c.Tags != null && c.Tags.Any(tag => Helper.ContainsIgnoreCase(tag, t))) ||
-                       (c.Description != null && Helper.ContainsIgnoreCase(c.Description, t)) ||
-                       (c.Overview != null && Helper.ContainsIgnoreCase(c.Overview, t));
-            }
-
-            // Prioritize items that match ALL search terms
-            var candidates = allConverters.Where(c => tokens.All(t => MatchesToken(c, t))).ToList();
-
-            if (formatTokens.Length >= 2)
-            {
-                var src = formatTokens[0];
-                var dst = formatTokens[1];
-                
-                var pairMatches = allConverters.Where(c => 
-                {
-                    bool supportsSrc = SupportsFormat(c.SourceFormat, c.SourceExtensions, src);
-                    bool supportsDst = SupportsFormat(c.DestinationFormat, c.DestinationExtensions, dst);
-                    if (supportsSrc && supportsDst) return true;
-
-                    bool supportsRevSrc = SupportsFormat(c.SourceFormat, c.SourceExtensions, dst);
-                    bool supportsRevDst = SupportsFormat(c.DestinationFormat, c.DestinationExtensions, src);
-                    return supportsRevSrc && supportsRevDst;
-                });
-
-                foreach (var pm in pairMatches)
-                {
-                    if (!candidates.Contains(pm)) candidates.Add(pm);
-                }
-            }
-
-            // Fallback: if no matches for all terms, return items matching ANY term
-            if (candidates.Count == 0)
-            {
-                candidates = allConverters.Where(c => tokens.Any(t => MatchesToken(c, t))).ToList();
-            }
-
-            if (formatTokens.Length >= 2)
-            {
-                var src = formatTokens[0];
-                var dst = formatTokens[1];
-
-                var virtuals = new List<ConverterDto>();
-                
-                foreach (var c in candidates)
-                {
-                    // Forward check (src -> dst)
-                    bool supportsSrc = SupportsFormat(c.SourceFormat, c.SourceExtensions, src);
-                    bool supportsDst = SupportsFormat(c.DestinationFormat, c.DestinationExtensions, dst);
-
-                    if (supportsSrc && supportsDst)
-                    {
-                         if (!string.Equals(c.SourceFormat, src, StringComparison.OrdinalIgnoreCase) || !string.Equals(c.DestinationFormat, dst, StringComparison.OrdinalIgnoreCase))
-                         {
-                             virtuals.Add(CreateVirtual(c, src, dst));
-                         }
-                    }
-                    
-                    // Reverse check (dst -> src)
-                    bool supportsRevSrc = SupportsFormat(c.SourceFormat, c.SourceExtensions, dst);
-                    bool supportsRevDst = SupportsFormat(c.DestinationFormat, c.DestinationExtensions, src);
-
-                     if (supportsRevSrc && supportsRevDst)
-                    {
-                         if (!string.Equals(c.SourceFormat, dst, StringComparison.OrdinalIgnoreCase) || !string.Equals(c.DestinationFormat, src, StringComparison.OrdinalIgnoreCase))
-                         {
-                             virtuals.Add(CreateVirtual(c, dst, src));
-                         }
-                    }
-                }
-                candidates.AddRange(virtuals);
-            }
-
-            int Score(ConverterDto c)
-            {
-                int s = 0;
-                
-                // 0. Individual Token Scoring with Positional Weighting
-                for (int i = 0; i < formatTokens.Length; i++)
-                {
-                    var t = formatTokens[i];
-                    bool isSrc = SupportsFormat(c.SourceFormat, c.SourceExtensions, t);
-                    bool isDst = SupportsFormat(c.DestinationFormat, c.DestinationExtensions, t);
-
-                    if (isSrc) s += 3000;
-                    if (isDst) s += 3000;
-
-                    // Positional Bonuses
-                    if (i == 0) // First format term: Prefer Source
-                    {
-                        if (isSrc) s += 2000; 
-                    }
-                    else if (i == 1) // Second format term: Prefer Destination
-                    {
-                        if (isDst) s += 2000; 
-                    }
-                }
-                
-                if (formatTokens.Length >= 2)
-                {
-                    var t1 = formatTokens[0];
-                    var t2 = formatTokens[1];
-                    
-                    // 1. SourceFormat & DestinationFormat (Highest Priority)
-                    bool fwdFmt = string.Equals(c.SourceFormat, t1, StringComparison.OrdinalIgnoreCase) && string.Equals(c.DestinationFormat, t2, StringComparison.OrdinalIgnoreCase);
-                    bool revFmt = string.Equals(c.SourceFormat, t2, StringComparison.OrdinalIgnoreCase) && string.Equals(c.DestinationFormat, t1, StringComparison.OrdinalIgnoreCase);
-                    
-                    if (fwdFmt) s += 100000;
-                    if (revFmt) s += 50000;
-                    
-                    // 3. SourceExtensions & DestinationExtensions (Third Priority)
-                    if (!fwdFmt && !revFmt) 
-                    {
-                        bool fwdExt = SupportsFormat(c.SourceFormat, c.SourceExtensions, t1) && SupportsFormat(c.DestinationFormat, c.DestinationExtensions, t2);
-                        bool revExt = SupportsFormat(c.SourceFormat, c.SourceExtensions, t2) && SupportsFormat(c.DestinationFormat, c.DestinationExtensions, t1);
-
-                        if (fwdExt) s += 40000;
-                        if (revExt) s += 20000;
-                    }
-                }
-
-                // 2. Summary (Second Priority)
-                if (c.Summary != null)
-                {
-                    int summaryHits = tokens.Count(t => Helper.ContainsIgnoreCase(c.Summary, t));
-                    s += summaryHits * 1000;
-                }
-
-                // 4. Tags (Low Priority)
-                if (c.Tags != null)
-                {
-                    int tagHits = tokens.Count(t => c.Tags.Any(tag => Helper.ContainsIgnoreCase(tag, t)));
-                    s += tagHits * 10;
-                }
-
-                // 5. Description (Lower Priority)
-                if (c.Description != null)
-                {
-                    int descHits = tokens.Count(t => Helper.ContainsIgnoreCase(c.Description, t));
-                    s += descHits * 5;
-                }
-
-                // 6. Overview (Lowest Priority)
-                if (c.Overview != null)
-                {
-                    int ovHits = tokens.Count(t => Helper.ContainsIgnoreCase(c.Overview, t));
-                    s += ovHits * 2;
-                }
-
-                return s;
-            }
-
-            return candidates
-                .OrderByDescending(Score)
-                .ThenBy(c => c.Summary)
-                .GroupBy(c => new { S = c.SourceFormat?.ToLowerInvariant(), D = c.DestinationFormat?.ToLowerInvariant() })
-                .Select(g => g.First())
-                .Where(x=> GetConverter(x.SourceFormat, x.DestinationFormat) != null)
-                .ToList();
-        }
-        
-        private ConverterDto CreateVirtual(ConverterDto c, string s, string d)
-        {
-            return new ConverterDto
-            {
-                SourceFormat = s.ToLowerInvariant(),
-                DestinationFormat = d.ToLowerInvariant(),
-                SourceExtensions = c.SourceExtensions,
-                DestinationExtensions = c.DestinationExtensions,
-                Summary = $"{s.ToUpper()} to {d.ToUpper()} API",
-                Description = c.Description,
-                Tags = c.Tags,
-                Overview = c.Overview
-            };
+            // The server orders paths by relevance (x-ca-search-rank ascending) when
+            // filtered, so parser document order is already the order we want.
+            return ParseConverters(doc);
         }
 
         public List<TagDto> GetTags()
@@ -340,15 +149,14 @@ namespace ConvertApiDotNet.Services
             }
         }
 
-        private async Task<OpenApiDocument> TryFetchOpenApiAsync(string path)
+        private async Task<OpenApiDocument> TryFetchOpenApiAsync(string path, string searchQuery = null)
         {
-            var url = new UriBuilder(_baseUri)
-            {
-                Path = path
-            };
+            var ub = new UriBuilder(_baseUri) { Path = path };
+            if (!string.IsNullOrEmpty(searchQuery))
+                ub.Query = "q=" + Uri.EscapeDataString(searchQuery);
             try
             {
-                var response = await _http.GetAsync(url.Uri, ConvertApiConstants.DownloadTimeout).ConfigureAwait(false);
+                var response = await _http.GetAsync(ub.Uri, ConvertApiConstants.DownloadTimeout).ConfigureAwait(false);
                 if (response.StatusCode != HttpStatusCode.OK)
                     return null;
                 var json = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
@@ -675,44 +483,6 @@ namespace ConvertApiDotNet.Services
         {
             if (string.IsNullOrWhiteSpace(s)) return s;
             return s.Trim().TrimStart('.');
-        }
-
-        private static bool Matches(ConverterDto c, string term)
-        {
-            if (c == null || string.IsNullOrWhiteSpace(term)) return false;
-            var t = term.Trim();
-            bool In(params string[] fields)
-            {
-                foreach (var f in fields)
-                {
-                    if (!string.IsNullOrEmpty(f) && f.IndexOf(t, StringComparison.OrdinalIgnoreCase) >= 0)
-                        return true;
-                }
-                return false;
-            }
-
-            if (In(c.SourceFormat, c.DestinationFormat, c.Summary, c.Description, c.Overview, c.MetaTitle, c.MetaDescription))
-                return true;
-
-            if (c.Tags != null && c.Tags.Any(tag => tag?.IndexOf(t, StringComparison.OrdinalIgnoreCase) >= 0))
-                return true;
-
-            if (c.ConverterParameterGroups != null)
-            {
-                foreach (var g in c.ConverterParameterGroups)
-                {
-                    if (In(g?.Name)) return true;
-                    if (g?.ConverterParameters != null)
-                    {
-                        foreach (var p in g.ConverterParameters)
-                        {
-                            if (In(p?.Name, p?.Label, p?.Description, p?.GroupName, p?.Type, p?.Representation))
-                                return true;
-                        }
-                    }
-                }
-            }
-            return false;
         }
     }
 }
