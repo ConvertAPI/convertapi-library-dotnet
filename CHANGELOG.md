@@ -4,6 +4,46 @@ All notable changes to this project will be documented in this file.
 
 The format is based on Keep a Changelog and this project adheres to Semantic Versioning.
 
+## [3.1.15-dev] — 2026-05-14
+
+### Added
+- `IConverterCatalog.SearchConvertersAsync(string query)` — async-canonical form of search.
+- `IConverterCatalog.SearchConverters(string query)` — sync overload taking a single string.
+
+### Changed
+- **Search is now server-side.** `SearchConverters` and `SearchConvertersAsync` hit the
+  server's `/info/openapi?q=...` endpoint on every call instead of running a local scorer
+  against the cached OpenAPI document. Results are returned in server-computed relevance
+  order. This consolidates ranking logic in one place so SDKs and direct API consumers
+  see the same results, and lets scoring tweaks ship without an SDK release. Requires a
+  ConvertAPI server build that supports the `?q=` filter; older self-hosted servers will
+  not return useful results.
+- The existing `SearchConverters(string[] terms)` overload now joins terms with spaces and
+  delegates to the new server-backed implementation. Callers don't need to change code,
+  but ranking and result count may differ from the previous local scorer.
+
+### Removed
+- The in-SDK search scorer (token weighting, format-pair bonuses, virtual converter
+  synthesis). Moved to the server.
+
+## [3.1.8-dev] — 2025-11-26
+
+### Changed
+- Start next development cycle as `-dev` prerelease: bump version to `3.1.8-dev` (assembly/file version `3.1.8.0`).
+
+## [3.1.7-dev] — 2025-11-25
+
+### Added
+- Add `ConverterCatalog` service and demo project for handling ConvertAPI converters.
+
+### Changed
+- Downgrade `GetConverterInfoDemo` target framework to .NET 6.0.
+- Start next development cycle as `-dev` prerelease: bump version to `3.1.7-dev` (assembly/file version `3.1.7.0`).
+- This is a development snapshot; entries will accumulate here until the next stable release.
+
+### Fixed
+- Fix `Representation` parameter handling in `ConverterCatalog` (#67).
+
 ## [3.1.6] — 2025-11-12
 
 ### Added

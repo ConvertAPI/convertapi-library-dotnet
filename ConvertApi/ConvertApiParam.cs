@@ -88,9 +88,9 @@ namespace ConvertApiDotNet
         }
 
         /// <summary>
-        /// Convert local file.
+        /// Convert a local file or reference an already uploaded file by its FileId.
         /// </summary>
-        /// <param name="path">Path to a local file.</param>
+        /// <param name="path">Path to a local file or a 32-character lowercase FileId.</param>
         public ConvertApiFileParam(string path) : this("file", path)
         {
         }
@@ -99,15 +99,27 @@ namespace ConvertApiDotNet
         {
             if (string.IsNullOrWhiteSpace(path))
                 throw new ArgumentException(
-                    "Path must be a non-empty path to an existing local file. To use a FileId, pass new ConvertApiParam(\"FileId\", fileId).",
+                    "Value must be a non-empty local file path or a 32-character lowercase FileId.",
                     nameof(path));
 
-            if (!File.Exists(path))
-                throw new FileNotFoundException(
-                    $"File not found at path '{path}'. To use a FileId, pass new ConvertApiParam(\"FileId\", fileId).",
-                    path);
+            // Prefer an existing local file path
+            if (File.Exists(path))
+            {
+                Tasks = Upload(new FileInfo(path));
+                return;
+            }
 
-            Tasks = Upload(new FileInfo(path));
+            // If it looks like a FileId, pass it as-is (no upload)
+            if (LooksLikeFileId(path))
+            {
+                Value = new[] { path };
+                return;
+            }
+
+            // Neither a file on disk nor a valid FileId
+            throw new FileNotFoundException(
+                $"Value '{path}' is neither an existing local file nor a valid FileId (32 lowercase alphanumeric characters).",
+                path);
         }
 
         /// <summary>
@@ -221,6 +233,23 @@ namespace ConvertApiDotNet
         public async Task<ConvertApiFile> GetValueAsync()
         {
             return await GetUploadedFileAsync();
+        }
+
+        private static bool LooksLikeFileId(string value)
+        {
+            if (string.IsNullOrEmpty(value) || value.Length != 32)
+                return false;
+
+            for (int i = 0; i < value.Length; i++)
+            {
+                var ch = value[i];
+                var isDigit = ch >= '0' && ch <= '9';
+                var isLower = ch >= 'a' && ch <= 'z';
+                if (!isDigit && !isLower)
+                    return false;
+            }
+
+            return true;
         }
     }
 }

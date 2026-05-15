@@ -21,7 +21,8 @@ namespace Workflow
                 var convertApi = new ConvertApi("api_token");
 
                 Console.WriteLine("Converting PDF to JPG and compressing result files with ZIP");
-                var fileName = Path.Combine(Path.GetTempPath(), "test.pdf");
+                var examplesDir = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "..", "..", "..", ".."));
+                var fileName = Path.Combine(examplesDir, "TestFiles", "test.pdf");
 
                 var firstTask = await convertApi.ConvertAsync("pdf", "jpg", new ConvertApiFileParam(fileName));
                 Console.WriteLine($"Conversions done. Cost: {firstTask.ConversionCost}. Total files created: {firstTask.FileCount()}");
