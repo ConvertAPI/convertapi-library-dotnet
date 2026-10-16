@@ -1,0 +1,209 @@
+name: Publish
+run-name: Publishing ConvertApi ${{ github.event.release.tag_name }} to nuget.org
+
+# A release is a GitHub Release, never a merge. Merging to main only builds (build.yml); publishing the
+# Release v{semver} runs this file, which packs that tag's commit with the tag's version and pushes it to
+# nuget.org. NuGet versions are public and permanent - a pushed version can be unlisted but never
+# replaced - so nothing here retries, overwrites or skips a duplicate.
+#
+#   gh release create v3.1.19 --target main --generate-notes            -> ConvertApi 3.1.19
+#   gh release create v3.2.0-preview.1 --target main --prerelease ...   -> ConvertApi 3.2.0-preview.1
+#
+# A stable version must be a commit on main. A pre-release may be any commit, so a branch can be tried
+# out as a preview package before it is merged.
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: read
+
+env:
+  # Only this account may publish a Release that reaches nuget.org. GitHub cannot express this as a
+  # permission on the Team plan, so it is checked here; the real controls are the v* tag ruleset (only
+  # repository admins create v* tags) and the nuget environment, which accepts only v* tags.
+  PUBLISHER: tomasr78
+  PACKAGE_ID: ConvertApi
+
+jobs:
+  publish:
+    name: publish
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    environment:
+      name: nuget
+      url: https://www.nuget.org/packages/ConvertApi/${{ steps.tag.outputs.version }}
+    concurrency:
+      group: publish-nuget
+      cancel-in-progress: false
+    permissions:
+      contents: read
+      # Only for nuget.org Trusted Publishing (NuGet/login below), which trades this run's OIDC token for
+      # a short-lived API key. Unused while the repository still publishes with the NUGET_API_KEY secret.
+      id-token: write
+    steps:
+      - name: Check who published the release
+        run: |
+          # A re-run keeps GITHUB_ACTOR as the original user; GITHUB_TRIGGERING_ACTOR is whoever pressed
+          # "Re-run", so both must be the publisher or anyone with write access could replay a release.
+          if [ "$GITHUB_ACTOR" != "$PUBLISHER" ] || [ "${GITHUB_TRIGGERING_ACTOR:-$GITHUB_ACTOR}" != "$PUBLISHER" ]; then
+            echo "::error::Only $PUBLISHER may publish to nuget.org - this release was published by $GITHUB_ACTOR and run by ${GITHUB_TRIGGERING_ACTOR:-$GITHUB_ACTOR}."
+            exit 1
+          fi
+          echo "Published by $GITHUB_ACTOR"
+
+      # The release event runs this file from the tag, so the workflow and the code come from the same commit.
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Check the tag and the version
+        id: tag
+        env:
+          TAG: ${{ github.event.release.tag_name }}
+          PRERELEASE: ${{ github.event.release.prerelease }}
+        run: |
+          set -euo pipefail
+          # SemVer 2.0 without build metadata (nuget.org ignores "+..." and it would only confuse).
+          SEMVER='^v(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)(-[0-9A-Za-z-]+(\.[0-9A-Za-z-]+)*)?$'
+          if ! [[ "$TAG" =~ $SEMVER ]]; then
+            echo "::error::Tag '$TAG' is not v{major}.{minor}.{patch} or v{major}.{minor}.{patch}-{pre-release}, e.g. v3.1.19 or v3.2.0-preview.1"
+            exit 1
+          fi
+          if [ "$GITHUB_REF" != "refs/tags/$TAG" ]; then
+            echo "::error::The run is on $GITHUB_REF, not on the release tag refs/tags/$TAG"
+            exit 1
+          fi
+          VERSION="${TAG#v}"
+          SHA=$(git rev-parse "refs/tags/$TAG^{commit}")
+          if [ "$(git rev-parse HEAD)" != "$SHA" ]; then
+            echo "::error::Checked out $(git rev-parse HEAD), but $TAG points at $SHA"
+            exit 1
+          fi
+
+          # The GitHub "pre-release" tick and the version must agree, so a preview cannot become the
+          # package's latest stable version by a forgotten tick, and a stable version cannot hide as a pre-release.
+          if [[ "$VERSION" == *-* ]]; then
+            if [ "$PRERELEASE" != true ]; then
+              echo "::error::$TAG is a pre-release version, so the GitHub Release must be marked as a pre-release (gh release create --prerelease)"
+              exit 1
+            fi
+          else
+            if [ "$PRERELEASE" = true ]; then
+              echo "::error::$TAG is a stable version, but the GitHub Release is marked as a pre-release. Use a pre-release version such as ${TAG}-preview.1, or untick pre-release."
+              exit 1
+            fi
+            if ! git merge-base --is-ancestor "$SHA" origin/main; then
+              echo "::error::$TAG ($SHA) is not on main. Stable versions are released from main only; release a branch as a pre-release instead."
+              exit 1
+            fi
+          fi
+
+          # nuget.org lists every version ever pushed, unlisted ones included, in lower case.
+          INDEX=$(curl -fsS --retry 3 "https://api.nuget.org/v3-flatcontainer/${PACKAGE_ID,,}/index.json")
+          if jq -e --arg v "${VERSION,,}" '.versions | index($v)' <<<"$INDEX" >/dev/null; then
+            echo "::error::$PACKAGE_ID $VERSION already exists on nuget.org and can never be pushed again. Release the next version instead."
+            exit 1
+          fi
+          if [[ "$VERSION" != *-* ]]; then
+            LATEST=$(jq -r '[.versions[] | select(contains("-") | not)] | last // empty' <<<"$INDEX")
+            if [ -n "$LATEST" ] && [ "$(printf '%s\n%s\n' "$LATEST" "$VERSION" | sort -V | tail -n1)" != "$VERSION" ]; then
+              echo "::warning::$VERSION is lower than the latest stable $LATEST, so it will not become the version that new installs get."
+            fi
+          fi
+
+          {
+            echo "version=$VERSION"
+            echo "sha=$SHA"
+          } >> "$GITHUB_OUTPUT"
+          echo "Publishing $PACKAGE_ID $VERSION from $SHA"
+
+      - uses: actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68 # v6.0.0
+        with:
+          global-json-file: global.json
+
+      # The csproj fails the restore on any high or critical advisory in the dependency graph, so a
+      # vulnerable dependency cannot be published.
+      - name: Restore
+        run: dotnet restore ConvertApi/ConvertApi.csproj
+
+      - name: Build and pack
+        env:
+          VERSION: ${{ steps.tag.outputs.version }}
+        run: |
+          set -euo pipefail
+          dotnet build ConvertApi/ConvertApi.csproj -c Release --no-restore \
+            -p:Version="$VERSION" -p:ContinuousIntegrationBuild=true
+          dotnet pack ConvertApi/ConvertApi.csproj -c Release --no-build -o out \
+            -p:Version="$VERSION" -p:ContinuousIntegrationBuild=true
+          ls -l out
+
+      - name: Check the package
+        env:
+          VERSION: ${{ steps.tag.outputs.version }}
+          SHA: ${{ steps.tag.outputs.sha }}
+        run: |
+          set -euo pipefail
+          PKG="out/$PACKAGE_ID.$VERSION.nupkg"
+          test -f "$PKG" && test -f "out/$PACKAGE_ID.$VERSION.snupkg"
+          NUSPEC=$(unzip -p "$PKG" "$PACKAGE_ID.nuspec")
+          grep -q "<version>$VERSION</version>" <<<"$NUSPEC" || { echo "::error::$PKG does not carry version $VERSION"; exit 1; }
+          grep -q "commit=\"$SHA\"" <<<"$NUSPEC" || { echo "::error::$PKG does not record commit $SHA"; exit 1; }
+          echo "$NUSPEC" | grep -E '<(id|version|repository|dependency) '
+
+      # Trusted Publishing: once a nuget.org policy for this repository, publish.yml and the nuget
+      # environment exists, setting the repository variable NUGET_USER (the nuget.org profile name that
+      # owns the policy) switches publishing to a short-lived key, and NUGET_API_KEY can be deleted.
+      - name: Log in to nuget.org (Trusted Publishing)
+        id: login
+        if: vars.NUGET_USER != ''
+        uses: NuGet/login@8d196754b4036150537f80ac539e15c2f1028841 # v1.2.0
+        with:
+          user: ${{ vars.NUGET_USER }}
+
+      # No --skip-duplicate: a version that already exists must fail loudly, never pass as published.
+      # The .snupkg next to the .nupkg is pushed to the symbol server by the same command.
+      - name: Push to nuget.org
+        env:
+          VERSION: ${{ steps.tag.outputs.version }}
+          NUGET_API_KEY: ${{ steps.login.outputs.NUGET_API_KEY || secrets.NUGET_API_KEY }}
+        run: |
+          set -euo pipefail
+          if [ -z "$NUGET_API_KEY" ]; then
+            echo "::error::No nuget.org key: set up Trusted Publishing (NUGET_USER) or the NUGET_API_KEY secret"
+            exit 1
+          fi
+          dotnet nuget push "out/$PACKAGE_ID.$VERSION.nupkg" \
+            --api-key "$NUGET_API_KEY" --source https://api.nuget.org/v3/index.json
+
+      # nuget.org validates and indexes a push before anyone can restore it, usually within minutes. A slow
+      # index is not a failed release, so this only warns.
+      - name: Wait for nuget.org to serve the package
+        env:
+          VERSION: ${{ steps.tag.outputs.version }}
+        run: |
+          set -uo pipefail
+          for _ in $(seq 1 40); do
+            if curl -fsS "https://api.nuget.org/v3-flatcontainer/${PACKAGE_ID,,}/index.json" \
+                 | jq -e --arg v "${VERSION,,}" '.versions | index($v)' >/dev/null; then
+              echo "$PACKAGE_ID $VERSION is available on nuget.org"
+              exit 0
+            fi
+            sleep 30
+          done
+          echo "::warning::$PACKAGE_ID $VERSION was pushed but nuget.org has not served it after 20 minutes. Check https://www.nuget.org/packages/$PACKAGE_ID/$VERSION"
+
+      - name: Summary
+        env:
+          VERSION: ${{ steps.tag.outputs.version }}
+          SHA: ${{ steps.tag.outputs.sha }}
+          AUTH: ${{ steps.login.outcome == 'success' && 'Trusted Publishing' || 'NUGET_API_KEY secret' }}
+        run: |
+          {
+            echo "| | |"
+            echo "|---|---|"
+            echo "| Package | [\`$PACKAGE_ID $VERSION\`](https://www.nuget.org/packages/$PACKAGE_ID/$VERSION) |"
+            echo "| Commit | \`$SHA\` |"
+            echo "| Published with | $AUTH |"
+          } >> "$GITHUB_STEP_SUMMARY"

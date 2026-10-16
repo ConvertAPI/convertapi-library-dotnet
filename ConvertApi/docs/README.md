@@ -462,7 +462,7 @@ int conversionsConsumed = user.ConversionsConsumed;
 
 ### More examples
 
-You can find more advanced examples in the [examples](https://github.com/ConvertAPI/convertapi-dotnet/tree/master/Examples) folder.
+You can find more advanced examples in the [examples](https://github.com/ConvertAPI/convertapi-library-dotnet/tree/main/Examples) folder.
 
 #### Converting your first file, complete example:
 
@@ -492,4 +492,4 @@ catch (ConvertApiException e)
 Please leave all comments, bugs, requests, and issues on the Issues page. We'll respond to your request ASAP!
 
 ### License
-The ConvertAPI .NET Library is licensed under the [MIT](http://www.opensource.org/licenses/mit-license.php "Read more about the MIT license form") license. Refere to the [LICENSE](https://github.com/ConvertAPI/convertapi-dotnet/blob/master/LICENSE) file for more information.
+The ConvertAPI .NET Library is licensed under the [MIT](http://www.opensource.org/licenses/mit-license.php "Read more about the MIT license form") license. Refere to the [LICENSE](https://github.com/ConvertAPI/convertapi-library-dotnet/blob/main/LICENSE) file for more information.
