@@ -27,7 +27,7 @@
 
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
-    <PackageReference Include="Microsoft.OpenApi.Readers" Version="1.6.23" />
+    <PackageReference Include="Microsoft.OpenApi.Readers" Version="1.6.30" />
   </ItemGroup>
 
   <ItemGroup>
