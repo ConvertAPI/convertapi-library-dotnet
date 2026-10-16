@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file.
 
 The format is based on Keep a Changelog and this project adheres to Semantic Versioning.
 
-## [3.2.0] — Unreleased
+## [3.2.0] — 2026-10-16
 
 ### Removed
 - The `netcoreapp3.1` target. The package now ships a single `netstandard2.0` assembly, which every
@@ -16,6 +16,7 @@ The format is based on Keep a Changelog and this project adheres to Semantic Ver
 - Examples target `net10.0` (were `net6.0`, out of support since November 2024), and `SplitPDF` builds
   against the library in this repository instead of the `ConvertApi` 3.1.2 package.
 - Dependabot opens weekly pull requests for GitHub Actions and NuGet dependencies.
+- `Newtonsoft.Json` dependency 13.0.1 → 13.0.4 (the minimum version apps now resolve).
 
 ## [3.1.19] — 2026-10-16
 
