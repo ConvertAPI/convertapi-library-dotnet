@@ -4,6 +4,19 @@ All notable changes to this project will be documented in this file.
 
 The format is based on Keep a Changelog and this project adheres to Semantic Versioning.
 
+## [3.2.0] — Unreleased
+
+### Removed
+- The `netcoreapp3.1` target. The package now ships a single `netstandard2.0` assembly, which every
+  supported .NET (and .NET Framework 4.6.2+) already uses; .NET Core 3.1 has been out of support since
+  December 2022. The library had no `netcoreapp3.1`-specific code, so the public API is unchanged. Apps
+  still on .NET Core 3.1 now resolve the `netstandard2.0` build instead.
+
+### Changed
+- Examples target `net10.0` (were `net6.0`, out of support since November 2024), and `SplitPDF` builds
+  against the library in this repository instead of the `ConvertApi` 3.1.2 package.
+- Dependabot opens weekly pull requests for GitHub Actions and NuGet dependencies.
+
 ## [3.1.19] — 2026-10-16
 
 ### Security

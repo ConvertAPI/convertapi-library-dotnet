@@ -19,7 +19,7 @@
     <AssemblyName>ConvertApi</AssemblyName>
     <RootNamespace>ConvertApiDotNet</RootNamespace>
     <PackageReleaseNotes>https://github.com/ConvertAPI/convertapi-library-dotnet/releases</PackageReleaseNotes>
-    <TargetFrameworks>netstandard2.0;netcoreapp3.1</TargetFrameworks>
+    <TargetFramework>netstandard2.0</TargetFramework>
     <Description>ConvertAPI for .NET — one call to turn Office files into PDF or back again (DOCX ⇄ PDF, XLSX ⇄ PDF, PPTX ⇄ PDF). Convert HTML, images, ebooks, email, zip; merge, split, watermark, compress, OCR, redact, protect or repair PDF. Async and cross-platform: targets .NET Standard 2.0, so it runs on .NET Framework 4.6.2+ and every modern .NET.</Description>
     <IncludeSymbols>true</IncludeSymbols>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
