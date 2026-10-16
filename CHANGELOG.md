@@ -4,6 +4,20 @@ All notable changes to this project will be documented in this file.
 
 The format is based on Keep a Changelog and this project adheres to Semantic Versioning.
 
+## [3.1.19] — 2026-10-16
+
+### Security
+- Bump `Microsoft.OpenApi.Readers` 1.6.23 → 1.6.31, fixing the high-severity YAML alias-expansion
+  denial of service [GHSA-7pxr-59rr-hqj2](https://github.com/advisories/GHSA-7pxr-59rr-hqj2)
+  (patched in 1.6.30). No API change: the converter catalog returns the same converters and tags.
+
+### Changed
+- Releases are now cut from a GitHub Release `v{version}`; the package version comes from the tag.
+  The build now fails on any high or critical advisory in the dependency graph.
+- Package metadata: repository URL points to `convertapi-library-dotnet`, the description no longer
+  names specific .NET versions, release notes link to GitHub Releases, and a symbol package (`.snupkg`)
+  is published alongside.
+
 ## [3.1.15-dev] — 2026-05-14
 
 ### Added

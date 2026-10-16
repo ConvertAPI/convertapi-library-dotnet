@@ -1,15 +1,16 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Version>3.1.18</Version>
+    <!-- The released version comes from the GitHub Release tag: the publish workflow passes -p:Version=3.1.19 for v3.1.19.
+         This placeholder is what local and pull request builds get, so they can never be mistaken for a release. -->
+    <Version>0.0.0-local</Version>
     <Company>ConvertApi</Company>
     <Authors>ConvertApi</Authors>
     <PackageProjectUrl>https://www.convertapi.com</PackageProjectUrl>
-    <RepositoryUrl>https://github.com/ConvertAPI/convertapi-dotnet</RepositoryUrl>
-    <RepositoryType>GIT</RepositoryType>
+    <RepositoryUrl>https://github.com/ConvertAPI/convertapi-library-dotnet</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
     <PackageTags>file-converter document-converter office-to-pdf office2pdf docx-to-pdf docx2pdf xlsx-to-pdf xlsx2pdf pptx-to-pdf ppt2pdf pdf-merge pdf-split pdf-compress pdf-watermark prdf-extract pdf2extract pdf-protect pdfa ocr redact html-to-pdf web-to-pdf image-to-pdf jpg-to-pdf png-to-pdf email-to-pdf eml-to-pdf msg-to-pdf convertapi pdf docx xlsx pptx office converter csharp dotnet sdk </PackageTags>
-    <Copyright>2012-2025 ConvertApi</Copyright>
+    <Copyright>2012-2026 ConvertApi</Copyright>
     <PackageLicenseUrl>https://www.convertapi.com/terms</PackageLicenseUrl>
     <PackageIconUrl>https://www.convertapi.com/favicon/android-chrome-192x192.png</PackageIconUrl>
     <PackageReadmeFile>README.md</PackageReadmeFile>
@@ -17,17 +18,21 @@
     <Product>ConvertApi</Product>
     <AssemblyName>ConvertApi</AssemblyName>
     <RootNamespace>ConvertApiDotNet</RootNamespace>
-    <AssemblyVersion>3.1.18.0</AssemblyVersion>
-    <FileVersion>3.1.18.0</FileVersion>
-    <PackageReleaseNotes>Development snapshot (-dev prerelease). Changelog will evolve during the development cycle.</PackageReleaseNotes>
+    <PackageReleaseNotes>https://github.com/ConvertAPI/convertapi-library-dotnet/releases</PackageReleaseNotes>
     <TargetFrameworks>netstandard2.0;netcoreapp3.1</TargetFrameworks>
-    <PackageVersion>3.1.18</PackageVersion>
-    <Description>ConvertAPI for .NET — one call to turn Office files into PDF or back again (DOCX ⇄ PDF, XLSX ⇄ PDF, PPTX ⇄ PDF). Convert HTML, images, ebooks, email, zip; merge, split, watermark, compress, OCR, redact, protect or repair PDF. Async, cross-platform, .NET Standard 2.0+ / .NET Core 5-9</Description>
+    <Description>ConvertAPI for .NET — one call to turn Office files into PDF or back again (DOCX ⇄ PDF, XLSX ⇄ PDF, PPTX ⇄ PDF). Convert HTML, images, ebooks, email, zip; merge, split, watermark, compress, OCR, redact, protect or repair PDF. Async and cross-platform: targets .NET Standard 2.0, so it runs on .NET Framework 4.6.2+ and every modern .NET.</Description>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    <!-- A library passes its dependencies on to every consumer, so a known high or critical advisory in any of them,
+         direct or transitive, fails the build instead of shipping. Moderate and low advisories stay warnings. -->
+    <NuGetAudit>true</NuGetAudit>
+    <NuGetAuditMode>all</NuGetAuditMode>
+    <WarningsAsErrors>$(WarningsAsErrors);NU1903;NU1904</WarningsAsErrors>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
-    <PackageReference Include="Microsoft.OpenApi.Readers" Version="1.6.23" />
+    <PackageReference Include="Microsoft.OpenApi.Readers" Version="1.6.31" />
   </ItemGroup>
 
   <ItemGroup>

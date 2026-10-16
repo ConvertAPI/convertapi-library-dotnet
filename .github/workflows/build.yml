@@ -1,0 +1,78 @@
+name: Build
+run-name: >-
+  ${{ github.event_name == 'pull_request' && format('Checking that #{0} builds', github.event.pull_request.number)
+   || format('Building {0}', github.ref_name) }}
+
+# Trunk-based: main is the only long-lived branch. Every pull request and every push to main builds the
+# whole solution (the library and all Examples) and packs the library, but nothing is published here:
+# this is a public NuGet package, and NuGet versions are permanent, so a release is a deliberate act -
+# publishing a GitHub Release v{semver}, which runs publish.yml. There is no test suite, so a clean build
+# and pack is the check that gates the merge (the required status check is this job's name, `build`).
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    concurrency:
+      # A newer push to the same pull request cancels the older build; builds of main never cancel each other.
+      group: build-${{ github.event_name == 'pull_request' && format('pr-{0}', github.event.pull_request.number) || github.run_id }}
+      cancel-in-progress: true
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68 # v6.0.0
+        with:
+          global-json-file: global.json
+
+      # The csproj turns high and critical NuGet advisories (NU1903/NU1904), direct or transitive, into
+      # errors, so a vulnerable dependency fails this step rather than reaching a release.
+      - name: Restore
+        run: dotnet restore ConvertApi.sln
+
+      - name: Build the library and the examples
+        run: dotnet build ConvertApi.sln -c Release --no-restore -p:ContinuousIntegrationBuild=true
+
+      # A pre-release version that sorts below any real release and names the run, so a package
+      # downloaded from this run can be tried out but never mistaken for a published one.
+      - name: Pack
+        id: pack
+        env:
+          RUN: ${{ github.run_number }}
+          SHORT_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+        run: |
+          set -euo pipefail
+          VERSION="0.0.0-ci.$RUN.g${SHORT_SHA:0:7}"
+          dotnet pack ConvertApi/ConvertApi.csproj -c Release --no-build -o out \
+            -p:Version="$VERSION" -p:ContinuousIntegrationBuild=true
+          test -f "out/ConvertApi.$VERSION.nupkg"
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: ConvertApi-${{ steps.pack.outputs.version }}
+          path: out/
+          retention-days: 14
+          if-no-files-found: error
+
+      - name: Summary
+        env:
+          VERSION: ${{ steps.pack.outputs.version }}
+        run: |
+          {
+            echo "| | |"
+            echo "|---|---|"
+            echo "| Package | \`ConvertApi $VERSION\` (artifact only, not published) |"
+            echo "| Dependencies | $(unzip -p "out/ConvertApi.$VERSION.nupkg" ConvertApi.nuspec | grep -o 'dependency id="[^"]*" version="[^"]*"' | sort -u | sed 's/dependency id="\([^"]*\)" version="\([^"]*\)"/\1 \2/' | paste -sd ',' - | sed 's/,/, /g') |"
+          } >> "$GITHUB_STEP_SUMMARY"
