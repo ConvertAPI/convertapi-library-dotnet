@@ -55,11 +55,11 @@ Below is an overview of the key functionalities:
 For a complete list of supported conversions and tools, visit the [ConvertAPI API Reference](https://www.convertapi.com/api).
 
 ## Compatibility
-The ConvertAPI .NET library is compatible with a wide range of platforms that support .NET Standard 2.0+ or .NET Framework 4.0+. Supported environments include:
+The ConvertAPI .NET library is compatible with a wide range of platforms that implement .NET Standard 2.0, which the package targets. Supported environments include:
 
-- .NET Core 5, 6, 7, 8, 9, and above
+- .NET 5, 6, 7, 8, 9, 10 and above, and .NET Core 2.0+
 - .NET Standard 2.0 and above
-- .NET Framework 4.0, 4.6.1, 4.7.2, 4.8.1 and above
+- .NET Framework 4.6.2 and above (4.7.2+ recommended; older versions cannot use .NET Standard 2.0 packages reliably)
 - Windows, Linux, macOS
 - Microsoft Azure, Azure App Service, Azure Functions
 - Xamarin (iOS, macOS, Android)
