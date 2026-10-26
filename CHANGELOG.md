@@ -4,6 +4,13 @@ All notable changes to this project will be documented in this file.
 
 The format is based on Keep a Changelog and this project adheres to Semantic Versioning.
 
+## [3.2.2] — 2026-10-26
+
+### Changed
+- The package declares its license as `MIT` (`PackageLicenseExpression`), matching the repository's
+  `LICENSE` file. It used the deprecated `PackageLicenseUrl` pointing at the website's terms, so nuget.org
+  and license scanners showed no recognised license.
+
 ## [3.2.0] — 2026-10-16
 
 ### Removed
