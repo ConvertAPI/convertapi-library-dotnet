@@ -11,7 +11,7 @@
     <RepositoryType>git</RepositoryType>
     <PackageTags>file-converter document-converter office-to-pdf office2pdf docx-to-pdf docx2pdf xlsx-to-pdf xlsx2pdf pptx-to-pdf ppt2pdf pdf-merge pdf-split pdf-compress pdf-watermark prdf-extract pdf2extract pdf-protect pdfa ocr redact html-to-pdf web-to-pdf image-to-pdf jpg-to-pdf png-to-pdf email-to-pdf eml-to-pdf msg-to-pdf convertapi pdf docx xlsx pptx office converter csharp dotnet sdk </PackageTags>
     <Copyright>2012-2026 ConvertApi</Copyright>
-    <PackageLicenseUrl>https://www.convertapi.com/terms</PackageLicenseUrl>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageIconUrl>https://www.convertapi.com/favicon/android-chrome-192x192.png</PackageIconUrl>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageId>ConvertApi</PackageId>
