@@ -11,8 +11,7 @@ namespace CreatePdfThumbnail
     {
         /// <summary>
         /// Create PDF Thumbnail
-        /// Example of extracting first page from PDF and then converting it to JPG using chaining.
-        /// https://www.convertapi.com/pdf-to-extract
+        /// Example of converting the first page of a PDF to a JPG thumbnail.
         /// https://www.convertapi.com/pdf-to-jpg
         /// </summary>
         static async Task Main(string[] args)
@@ -25,10 +24,9 @@ namespace CreatePdfThumbnail
             {
                 var thumbnail = await convertApi.ConvertAsync("pdf", "jpg",
                     new ConvertApiFileParam(pdfFile),
-                    new ConvertApiParam("ScaleImage", "true"),
-                    new ConvertApiParam("ScaleProportions", "true"),
                     new ConvertApiParam("ImageHeight", "300"),
                     new ConvertApiParam("ImageWidth", "300"),
+                    new ConvertApiParam("FitToSize", "true"),
                     new ConvertApiParam("PageRange", "1")
                 );
 
