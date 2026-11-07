@@ -457,6 +457,28 @@ int conversionsConsumed = user.ConversionsConsumed;
 
 You can find more advanced examples in the [examples](https://github.com/ConvertAPI/convertapi-library-dotnet/tree/main/Examples) folder.
 
+- [ConvertPdfToDocx/Program.cs](https://github.com/ConvertAPI/convertapi-library-dotnet/blob/main/Examples/ConvertPdfToDocx/Program.cs) - Convert a PDF to an editable Word DOCX document
+- [ConvertPdfToPdfA/Program.cs](https://github.com/ConvertAPI/convertapi-library-dotnet/blob/main/Examples/ConvertPdfToPdfA/Program.cs) - Convert a PDF to PDF/A with an embedded invoice XML
+- [ConvertPdfToPptx/Program.cs](https://github.com/ConvertAPI/convertapi-library-dotnet/blob/main/Examples/ConvertPdfToPptx/Program.cs) - Convert a PDF to a PowerPoint PPTX presentation
+- [ConvertPdfToXlsx/Program.cs](https://github.com/ConvertAPI/convertapi-library-dotnet/blob/main/Examples/ConvertPdfToXlsx/Program.cs) - Convert a PDF to an Excel XLSX spreadsheet
+- [ConvertRemoteFile/Program.cs](https://github.com/ConvertAPI/convertapi-library-dotnet/blob/main/Examples/ConvertRemoteFile/Program.cs) - Convert a remote file (a PPTX at a URL) to PDF
+- [ConvertUrlToPdf/Program.cs](https://github.com/ConvertAPI/convertapi-library-dotnet/blob/main/Examples/ConvertUrlToPdf/Program.cs) - Convert a web page URL to PDF
+- [ConvertWordToPdfAndPng/Program.cs](https://github.com/ConvertAPI/convertapi-library-dotnet/blob/main/Examples/ConvertWordToPdfAndPng/Program.cs) - Convert one Word DOCX file to PDF and to PNG without uploading it twice
+- [ConverterCatalogDemo/Program.cs](https://github.com/ConvertAPI/convertapi-library-dotnet/blob/main/Examples/ConverterCatalogDemo/Program.cs) - List the available converters and their details with the converter catalog
+- [CreatePdfThumbnail/Program.cs](https://github.com/ConvertAPI/convertapi-library-dotnet/blob/main/Examples/CreatePdfThumbnail/Program.cs) - Turn the first page of a PDF into a JPG thumbnail
+- [DeleteFiles/Program.cs](https://github.com/ConvertAPI/convertapi-library-dotnet/blob/main/Examples/DeleteFiles/Program.cs) - Delete the uploaded and result files from the server after a conversion
+- [ExceptionHandling/Program.cs](https://github.com/ConvertAPI/convertapi-library-dotnet/blob/main/Examples/ExceptionHandling/Program.cs) - Catch a ConvertAPI exception and print its status code and response
+- [FromStreamToStream/Program.cs](https://github.com/ConvertAPI/convertapi-library-dotnet/blob/main/Examples/FromStreamToStream/Program.cs) - Convert HTML from a string stream and get the PDF back as a stream
+- [GetConverterInfoDemo/Program.cs](https://github.com/ConvertAPI/convertapi-library-dotnet/blob/main/Examples/GetConverterInfoDemo/Program.cs) - Read a converter's accepted formats and parameters, for example to build a dynamic UI
+- [HandleRetry/Program.cs](https://github.com/ConvertAPI/convertapi-library-dotnet/blob/main/Examples/HandleRetry/Program.cs) - Retry a conversion when the service returns 503 (service unavailable)
+- [MergeWordDocsToPdf/Program.cs](https://github.com/ConvertAPI/convertapi-library-dotnet/blob/main/Examples/MergeWordDocsToPdf/Program.cs) - Convert Word and PowerPoint files to PDF and merge them into one PDF
+- [RetrieveUserInformation/Program.cs](https://github.com/ConvertAPI/convertapi-library-dotnet/blob/main/Examples/RetrieveUserInformation/Program.cs) - Retrieve your ConvertAPI account information
+- [SplitAndMergePdf/Program.cs](https://github.com/ConvertAPI/convertapi-library-dotnet/blob/main/Examples/SplitAndMergePdf/Program.cs) - Split a PDF and merge its first and last pages into a new PDF
+- [SplitPDF/Program.cs](https://github.com/ConvertAPI/convertapi-library-dotnet/blob/main/Examples/SplitPDF/Program.cs) - Split a PDF by bookmarks, page patterns, text and page ranges
+- [UploadOnceReuseTwice/Program.cs](https://github.com/ConvertAPI/convertapi-library-dotnet/blob/main/Examples/UploadOnceReuseTwice/Program.cs) - Upload a DOCX file once and reuse it for PDF and PNG conversions
+- [WatermarkPdf/Program.cs](https://github.com/ConvertAPI/convertapi-library-dotnet/blob/main/Examples/WatermarkPdf/Program.cs) - Add a text watermark and a PDF overlay to a PDF
+- [Workflow/Program.cs](https://github.com/ConvertAPI/convertapi-library-dotnet/blob/main/Examples/Workflow/Program.cs) - Chain two conversions: PDF to JPG images, then the images to a ZIP
+
 #### Converting your first file, complete example:
 
 ConvertAPI is designed to make converting files super easy. The following snippet shows how easy it is to get started. Let's convert the WORD DOCX file to PDF:
