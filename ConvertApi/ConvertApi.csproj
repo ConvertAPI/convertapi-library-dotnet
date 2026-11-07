@@ -36,9 +36,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="docs\README.md" Pack="true" PackagePath="\">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
+    <!-- nuget.org shows the repository's own README.md, so the package page and GitHub cannot drift apart.
+         The publish workflow rewrites utm_source=github to utm_source=nuget in the packed copy. -->
+    <None Include="..\README.md" Pack="true" PackagePath="\" />
   </ItemGroup>
 
 </Project>

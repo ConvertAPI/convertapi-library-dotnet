@@ -128,6 +128,15 @@ jobs:
       - name: Restore
         run: dotnet restore ConvertApi/ConvertApi.csproj
 
+      # The package's readme is the repository's README.md. Its sign-up links say utm_source=github; the
+      # packed copy says utm_source=nuget, so visits from the nuget.org package page are counted apart.
+      # Only this run's checkout changes, never the repository.
+      - name: Tag the README links for nuget.org
+        run: |
+          set -euo pipefail
+          sed -i 's/utm_source=github/utm_source=nuget/g' README.md
+          echo "Links tagged utm_source=nuget: $(grep -o 'utm_source=nuget' README.md | wc -l)"
+
       - name: Build and pack
         env:
           VERSION: ${{ steps.tag.outputs.version }}
@@ -150,6 +159,11 @@ jobs:
           NUSPEC=$(unzip -p "$PKG" "$PACKAGE_ID.nuspec")
           grep -q "<version>$VERSION</version>" <<<"$NUSPEC" || { echo "::error::$PKG does not carry version $VERSION"; exit 1; }
           grep -q "commit=\"$SHA\"" <<<"$NUSPEC" || { echo "::error::$PKG does not record commit $SHA"; exit 1; }
+          README=$(unzip -p "$PKG" README.md)
+          if grep -q 'utm_source=github' <<<"$README"; then
+            echo "::error::The README.md in $PKG still has utm_source=github links"
+            exit 1
+          fi
           echo "$NUSPEC" | grep -E '<(id|version|repository|dependency) '
 
       # Trusted Publishing: once a nuget.org policy for this repository, publish.yml and the nuget

@@ -16,7 +16,8 @@ That runs `.github/workflows/publish.yml` in the `nuget` environment, which:
 2. checks the tag is SemVer (`v3.1.19`, `v3.2.0-preview.1`), that the GitHub pre-release tick matches
    the version, that a stable version is a commit on `main`, and that nuget.org has never had that version;
 3. builds and packs that commit with `-p:Version={tag without v}`, failing on any high or critical
-   advisory in the dependency graph;
+   advisory in the dependency graph. The package's readme is the repository's `README.md`, with
+   `utm_source=github` in its links rewritten to `utm_source=nuget`;
 4. pushes `ConvertApi.{version}.nupkg` and its `.snupkg` to nuget.org and waits until nuget.org serves it.
 
 **Pre-releases** work the same way and may come from any branch:
