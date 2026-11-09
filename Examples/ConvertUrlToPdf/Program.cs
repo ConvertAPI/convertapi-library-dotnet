@@ -20,10 +20,10 @@ namespace ConvertUrlToPdf
                 //Get your API Token at https://www.convertapi.com/a/authentication
                 var convertApi = new ConvertApi(Environment.GetEnvironmentVariable("CONVERTAPI_TOKEN"));
 
-                Console.WriteLine("Converting web page https://en.wikipedia.org/wiki/Data_conversion to PDF...");
+                Console.WriteLine("Converting web page https://cdn.convertapi.com/public/files/demo to PDF...");
 
                 var response = await convertApi.ConvertAsync("html", "pdf",
-                    new ConvertApiParam("Url", "https://en.wikipedia.org/wiki/Data_conversion"), 
+                    new ConvertApiParam("Url", "https://cdn.convertapi.com/public/files/demo"), 
                     new ConvertApiParam("FileName", "web-example"));
 
                 var fileSaved = await response.Files.SaveFilesAsync(Path.GetTempPath());
