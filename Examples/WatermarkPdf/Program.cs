@@ -45,8 +45,6 @@ try
     sw.Stop();
 
     Console.WriteLine("Elapsed " + sw.Elapsed);
-
-    Process.Start(saveFiles.ToString());
 }
 //Catch exceptions from asynchronous methods
 catch (ConvertApiException e)
