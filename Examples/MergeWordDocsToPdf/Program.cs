@@ -23,15 +23,19 @@ namespace MergeWordDocsToPdf
                 var sw = new Stopwatch();
                 sw.Start();
                 //Get your API Token at https://www.convertapi.com/a/authentication
-                var convertApi = new ConvertApi("api_token");
+                var convertApi = new ConvertApi(Environment.GetEnvironmentVariable("CONVERTAPI_TOKEN"));
 
                 var destinationFileName = Path.Combine(Path.GetTempPath(), $"test-merged-{Guid.NewGuid()}.pdf");
 
-                var convertApiFileParam = new ConvertApiFileParam(@"..\..\..\..\TestFiles\test.docx");
+                // Sample files from Examples/TestFiles, copied next to the program when it builds
+                var wordFile = Path.Combine(AppContext.BaseDirectory, "TestFiles", "test.docx");
+                var powerPointFile = Path.Combine(AppContext.BaseDirectory, "TestFiles", "test.pptx");
+
+                var convertApiFileParam = new ConvertApiFileParam(wordFile);
 
                 var doc1 = convertApi.ConvertAsync("docx", "pdf", convertApiFileParam);
                 Console.WriteLine("Word sent for conversion...");
-                var doc2 = convertApi.ConvertAsync("pptx", "pdf", new ConvertApiFileParam(@"..\..\..\..\TestFiles\test.pptx"));
+                var doc2 = convertApi.ConvertAsync("pptx", "pdf", new ConvertApiFileParam(powerPointFile));
                 Console.WriteLine("PowerPoint sent for conversion...");
 
                 var mergeTask = await convertApi.ConvertAsync("pdf", "merge",

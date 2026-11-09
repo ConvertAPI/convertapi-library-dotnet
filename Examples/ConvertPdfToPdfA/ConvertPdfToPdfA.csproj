@@ -11,4 +11,9 @@
     <ProjectReference Include="..\..\ConvertApi\ConvertApi.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Include="..\TestFiles\invoice.pdf" Link="TestFiles\invoice.pdf" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="..\TestFiles\invoice.xml" Link="TestFiles\invoice.xml" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
 </Project>

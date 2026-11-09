@@ -14,8 +14,10 @@ class Program
     static async Task Main()
     {
         //Get your api token at https://www.convertapi.com/a
-        var convertApi = new ConvertApi("api_token");
-        const string sourceFile = @"..\..\..\..\TestFiles\test.pdf";
+        var convertApi = new ConvertApi(Environment.GetEnvironmentVariable("CONVERTAPI_TOKEN"));
+
+        // Sample file from Examples/TestFiles, copied next to the program when it builds
+        var sourceFile = Path.Combine(AppContext.BaseDirectory, "TestFiles", "test.pdf");
 
         // Define two retry delays.
         var retryDelays = new[] { TimeSpan.FromSeconds(2.5), TimeSpan.FromSeconds(7) };

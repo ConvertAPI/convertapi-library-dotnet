@@ -14,10 +14,11 @@ namespace ConvertPdfToPdfA
             try
             {
                 // Get your API Token at https://www.convertapi.com/a/authentication
-                var convertApi = new ConvertApi("api_token");
+                var convertApi = new ConvertApi(Environment.GetEnvironmentVariable("CONVERTAPI_TOKEN"));
 
-                const string sourceFile = @"..\..\..\..\TestFiles\invoice.pdf";
-                const string invoiceXml = @"..\..\..\..\TestFiles\invoice.xml";
+                // Sample files from Examples/TestFiles, copied next to the program when it builds
+                var sourceFile = Path.Combine(AppContext.BaseDirectory, "TestFiles", "invoice.pdf");
+                var invoiceXml = Path.Combine(AppContext.BaseDirectory, "TestFiles", "invoice.xml");
 
                 var destinationFileName = Path.Combine(Path.GetTempPath(), $"result-pdfa-{Guid.NewGuid()}.pdf");
 

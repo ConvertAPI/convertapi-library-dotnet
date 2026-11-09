@@ -18,9 +18,10 @@ namespace DeleteFiles
             try
             {
                 // Get your API Token at https://www.convertapi.com/a/authentication
-                var convertApi = new ConvertApi("api_token");
+                var convertApi = new ConvertApi(Environment.GetEnvironmentVariable("CONVERTAPI_TOKEN"));
 
-                const string sourceFile = @"..\..\..\..\TestFiles\test.docx";
+                // Sample file from Examples/TestFiles, copied next to the program when it builds
+                var sourceFile = Path.Combine(AppContext.BaseDirectory, "TestFiles", "test.docx");
 
                 Console.WriteLine("Converting DOCX to PDF...");
 

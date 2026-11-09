@@ -7,7 +7,7 @@ class Program
     static async Task<int> Main(string[] args)
     {
         //Get your api token at https://www.convertapi.com/a
-        var token = "api_token";
+        var token = Environment.GetEnvironmentVariable("CONVERTAPI_TOKEN");
 
         var api = new ConvertApi(token);
 
