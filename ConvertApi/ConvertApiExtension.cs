@@ -33,7 +33,9 @@ namespace ConvertApiDotNet
             var fileInfo = new FileInfo(fileName);
             using (var readFile = await AsStreamAsync(url))
             {
-                using (var fileStream = fileInfo.OpenWrite())
+                // FileMode.Create truncates an existing file. FileInfo.OpenWrite (FileMode.OpenOrCreate) did not,
+                // so a result saved over a longer file kept that file's trailing bytes and came out corrupt.
+                using (var fileStream = new FileStream(fileInfo.FullName, FileMode.Create, FileAccess.Write, FileShare.None))
                     await readFile.CopyToAsync(fileStream);
             }
 
@@ -41,11 +43,18 @@ namespace ConvertApiDotNet
         }
 
         #region File Task Methods
+        /// <summary>
+        /// Save the first result file as <paramref name="fileName"/>, replacing the file if it exists.
+        /// </summary>
         public static async Task<FileInfo> SaveFileAsync(this ConvertApiResponse response, string fileName)
         {
             return await response.Files[0].SaveFileAsync(fileName);
         }
 
+        /// <summary>
+        /// Save every result file into <paramref name="outputDirectory"/> under its own name, replacing files
+        /// that exist. The folder is created if it does not exist.
+        /// </summary>
         public static async Task<List<FileInfo>> SaveFilesAsync(this ConvertApiResponse response, string outputDirectory)
         {
             return await response.Files.SaveFilesAsync(outputDirectory);
@@ -56,13 +65,24 @@ namespace ConvertApiDotNet
             return await AsStreamAsync(processedFile.Url);
         }
 
+        /// <summary>
+        /// Save the file as <paramref name="fileName"/>, replacing the file if it exists.
+        /// </summary>
         public static async Task<FileInfo> SaveFileAsync(this ConvertApiFile processedFile, string fileName)
         {
             return await SaveFileAsync(processedFile.Url, fileName);
         }
 
+        /// <summary>
+        /// Save the files into <paramref name="outputDirectory"/>, each under its own name, replacing files that
+        /// exist. The folder is created if it does not exist.
+        /// </summary>
         public static async Task<List<FileInfo>> SaveFilesAsync(this IEnumerable<ConvertApiFile> processedFile, string outputDirectory)
         {
+            // An empty path still means the current directory, as Path.Combine("", name) below always did.
+            if (!string.IsNullOrEmpty(outputDirectory))
+                Directory.CreateDirectory(outputDirectory);
+
             var list = new List<FileInfo>();
             foreach (var file in processedFile)
             {
