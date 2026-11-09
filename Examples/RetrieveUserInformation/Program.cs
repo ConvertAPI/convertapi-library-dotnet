@@ -17,8 +17,6 @@ namespace RetrieveUserInformation
             var convertApi = new ConvertApi(Environment.GetEnvironmentVariable("CONVERTAPI_TOKEN"));
             var convertApiUser = await convertApi.GetUserAsync();
 
-            Console.WriteLine("Secret={0}", convertApiUser.Secret);
-            Console.WriteLine("ApiKey={0}", convertApiUser.ApiKey);
             Console.WriteLine("Active={0}", convertApiUser.Active);
             Console.WriteLine("FullName={0}", convertApiUser.FullName);
             Console.WriteLine("Email={0}", convertApiUser.Email);
