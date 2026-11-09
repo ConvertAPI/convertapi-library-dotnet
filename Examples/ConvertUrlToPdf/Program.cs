@@ -11,7 +11,7 @@ namespace ConvertUrlToPdf
     {
         /// <summary>
         /// Example of converting Web Page URL to PDF file
-        /// https://www.convertapi.com/web-to-pdf
+        /// https://www.convertapi.com/html-to-pdf
         /// </summary>
         static async Task Main(string[] args)
         {            
@@ -22,7 +22,7 @@ namespace ConvertUrlToPdf
 
                 Console.WriteLine("Converting web page https://en.wikipedia.org/wiki/Data_conversion to PDF...");
 
-                var response = await convertApi.ConvertAsync("web", "pdf", 
+                var response = await convertApi.ConvertAsync("html", "pdf",
                     new ConvertApiParam("Url", "https://en.wikipedia.org/wiki/Data_conversion"), 
                     new ConvertApiParam("FileName", "web-example"));
 

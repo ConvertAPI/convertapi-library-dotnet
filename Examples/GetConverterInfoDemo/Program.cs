@@ -16,7 +16,7 @@ class Program
             ("docx", "pdf"),
             ("pdf", "pptx"),
             ("pdf", "merge"),
-            ("any", "pdf")
+            ("file", "pdf")
         };
 
         foreach (var (src, dst) in samples)

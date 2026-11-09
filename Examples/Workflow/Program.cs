@@ -27,7 +27,8 @@ namespace Workflow
                 var firstTask = await convertApi.ConvertAsync("pdf", "jpg", new ConvertApiFileParam(fileName));
                 Console.WriteLine($"Conversions done. Cost: {firstTask.ConversionCost}. Total files created: {firstTask.FileCount()}");
 
-                var secondsTask = await convertApi.ConvertAsync("jpg", "zip", new ConvertApiFileParam(firstTask));
+                // Files is the ZIP converter's input parameter, also for a single file
+                var secondsTask = await convertApi.ConvertAsync("file", "zip", new ConvertApiFileParam("Files", firstTask));
                 var saveFiles = await secondsTask.Files.SaveFilesAsync(Path.GetTempPath());
 
                 Console.WriteLine($"Conversions done. Cost: {secondsTask.ConversionCost}. Total files created: {secondsTask.FileCount()}");

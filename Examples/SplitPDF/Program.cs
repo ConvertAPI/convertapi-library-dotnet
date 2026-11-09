@@ -10,14 +10,17 @@ class Program
         // Sample PDF from the files folder, copied next to the program when it builds
         var sampleFile = Path.Combine(AppContext.BaseDirectory, "files", "sample.pdf");
 
+        // Save the results in a SplitPDF folder in your temp folder, one subfolder per example
+        var outputFolder = Path.Combine(Path.GetTempPath(), "SplitPDF");
+
         // Ensure output directories exist before saving files.
         // You might want to implement more robust directory handling in production code.
-        Directory.CreateDirectory("output/bookmark-splits-example");
-        Directory.CreateDirectory("output/pattern-splits-example");
-        Directory.CreateDirectory("output/text-pattern-splits-example");
-        Directory.CreateDirectory("output/extract-specific-pages-example");
-        Directory.CreateDirectory("output/split-by-ranges-example");
-        Directory.CreateDirectory("output/merged-output-example");
+        Directory.CreateDirectory(Path.Combine(outputFolder, "bookmark-splits-example"));
+        Directory.CreateDirectory(Path.Combine(outputFolder, "pattern-splits-example"));
+        Directory.CreateDirectory(Path.Combine(outputFolder, "text-pattern-splits-example"));
+        Directory.CreateDirectory(Path.Combine(outputFolder, "extract-specific-pages-example"));
+        Directory.CreateDirectory(Path.Combine(outputFolder, "split-by-ranges-example"));
+        Directory.CreateDirectory(Path.Combine(outputFolder, "merged-output-example"));
 
         // 1) Bookmark-Based Splitting
         // Split the PDF into separate files at each bookmark level.
@@ -25,7 +28,7 @@ class Program
             new ConvertApiFileParam("File", sampleFile),
             new ConvertApiParam("SplitByBookmark", "true")
         );
-        await res1.SaveFilesAsync("output/bookmark-splits-example");
+        await res1.SaveFilesAsync(Path.Combine(outputFolder, "bookmark-splits-example"));
 
         // 2) Pattern-Based Splitting
         // Split the document into chunks of pages by a repeating pattern (e.g., 2 then 3 pages).
@@ -33,7 +36,7 @@ class Program
             new ConvertApiFileParam("File", sampleFile),
             new ConvertApiParam("SplitByPattern", "2,3")
         );
-        await res2.SaveFilesAsync("output/pattern-splits-example");
+        await res2.SaveFilesAsync(Path.Combine(outputFolder, "pattern-splits-example"));
 
         // 3) Text-Based Splitting
         // Split the document each time a specific text pattern (regex) is matched.
@@ -41,7 +44,7 @@ class Program
             new ConvertApiFileParam("File", sampleFile),
             new ConvertApiParam("SplitByTextPattern", @"Chapter \d+:") // Example: splits at "Chapter 1:", "Chapter 2:", etc.
         );
-        await res3.SaveFilesAsync("output/text-pattern-splits-example");
+        await res3.SaveFilesAsync(Path.Combine(outputFolder, "text-pattern-splits-example"));
 
         // 4) Extracting Specific Pages
         // Extract individual pages within a specified range, saving each as a separate file.
@@ -49,7 +52,7 @@ class Program
             new ConvertApiFileParam("File", sampleFile),
             new ConvertApiParam("ExtractPages", "5-10") // Example: extracts pages 5, 6, 7, 8, 9, 10 into separate files
         );
-        await res4.SaveFilesAsync("output/extract-specific-pages-example");
+        await res4.SaveFilesAsync(Path.Combine(outputFolder, "extract-specific-pages-example"));
 
         // 5) Splitting by Ranges
         // Create separate files for specific pages or ranges.
@@ -57,7 +60,7 @@ class Program
             new ConvertApiFileParam("File", sampleFile),
             new ConvertApiParam("SplitByRange", "1,3,5-7") // Example: creates files for page 1, page 3, and pages 5-7
         );
-        await res5.SaveFilesAsync("output/split-by-ranges-example");
+        await res5.SaveFilesAsync(Path.Combine(outputFolder, "split-by-ranges-example"));
 
         // 6) Merging Output
         // Use SplitByRange or ExtractPages, but merge all results into a single output file.
@@ -67,8 +70,8 @@ class Program
             new ConvertApiParam("MergeOutput", "true") // Merge them into one file
         );
         // This will save a single file containing pages 2, 4, 5, 6, and 8
-        await res6.SaveFilesAsync("output/merged-output-example");
+        await res6.SaveFilesAsync(Path.Combine(outputFolder, "merged-output-example"));
 
-        Console.WriteLine("All splits complete!");
+        Console.WriteLine("All splits complete! Files saved to " + outputFolder);
     }
 }
