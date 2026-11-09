@@ -14,14 +14,18 @@ try
     var sw = new Stopwatch();
     sw.Start();
     //Get your API Token at https://www.convertapi.com/a/authentication
-    var convertApi = new ConvertApi("api_token");
+    var convertApi = new ConvertApi(Environment.GetEnvironmentVariable("CONVERTAPI_TOKEN"));
 
     var destinationFileName = Path.Combine(Path.GetTempPath(), $"watermarked-{Guid.NewGuid()}.pdf");
+
+    // Sample files from Examples/TestFiles, copied next to the program when it builds
+    var pdfFile = Path.Combine(AppContext.BaseDirectory, "TestFiles", "test-text.pdf");
+    var overlayFile = Path.Combine(AppContext.BaseDirectory, "TestFiles", "pdf-overlay.pdf");
 
     Console.WriteLine("PDF sent for text watermarking...");
 
     var pdfWatermark = await convertApi.ConvertAsync("pdf", "watermark",
-        new ConvertApiFileParam("File", @"..\..\..\TestFiles\test-text.pdf"),
+        new ConvertApiFileParam("File", pdfFile),
         new ConvertApiParam("VerticalAlignment", "bottom"),
         new ConvertApiParam("Text", "This is ConvertAPI watermark %DATETIME%"),
         new ConvertApiParam("FontSize", 15));
@@ -30,7 +34,7 @@ try
 
     var pdfWatermarkOverlay = await convertApi.ConvertAsync("pdf", "watermark-overlay",
         new ConvertApiFileParam("File", pdfWatermark),
-        new ConvertApiFileParam("OverlayFile", new FileInfo(@"..\..\..\TestFiles\pdf-overlay.pdf")),
+        new ConvertApiFileParam("OverlayFile", new FileInfo(overlayFile)),
         new ConvertApiParam("Style", "stamp"),
         new ConvertApiParam("Opacity", 50));
 
@@ -41,8 +45,6 @@ try
     sw.Stop();
 
     Console.WriteLine("Elapsed " + sw.Elapsed);
-
-    Process.Start(saveFiles.ToString());
 }
 //Catch exceptions from asynchronous methods
 catch (ConvertApiException e)

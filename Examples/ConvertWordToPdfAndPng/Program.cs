@@ -15,8 +15,10 @@ namespace ConvertWordToPdfAndPng
         static async Task Main(string[] args)
         {
             //Get your API Token at https://www.convertapi.com/a/authentication
-            var convertApi = new ConvertApi("api_token");
-            const string sourceFile = @"..\..\..\TestFiles\test.docx";
+            var convertApi = new ConvertApi(Environment.GetEnvironmentVariable("CONVERTAPI_TOKEN"));
+
+            // Sample file from Examples/TestFiles, copied next to the program when it builds
+            var sourceFile = Path.Combine(AppContext.BaseDirectory, "TestFiles", "test.docx");
 
             var fileParam = new ConvertApiFileParam(sourceFile);
 

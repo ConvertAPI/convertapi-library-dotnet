@@ -20,13 +20,10 @@ namespace UploadOnceReuseTwice
             try
             {
                 // Get your API Token at https://www.convertapi.com/a/authentication
-                var convertApi = new ConvertApi("api_token");
+                var convertApi = new ConvertApi(Environment.GetEnvironmentVariable("CONVERTAPI_TOKEN"));
 
-                // Use the sample DOCX that ships with this repository
-                // Resolve the path relative to the compiled output folder to make it robust
-                // BaseDirectory typically is: Examples\UploadOnceReuseTwice\bin\{Config}\{TFM}\
-                var examplesDir = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "..", "..", "..", ".."));
-                var sourceFile = Path.Combine(examplesDir, "TestFiles", "test.docx");
+                // Sample file from Examples/TestFiles, copied next to the program when it builds
+                var sourceFile = Path.Combine(AppContext.BaseDirectory, "TestFiles", "test.docx");
 
                 if (!File.Exists(sourceFile))
                 {

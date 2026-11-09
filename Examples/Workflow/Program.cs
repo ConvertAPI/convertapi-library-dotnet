@@ -18,11 +18,11 @@ namespace Workflow
             try
             {
                 //Get your API Token at https://www.convertapi.com/a/authentication            
-                var convertApi = new ConvertApi("api_token");
+                var convertApi = new ConvertApi(Environment.GetEnvironmentVariable("CONVERTAPI_TOKEN"));
 
                 Console.WriteLine("Converting PDF to JPG and compressing result files with ZIP");
-                var examplesDir = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "..", "..", "..", ".."));
-                var fileName = Path.Combine(examplesDir, "TestFiles", "test.pdf");
+                // Sample file from Examples/TestFiles, copied next to the program when it builds
+                var fileName = Path.Combine(AppContext.BaseDirectory, "TestFiles", "test.pdf");
 
                 var firstTask = await convertApi.ConvertAsync("pdf", "jpg", new ConvertApiFileParam(fileName));
                 Console.WriteLine($"Conversions done. Cost: {firstTask.ConversionCost}. Total files created: {firstTask.FileCount()}");

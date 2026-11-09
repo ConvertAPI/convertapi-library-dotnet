@@ -11,4 +11,9 @@
       <ProjectReference Include="..\..\ConvertApi\ConvertApi.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <None Include="..\TestFiles\test-text.pdf" Link="TestFiles\test-text.pdf" CopyToOutputDirectory="PreserveNewest" />
+      <None Include="..\TestFiles\pdf-overlay.pdf" Link="TestFiles\pdf-overlay.pdf" CopyToOutputDirectory="PreserveNewest" />
+    </ItemGroup>
+
 </Project>

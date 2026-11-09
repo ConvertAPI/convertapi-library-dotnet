@@ -16,7 +16,7 @@ namespace ConvertRemoteFile
             try
             {
                 //Get your API Token at https://www.convertapi.com/a/authentication
-                var convertApi = new ConvertApi("api_token");
+                var convertApi = new ConvertApi(Environment.GetEnvironmentVariable("CONVERTAPI_TOKEN"));
 
                 var sourceFile = new Uri("https://cdn.convertapi.com/public/files/demo.pptx");
 

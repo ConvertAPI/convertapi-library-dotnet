@@ -11,24 +11,24 @@ namespace CreatePdfThumbnail
     {
         /// <summary>
         /// Create PDF Thumbnail
-        /// Example of extracting first page from PDF and then converting it to JPG using chaining.
-        /// https://www.convertapi.com/pdf-to-extract
+        /// Example of converting the first page of a PDF to a JPG thumbnail.
         /// https://www.convertapi.com/pdf-to-jpg
         /// </summary>
         static async Task Main(string[] args)
         {
             //Get your API Token at https://www.convertapi.com/a/authentication
-            var convertApi = new ConvertApi("api_token");
-            var pdfFile = @"..\..\..\TestFiles\test.pdf";           
+            var convertApi = new ConvertApi(Environment.GetEnvironmentVariable("CONVERTAPI_TOKEN"));
+
+            // Sample file from Examples/TestFiles, copied next to the program when it builds
+            var pdfFile = Path.Combine(AppContext.BaseDirectory, "TestFiles", "test.pdf");
 
             try
             {
                 var thumbnail = await convertApi.ConvertAsync("pdf", "jpg",
                     new ConvertApiFileParam(pdfFile),
-                    new ConvertApiParam("ScaleImage", "true"),
-                    new ConvertApiParam("ScaleProportions", "true"),
                     new ConvertApiParam("ImageHeight", "300"),
                     new ConvertApiParam("ImageWidth", "300"),
+                    new ConvertApiParam("FitToSize", "true"),
                     new ConvertApiParam("PageRange", "1")
                 );
 

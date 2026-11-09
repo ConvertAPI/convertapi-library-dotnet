@@ -9,4 +9,9 @@
     <ProjectReference Include="..\..\ConvertApi\ConvertApi.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Include="..\TestFiles\test.docx" Link="TestFiles\test.docx" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="..\TestFiles\test.pptx" Link="TestFiles\test.pptx" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
 </Project>
