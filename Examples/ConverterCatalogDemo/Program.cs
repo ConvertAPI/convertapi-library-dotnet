@@ -15,8 +15,6 @@ internal class Program
         Console.WriteLine("=== ConvertAPI Converter Catalog Demo ===");
         Console.WriteLine($"Base URI: {ConvertApiDotNet.ConvertApi.ApiBaseUri}");
         Console.WriteLine();
-        
-        ConvertApiDotNet.ConvertApi.ApiBaseUri = "https://stag-v2.convertapi.com";
 
         var catalog = new ConverterCatalog();
 
