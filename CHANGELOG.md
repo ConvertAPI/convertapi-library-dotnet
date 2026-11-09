@@ -16,6 +16,11 @@ The format is based on Keep a Changelog and this project adheres to Semantic Ver
 - `SaveFilesAsync(outputDirectory)` creates the folder if it does not exist, instead of throwing
   `DirectoryNotFoundException`. An empty path still means the current directory.
 - Unit tests (`ConvertApi.Tests`, NUnit) run in the `build` check of every pull request.
+- The package readme on nuget.org is the repository's `README.md`; the separate `ConvertApi/docs/README.md`
+  had drifted and is removed. The publish workflow tags the packed copy's links `utm_source=nuget`.
+- README: a quick start, C# task sections, and snippets that run as copied on Windows, macOS and Linux.
+  They save to a relative `output` folder they create, use `ConvertApiFile` (not `ProcessedFile`),
+  `FitToSize` (not the ignored `ScaleImage` and `ScaleProportions`) and the current converter names.
 
 ## [3.2.2] — 2026-10-26
 

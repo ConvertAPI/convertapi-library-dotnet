@@ -1,461 +1,736 @@
-# ConvertAPI C# Client
-## Overview
+# ConvertAPI C# SDK for .NET
 
-The ConvertAPI library provides a simple and efficient way to integrate the [ConvertAPI](https://www.convertapi.com) service into your .NET Framework, .NET Core, and .NET projects. ConvertAPI enables you to easily convert various file formats by leveraging its robust API. Whether you need to convert documents, images, spreadsheets, or other file types, the ConvertAPI library streamlines the process with minimal code and maximum efficiency.
+Convert Word, Excel, PowerPoint and HTML to PDF, turn PDF into Word, JPG or PNG, and extract text from, compress, merge, split or protect PDF files in C# with the [ConvertAPI](https://www.convertapi.com) REST API.
 
-## Features
+[![NuGet version](https://img.shields.io/nuget/v/ConvertApi.svg)](https://www.nuget.org/packages/ConvertApi) [![NuGet downloads](https://img.shields.io/nuget/dt/ConvertApi.svg)](https://www.nuget.org/packages/ConvertApi) [![Build](https://img.shields.io/github/actions/workflow/status/ConvertAPI/convertapi-library-dotnet/build.yml?branch=main&label=build)](https://github.com/ConvertAPI/convertapi-library-dotnet/actions/workflows/build.yml) [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/ConvertAPI/convertapi-library-dotnet/blob/main/LICENSE)
 
-Below is an overview of the key functionalities:
+**Free trial: 250 conversions, no credit card.** [Get your API token](https://www.convertapi.com/a/signup?ReturnUrl=%2Fa%2Fauthentication&utm_source=github&utm_medium=referral&utm_campaign=dotnet-sdk&utm_content=readme)
 
-### Document Conversion
+## Quick start
 
-* **Office to PDF**: Convert Word (DOC, DOCX), Excel (XLS, XLSX), and PowerPoint (PPT, PPTX) documents to PDF or PDF/A formats. [Example](#office-to-pdf)
-* **PDF to Office**: Transform PDFs into editable Word, Excel, and PowerPoint documents. [Example](#pdf-to-office)
-* **HTML/Web to PDF**: Convert HTML files or web pages to PDF using a headless Chrome browser. [Example](#htmlweb-to-pdf)
-* **Image to PDF**: Convert various image formats (e.g., JPG, PNG, BMP) to PDF. [Example](#image-to-pdf)
-* **PDF to Image**: Convert PDFs to image formats such as JPG, PNG, TIFF, SVG, and WebP. [Example](#pdf-to-image)
-* **eBook Conversion**: Convert DJVU and other eBook formats to PDF or images. [Example](#ebook-conversion)
-* **Email Conversion**: Convert EML and MSG email files to PDF or image formats. [Example](#email-conversion)
+Create a console app and add the package:
 
-### Document Processing & Transformation
+```bash
+dotnet new console -o ConvertDemo
+cd ConvertDemo
+dotnet add package ConvertApi
+```
 
-* **Merge PDF**: Combine multiple PDF documents into one PDF. [Example](#merge-documents)
-* **Split PDF**: Split PDF into several parts, by page ranges, patterns, bookmarks and etc. [Example](#split-pdf)
-* **Rotate**: Rotate pages in PDF. [Example](#rotate-pages)
-* **Delete Pages**: Remove unwanted pages from PDF. [Example](#delete-pages)
-* **Watermarking**: Add text or image watermarks to PDF and images. [Example](#add-watermark)
-* **Flatten PDFs**: Flatten PDF layers to prevent further editing. [Example](#flatten-pdf)
-* **Repair Documents**: Recover corrupted or damaged PDF and DOCX files. [Example](#repair-pdf)
-* **Rasterize PDFs**: Convert vector PDFs into raster images. [Example](#rasterize-pdf)
+Set your API token as an environment variable:
 
-### Security & Optimization
+```bash
+export CONVERTAPI_TOKEN=your-api-token      # macOS and Linux
+```
 
-* **Password Protection**: Encrypt PDF and Office documents with passwords and AES-256 encryption. [Example](#password-protect-pdf)
-* **Remove Protection**: Unlock password-protected PDFs. [Example](#remove-pdf-password)
-* **Redact PDF**: Automatically detect and redact sensitive information in PDF files using AI. [Example](#redact-pdf)
-* **Compress PDF**: Reduce PDF sizes by up to 90% without compromising quality. [Example](#compress-pdf)
-* **PDF/A Conversion**: Convert PDFs to PDF/A format for long-term archiving. [Example](#convert-to-pdfa)
-* **Metadata Management**: Edit or remove metadata from PDF documents. [Example](#remove-metadata)
+```powershell
+$env:CONVERTAPI_TOKEN = "your-api-token"    # Windows PowerShell
+```
 
-### Data Extraction & OCR
-
-* **Text Extraction**: Extract text content from PDFs, with optional OCR for scanned documents. [Example](#extract-text-from-pdf)
-* **Table Extraction**: Extract tabular data from PDFs into CSV or Excel formats. [Example](#extract-tables-from-pdf)
-* **Image Extraction**: Extract images from PDFs into various image formats. [Example](#extract-images-from-pdf)
-* **Form Data Extraction**: Extract form field data from PDFs into FDF format. [Example](#extract-form-data)
-* **Email Attachments**: Extract attachments from EML and MSG email files. [Example](#extract-email-attachments)
-
-### Advanced Tools
-
-* **Document Generation**: Create DOCX or PDF documents dynamically using templates and JSON data. [Example](#generate-document-from-template)
-* **Format Comparison**: Compare DOCX documents to identify differences in content and formatting. [Example](#compare-documents)
-* **ZIP Archiving**: Create ZIP archives from multiple files, with optional password protection. [Example](#create-zip-archive)
-
-For a complete list of supported conversions and tools, visit the [ConvertAPI API Reference](https://www.convertapi.com/api).
-
-## Compatibility
-The ConvertAPI .NET library is compatible with a wide range of platforms that implement .NET Standard 2.0, which the package targets. Supported environments include:
-
-- .NET 5, 6, 7, 8, 9, 10 and above, and .NET Core 2.0+
-- .NET Standard 2.0 and above
-- .NET Framework 4.6.2 and above (4.7.2+ recommended; older versions cannot use .NET Standard 2.0 packages reliably)
-- Windows, Linux, macOS
-- Microsoft Azure, Azure App Service, Azure Functions
-- Xamarin (iOS, macOS, Android)
-- Universal Windows Platform (UWP)
-- Web, Console, and Desktop applications
-
-## Installation
-
-Run this line from Package Manager Console:
+Replace `Program.cs` with this program. It converts a sample Word document to PDF:
 
 ```csharp
-Install-Package ConvertApi
+using ConvertApiDotNet;
+
+var convertApi = new ConvertApi(Environment.GetEnvironmentVariable("CONVERTAPI_TOKEN"));
+var result = await convertApi.ConvertAsync("docx", "pdf",
+    new ConvertApiFileParam(new Uri("https://cdn.convertapi.com/cara/testfiles/document.docx")));
+var files = await result.SaveFilesAsync(".");
+Console.WriteLine($"Saved {files[0].FullName}");
 ```
+
+Run `dotnet run`, and `document.pdf` appears in the current folder.
+
+- **.NET 10 without a project:** save the program as `convert.cs`, add `#:package ConvertApi@*` as its first line, and run `dotnet run convert.cs`.
+- **.NET Framework 4.6.2 or later:** install with `Install-Package ConvertApi`, add `using System;` and `using System.Threading.Tasks;`, and put the other lines inside `static async Task Main()`, because C# 7.3 has no top-level statements.
+- **ASP.NET Core:** keep the token in user secrets with `dotnet user-secrets init` and `dotnet user-secrets set ConvertApi:Token your-api-token`, then create the client with `new ConvertApi(builder.Configuration["ConvertApi:Token"])`.
+
+## Tasks
+
+Each task links to its C# code in this README and, where there is one, to a complete example project.
+
+| Task | Example project |
+|---|---|
+| [Convert Word (DOCX) to PDF](#convert-word-docx-to-pdf-in-c) | [ConvertWordToPdfAndPng](https://github.com/ConvertAPI/convertapi-library-dotnet/blob/main/Examples/ConvertWordToPdfAndPng/Program.cs) |
+| [Convert HTML to PDF: a file, a string or a web page](#convert-html-to-pdf-in-c) | [FromStreamToStream](https://github.com/ConvertAPI/convertapi-library-dotnet/blob/main/Examples/FromStreamToStream/Program.cs), [ConvertUrlToPdf](https://github.com/ConvertAPI/convertapi-library-dotnet/blob/main/Examples/ConvertUrlToPdf/Program.cs) |
+| [Convert Excel (XLSX) to PDF](#convert-excel-to-pdf-in-c) | |
+| [Convert PDF to Word (DOCX)](#convert-pdf-to-word-in-c) | [ConvertPdfToDocx](https://github.com/ConvertAPI/convertapi-library-dotnet/blob/main/Examples/ConvertPdfToDocx/Program.cs) |
+| [Convert PDF to JPG or PNG](#convert-pdf-to-jpg-or-png-in-c) | [CreatePdfThumbnail](https://github.com/ConvertAPI/convertapi-library-dotnet/blob/main/Examples/CreatePdfThumbnail/Program.cs) |
+| [Extract text from PDF](#extract-text-from-pdf-in-c) | |
+| [Compress PDF](#compress-pdf-in-c) | |
+| [Convert HTML to Word (DOCX)](#convert-html-to-docx-in-c) | |
+| [Convert PowerPoint (PPTX) to PDF](#powerpoint-to-pdf) | [ConvertRemoteFile](https://github.com/ConvertAPI/convertapi-library-dotnet/blob/main/Examples/ConvertRemoteFile/Program.cs) |
+| [Convert an image to PDF](#image-to-pdf) | |
+| [Convert PDF to PowerPoint (PPTX)](#pdf-to-powerpoint) | [ConvertPdfToPptx](https://github.com/ConvertAPI/convertapi-library-dotnet/blob/main/Examples/ConvertPdfToPptx/Program.cs) |
+| [Convert an eBook (EPUB) to PDF](#ebook-conversion) | |
+| [Convert an email (EML, MSG) to PDF](#email-conversion) | |
+| [Merge PDF files](#merge-documents) | [MergeWordDocsToPdf](https://github.com/ConvertAPI/convertapi-library-dotnet/blob/main/Examples/MergeWordDocsToPdf/Program.cs), [SplitAndMergePdf](https://github.com/ConvertAPI/convertapi-library-dotnet/blob/main/Examples/SplitAndMergePdf/Program.cs) |
+| [Split a PDF](#split-pdf) | [SplitPDF](https://github.com/ConvertAPI/convertapi-library-dotnet/blob/main/Examples/SplitPDF/Program.cs) |
+| [Rotate PDF pages](#rotate-pages) | |
+| [Delete PDF pages](#delete-pages) | |
+| [Add a watermark to a PDF](#add-watermark) | [WatermarkPdf](https://github.com/ConvertAPI/convertapi-library-dotnet/blob/main/Examples/WatermarkPdf/Program.cs) |
+| [Flatten a PDF](#flatten-pdf) | |
+| [Repair a PDF](#repair-pdf) | |
+| [Rasterize a PDF](#rasterize-pdf) | |
+| [Password-protect a PDF](#password-protect-pdf) | |
+| [Remove a PDF password](#remove-pdf-password) | |
+| [Redact a PDF](#redact-pdf) | |
+| [Convert PDF to PDF/A](#convert-to-pdfa) | [ConvertPdfToPdfA](https://github.com/ConvertAPI/convertapi-library-dotnet/blob/main/Examples/ConvertPdfToPdfA/Program.cs) |
+| [Remove PDF metadata](#remove-metadata) | |
+| [Extract tables from PDF to Excel](#extract-tables-from-pdf) | [ConvertPdfToXlsx](https://github.com/ConvertAPI/convertapi-library-dotnet/blob/main/Examples/ConvertPdfToXlsx/Program.cs) |
+| [Extract images from PDF](#extract-images-from-pdf) | |
+| [Extract PDF form data](#extract-form-data) | |
+| [Extract email attachments](#extract-email-attachments) | |
+| [Generate a document from a template](#generate-document-from-template) | |
+| [Compare Word documents](#compare-documents) | |
+| [Create a ZIP archive](#create-zip-archive) | [Workflow](https://github.com/ConvertAPI/convertapi-library-dotnet/blob/main/Examples/Workflow/Program.cs) |
+| [Save, stream and delete result files](#work-with-the-result) | [DeleteFiles](https://github.com/ConvertAPI/convertapi-library-dotnet/blob/main/Examples/DeleteFiles/Program.cs) |
+| [Handle errors and retries](#handle-errors) | [ExceptionHandling](https://github.com/ConvertAPI/convertapi-library-dotnet/blob/main/Examples/ExceptionHandling/Program.cs), [HandleRetry](https://github.com/ConvertAPI/convertapi-library-dotnet/blob/main/Examples/HandleRetry/Program.cs) |
+| [Check your remaining conversions](#user-information) | [RetrieveUserInformation](https://github.com/ConvertAPI/convertapi-library-dotnet/blob/main/Examples/RetrieveUserInformation/Program.cs) |
+
+For every supported format and conversion, see the [ConvertAPI API reference](https://www.convertapi.com/api).
 
 ## Usage
 
-### Configuration
+The conversion snippets below are complete programs: paste one into `Program.cs`, put the input file in the project folder, and run `dotnet run`. Results are saved in the `output` folder. Visual Studio runs the program in the working directory set in the project's debug launch profile; by default that is the build output folder, such as `bin\Debug\net8.0`. Put the input file there, or use its full path. The `output` folder is created there too.
 
-#### Set credentials
+### Set the API token
 
-You can get your credentials at https://www.convertapi.com/a/authentication
+Every request needs an API token. [Get your API token](https://www.convertapi.com/a/signup?ReturnUrl=%2Fa%2Fauthentication&utm_source=github&utm_medium=referral&utm_campaign=dotnet-sdk&utm_content=readme): new users start a free trial, and existing customers who sign in land on their API tokens.
+
+Keep the token out of your source code. The snippets read it from the `CONVERTAPI_TOKEN` environment variable:
 
 ```csharp
-ConvertApi convertApi = new ConvertApi("api_token");
+var convertApi = new ConvertApi(Environment.GetEnvironmentVariable("CONVERTAPI_TOKEN"));
 ```
 
-#### Set conversion location (optional)
+### Set the conversion location (optional)
 
-You can choose from multiple conversion locations, including the EU API location for GDPR compliance. However, this selection is optional as ConvertAPI automatically detects the nearest server using GEO DNS. For more details, visit [ConvertAPI Servers Location](https://www.convertapi.com/doc/servers-location).
+By default, each request goes to the nearest ConvertAPI server. To keep files in one region, for example in the EU, set the API address once, before the first conversion. All addresses are listed in [server locations](https://www.convertapi.com/docs/servers-location).
 
 ```csharp
-ConvertApi.ApiBaseUri = "https://v2.convertapi.com";
+ConvertApi.ApiBaseUri = "https://eu-v2.convertapi.com";
 ```
 
-### File conversion
+### Convert Word (DOCX) to PDF in C#
 
-Example to convert file to PDF. All supported formats and options can be found 
-[here](https://www.convertapi.com/api).
-
-#### Office to PDF
-
-Convert Word, Excel, and PowerPoint documents to PDF:
+Convert a Word document to PDF. For a DOC file, keep `"docx"` and pass the DOC file name.
 
 ```csharp
+using ConvertApiDotNet;
+
+var convertApi = new ConvertApi(Environment.GetEnvironmentVariable("CONVERTAPI_TOKEN"));
 var result = await convertApi.ConvertAsync("docx", "pdf",
-    new ConvertApiFileParam(@"C:\files\document.docx"));
-await result.SaveFilesAsync(@"C:\output\");
+    new ConvertApiFileParam("document.docx"));
+Directory.CreateDirectory("output");
+await result.SaveFilesAsync("output");
 ```
 
-#### PDF to Office
+The PDF is saved as `output/document.pdf`.
 
-Convert PDF to editable Word, Excel, or PowerPoint formats:
+### Convert HTML to PDF in C#
+
+Convert an HTML file to PDF. Only the HTML file is uploaded, so link images and stylesheets by absolute URL or put them inline.
 
 ```csharp
+using ConvertApiDotNet;
+
+var convertApi = new ConvertApi(Environment.GetEnvironmentVariable("CONVERTAPI_TOKEN"));
+var result = await convertApi.ConvertAsync("html", "pdf",
+    new ConvertApiFileParam("page.html"),
+    new ConvertApiParam("PageSize", "a4"));
+Directory.CreateDirectory("output");
+await result.SaveFilesAsync("output");
+```
+
+Convert an HTML string, such as an invoice your app builds, to PDF:
+
+```csharp
+using System.Text;
+using ConvertApiDotNet;
+
+var convertApi = new ConvertApi(Environment.GetEnvironmentVariable("CONVERTAPI_TOKEN"));
+var html = "<h1>Invoice 1001</h1><p>Total: 99.00 USD</p>";
+var result = await convertApi.ConvertAsync("html", "pdf",
+    new ConvertApiFileParam(new MemoryStream(Encoding.UTF8.GetBytes(html)), "invoice.html"));
+Directory.CreateDirectory("output");
+await result.SaveFilesAsync("output");
+```
+
+Convert a web page to PDF by its URL:
+
+```csharp
+using ConvertApiDotNet;
+
+var convertApi = new ConvertApi(Environment.GetEnvironmentVariable("CONVERTAPI_TOKEN"));
+var result = await convertApi.ConvertAsync("html", "pdf",
+    new ConvertApiParam("Url", "https://www.example.com"));
+Directory.CreateDirectory("output");
+await result.SaveFilesAsync("output");
+```
+
+### Convert Excel to PDF in C#
+
+Convert an Excel workbook (XLSX or XLS) to PDF:
+
+```csharp
+using ConvertApiDotNet;
+
+var convertApi = new ConvertApi(Environment.GetEnvironmentVariable("CONVERTAPI_TOKEN"));
+var result = await convertApi.ConvertAsync("xlsx", "pdf",
+    new ConvertApiFileParam("spreadsheet.xlsx"));
+Directory.CreateDirectory("output");
+await result.SaveFilesAsync("output");
+```
+
+### Convert PDF to Word in C#
+
+Convert a PDF to an editable Word document (DOCX):
+
+```csharp
+using ConvertApiDotNet;
+
+var convertApi = new ConvertApi(Environment.GetEnvironmentVariable("CONVERTAPI_TOKEN"));
 var result = await convertApi.ConvertAsync("pdf", "docx",
-    new ConvertApiFileParam(@"C:\files\document.pdf"));
-await result.SaveFilesAsync(@"C:\output\");
+    new ConvertApiFileParam("document.pdf"));
+Directory.CreateDirectory("output");
+await result.SaveFilesAsync("output");
 ```
 
-#### HTML/Web to PDF
+### Convert PDF to JPG or PNG in C#
 
-Convert HTML files or web pages to PDF:
+Convert every page of a PDF to a JPG image. For PNG images, use `"png"` in place of `"jpg"`.
 
 ```csharp
-var result = await convertApi.ConvertAsync("web", "pdf",
-    new ConvertApiParam("Url", "https://example.com"));
-await result.SaveFilesAsync(@"C:\output\");
+using ConvertApiDotNet;
+
+var convertApi = new ConvertApi(Environment.GetEnvironmentVariable("CONVERTAPI_TOKEN"));
+var result = await convertApi.ConvertAsync("pdf", "jpg",
+    new ConvertApiFileParam("document.pdf"),
+    new ConvertApiParam("ImageResolution", 150));
+Directory.CreateDirectory("output");
+await result.SaveFilesAsync("output");
+```
+
+Each page becomes one image: `document.jpg` for the first page, then `document-2.jpg`, `document-3.jpg` and so on. To make a thumbnail of the first page, see [additional conversion parameters](#additional-conversion-parameters).
+
+### Extract text from PDF in C#
+
+Extract the text of a PDF into a string. Scanned pages are read with OCR when needed.
+
+```csharp
+using ConvertApiDotNet;
+
+var convertApi = new ConvertApi(Environment.GetEnvironmentVariable("CONVERTAPI_TOKEN"));
+var result = await convertApi.ConvertAsync("pdf", "txt",
+    new ConvertApiFileParam("document.pdf"));
+using var reader = new StreamReader(await result.Files[0].FileStreamAsync());
+var text = await reader.ReadToEndAsync();
+Console.WriteLine(text);
+```
+
+### Compress PDF in C#
+
+Make a PDF smaller. The `Preset` parameter accepts `lossless`, `text`, `archive`, `web`, `ebook` and `printer`.
+
+```csharp
+using ConvertApiDotNet;
+
+var convertApi = new ConvertApi(Environment.GetEnvironmentVariable("CONVERTAPI_TOKEN"));
+var result = await convertApi.ConvertAsync("pdf", "compress",
+    new ConvertApiFileParam("document.pdf"),
+    new ConvertApiParam("Preset", "web"));
+Directory.CreateDirectory("output");
+await result.SaveFilesAsync("output");
+```
+
+### Convert HTML to DOCX in C#
+
+Convert an HTML file to an editable Word document:
+
+```csharp
+using ConvertApiDotNet;
+
+var convertApi = new ConvertApi(Environment.GetEnvironmentVariable("CONVERTAPI_TOKEN"));
+var result = await convertApi.ConvertAsync("html", "docx",
+    new ConvertApiFileParam("page.html"));
+Directory.CreateDirectory("output");
+await result.SaveFilesAsync("output");
+```
+
+### More conversions and PDF tools
+
+#### PowerPoint to PDF
+
+Convert a PowerPoint presentation (PPTX or PPT) to PDF:
+
+```csharp
+using ConvertApiDotNet;
+
+var convertApi = new ConvertApi(Environment.GetEnvironmentVariable("CONVERTAPI_TOKEN"));
+var result = await convertApi.ConvertAsync("pptx", "pdf",
+    new ConvertApiFileParam("presentation.pptx"));
+Directory.CreateDirectory("output");
+await result.SaveFilesAsync("output");
 ```
 
 #### Image to PDF
 
-Convert images (e.g., JPG, PNG) to PDF:
+Convert a JPG image to PDF:
 
 ```csharp
+using ConvertApiDotNet;
+
+var convertApi = new ConvertApi(Environment.GetEnvironmentVariable("CONVERTAPI_TOKEN"));
 var result = await convertApi.ConvertAsync("jpg", "pdf",
-    new ConvertApiFileParam(@"C:\files\image.jpg"));
-await result.SaveFilesAsync(@"C:\output\");
+    new ConvertApiFileParam("image.jpg"));
+Directory.CreateDirectory("output");
+await result.SaveFilesAsync("output");
 ```
 
-#### PDF to Image
+#### PDF to PowerPoint
 
-Convert PDF to image formats (e.g., JPG, PNG):
+Convert a PDF to a PowerPoint presentation (PPTX):
 
 ```csharp
-var result = await convertApi.ConvertAsync("pdf", "jpg",
-    new ConvertApiFileParam(@"C:\files\document.pdf"));
-await result.SaveFilesAsync(@"C:\output\");
+using ConvertApiDotNet;
+
+var convertApi = new ConvertApi(Environment.GetEnvironmentVariable("CONVERTAPI_TOKEN"));
+var result = await convertApi.ConvertAsync("pdf", "pptx",
+    new ConvertApiFileParam("document.pdf"));
+Directory.CreateDirectory("output");
+await result.SaveFilesAsync("output");
 ```
 
-#### eBook Conversion
+#### eBook conversion
 
-Convert eBook formats (e.g., EPUB) to PDF:
+Convert an EPUB eBook to PDF:
 
 ```csharp
+using ConvertApiDotNet;
+
+var convertApi = new ConvertApi(Environment.GetEnvironmentVariable("CONVERTAPI_TOKEN"));
 var result = await convertApi.ConvertAsync("epub", "pdf",
-    new ConvertApiFileParam(@"C:\files\book.epub"));
-await result.SaveFilesAsync(@"C:\output\");
+    new ConvertApiFileParam("book.epub"));
+Directory.CreateDirectory("output");
+await result.SaveFilesAsync("output");
 ```
 
-#### Email Conversion
+#### Email conversion
 
-Convert EML or MSG email files to PDF:
+Convert an EML email to PDF. For an Outlook MSG file, keep `"eml"` and pass the MSG file name.
 
 ```csharp
+using ConvertApiDotNet;
+
+var convertApi = new ConvertApi(Environment.GetEnvironmentVariable("CONVERTAPI_TOKEN"));
 var result = await convertApi.ConvertAsync("eml", "pdf",
-    new ConvertApiFileParam(@"C:\files\email.eml"));
-await result.SaveFilesAsync(@"C:\output\");
+    new ConvertApiFileParam("email.eml"));
+Directory.CreateDirectory("output");
+await result.SaveFilesAsync("output");
 ```
 
-#### Merge Documents
+#### Merge documents
 
-Merge multiple PDF files into one:
+Merge several PDF files into one PDF:
 
 ```csharp
+using ConvertApiDotNet;
+
+var convertApi = new ConvertApi(Environment.GetEnvironmentVariable("CONVERTAPI_TOKEN"));
 var result = await convertApi.ConvertAsync("pdf", "merge",
-    new ConvertApiFileParam(@"C:\files\file1.pdf"),
-    new ConvertApiFileParam(@"C:\files\file2.pdf"));
-await result.SaveFilesAsync(@"C:\output\");
+    new ConvertApiFileParam("first.pdf"),
+    new ConvertApiFileParam("second.pdf"));
+Directory.CreateDirectory("output");
+await result.SaveFilesAsync("output");
 ```
 
 #### Split PDF
 
-Split a PDF into individual pages:
+Split a PDF into one file per page:
 
 ```csharp
+using ConvertApiDotNet;
+
+var convertApi = new ConvertApi(Environment.GetEnvironmentVariable("CONVERTAPI_TOKEN"));
 var result = await convertApi.ConvertAsync("pdf", "split",
-    new ConvertApiFileParam(@"C:\files\document.pdf"));
-await result.SaveFilesAsync(@"C:\output\");
+    new ConvertApiFileParam("document.pdf"));
+Directory.CreateDirectory("output");
+await result.SaveFilesAsync("output");
 ```
 
-#### Rotate Pages
+#### Rotate pages
 
-Rotate pages in a PDF document:
+Rotate the pages of a PDF by 90 degrees:
 
 ```csharp
+using ConvertApiDotNet;
+
+var convertApi = new ConvertApi(Environment.GetEnvironmentVariable("CONVERTAPI_TOKEN"));
 var result = await convertApi.ConvertAsync("pdf", "rotate",
-    new ConvertApiFileParam(@"C:\files\document.pdf"),
-    new ConvertApiParam("RotatePage", "90"));
-await result.SaveFilesAsync(@"C:\output\");
+    new ConvertApiFileParam("document.pdf"),
+    new ConvertApiParam("Angle", 90));
+Directory.CreateDirectory("output");
+await result.SaveFilesAsync("output");
 ```
 
-#### Delete Pages
+#### Delete pages
 
-Delete specific pages from a PDF:
+Delete pages 2 and 4 from a PDF:
 
 ```csharp
+using ConvertApiDotNet;
+
+var convertApi = new ConvertApi(Environment.GetEnvironmentVariable("CONVERTAPI_TOKEN"));
 var result = await convertApi.ConvertAsync("pdf", "delete-pages",
-    new ConvertApiFileParam(@"C:\files\document.pdf"),
+    new ConvertApiFileParam("document.pdf"),
     new ConvertApiParam("PageRange", "2,4"));
-await result.SaveFilesAsync(@"C:\output\");
+Directory.CreateDirectory("output");
+await result.SaveFilesAsync("output");
 ```
 
-#### Add Watermark
+#### Add watermark
 
 Add a text watermark to a PDF:
 
 ```csharp
-var result = await convertApi.ConvertAsync("pdf", "watermark",
-    new ConvertApiFileParam(@"C:\files\document.pdf"),
+using ConvertApiDotNet;
+
+var convertApi = new ConvertApi(Environment.GetEnvironmentVariable("CONVERTAPI_TOKEN"));
+var result = await convertApi.ConvertAsync("pdf", "text-watermark",
+    new ConvertApiFileParam("document.pdf"),
     new ConvertApiParam("Text", "Confidential"));
-await result.SaveFilesAsync(@"C:\output\");
+Directory.CreateDirectory("output");
+await result.SaveFilesAsync("output");
 ```
 
 #### Flatten PDF
 
-Flatten a PDF to prevent further editing:
+Flatten a PDF and its form fields, so they can no longer be edited:
 
 ```csharp
+using ConvertApiDotNet;
+
+var convertApi = new ConvertApi(Environment.GetEnvironmentVariable("CONVERTAPI_TOKEN"));
 var result = await convertApi.ConvertAsync("pdf", "flatten",
-    new ConvertApiFileParam(@"C:\files\document.pdf"));
-await result.SaveFilesAsync(@"C:\output\");
+    new ConvertApiFileParam("form.pdf"));
+Directory.CreateDirectory("output");
+await result.SaveFilesAsync("output");
 ```
 
 #### Repair PDF
 
-Repair a corrupted PDF file:
+Repair a damaged PDF:
 
 ```csharp
+using ConvertApiDotNet;
+
+var convertApi = new ConvertApi(Environment.GetEnvironmentVariable("CONVERTAPI_TOKEN"));
 var result = await convertApi.ConvertAsync("pdf", "repair",
-    new ConvertApiFileParam(@"C:\files\corrupted.pdf"));
-await result.SaveFilesAsync(@"C:\output\");
+    new ConvertApiFileParam("damaged.pdf"));
+Directory.CreateDirectory("output");
+await result.SaveFilesAsync("output");
 ```
 
 #### Rasterize PDF
 
-Convert a PDF to a rasterized image:
+Convert a vector PDF into a raster PDF, with every page stored as an image:
 
 ```csharp
+using ConvertApiDotNet;
+
+var convertApi = new ConvertApi(Environment.GetEnvironmentVariable("CONVERTAPI_TOKEN"));
 var result = await convertApi.ConvertAsync("pdf", "rasterize",
-    new ConvertApiFileParam(@"C:\files\document.pdf"));
-await result.SaveFilesAsync(@"C:\output\");
+    new ConvertApiFileParam("document.pdf"));
+Directory.CreateDirectory("output");
+await result.SaveFilesAsync("output");
 ```
 
-#### Password Protect PDF
+#### Password protect PDF
 
-Add password protection to a PDF:
+Protect a PDF with a password that is needed to open it:
 
 ```csharp
+using ConvertApiDotNet;
+
+var convertApi = new ConvertApi(Environment.GetEnvironmentVariable("CONVERTAPI_TOKEN"));
 var result = await convertApi.ConvertAsync("pdf", "protect",
-    new ConvertApiFileParam(@"C:\files\document.pdf"),
+    new ConvertApiFileParam("document.pdf"),
     new ConvertApiParam("UserPassword", "secure123"));
-await result.SaveFilesAsync(@"C:\output\");
+Directory.CreateDirectory("output");
+await result.SaveFilesAsync("output");
 ```
 
-#### Remove PDF Password
+#### Remove PDF password
 
-Remove password protection from a PDF:
+Remove the password from a protected PDF:
 
 ```csharp
+using ConvertApiDotNet;
+
+var convertApi = new ConvertApi(Environment.GetEnvironmentVariable("CONVERTAPI_TOKEN"));
 var result = await convertApi.ConvertAsync("pdf", "unprotect",
-    new ConvertApiFileParam(@"C:\files\protected.pdf"),
+    new ConvertApiFileParam("protected.pdf"),
     new ConvertApiParam("Password", "secure123"));
-await result.SaveFilesAsync(@"C:\output\");
+Directory.CreateDirectory("output");
+await result.SaveFilesAsync("output");
 ```
 
 #### Redact PDF
 
-Redact sensitive information in a PDF:
+Find and redact sensitive data in a PDF with AI, here with the `gdpr` preset:
 
 ```csharp
+using ConvertApiDotNet;
+
+var convertApi = new ConvertApi(Environment.GetEnvironmentVariable("CONVERTAPI_TOKEN"));
 var result = await convertApi.ConvertAsync("pdf", "redact",
-    new ConvertApiFileParam(@"C:\files\document.pdf"),
-    new ConvertApiParam("Preset", "gdpr"));   
-await result.SaveFilesAsync(@"C:\output\");
-```
-
-#### Compress PDF
-
-Compress a PDF file to reduce its size:
-
-```csharp
-var result = await convertApi.ConvertAsync("pdf", "compress",
-    new ConvertApiFileParam(@"C:\files\document.pdf"),
-    new ConvertApiParam("Preset", "web"));
-await result.SaveFilesAsync(@"C:\output\");
+    new ConvertApiFileParam("document.pdf"),
+    new ConvertApiParam("Preset", "gdpr"));
+Directory.CreateDirectory("output");
+await result.SaveFilesAsync("output");
 ```
 
 #### Convert to PDF/A
 
-Convert a PDF to PDF/A format for archiving:
+Convert a PDF to PDF/A-2b for long-term archiving:
 
 ```csharp
+using ConvertApiDotNet;
+
+var convertApi = new ConvertApi(Environment.GetEnvironmentVariable("CONVERTAPI_TOKEN"));
 var result = await convertApi.ConvertAsync("pdf", "pdfa",
-    new ConvertApiFileParam(@"C:\files\document.pdf"),
-    new ConvertApiParam("PdfaVersion", "pdfa2b"));
-await result.SaveFilesAsync(@"C:\output\");
+    new ConvertApiFileParam("document.pdf"),
+    new ConvertApiParam("PdfaVersion", "pdfA2b"));
+Directory.CreateDirectory("output");
+await result.SaveFilesAsync("output");
 ```
 
-#### Remove Metadata
+#### Remove metadata
 
-Remove metadata from a PDF:
+Remove the title, subject, author, creator and keywords from a PDF. A space in single quotes clears a field.
 
 ```csharp
+using ConvertApiDotNet;
+
+var convertApi = new ConvertApi(Environment.GetEnvironmentVariable("CONVERTAPI_TOKEN"));
 var result = await convertApi.ConvertAsync("pdf", "pdf",
-    new ConvertApiFileParam(@"C:\files\document.pdf"),
+    new ConvertApiFileParam("document.pdf"),
     new ConvertApiParam("PdfTitle", "' '"),
     new ConvertApiParam("PdfSubject", "' '"),
     new ConvertApiParam("PdfAuthor", "' '"),
     new ConvertApiParam("PdfCreator", "' '"),
     new ConvertApiParam("PdfKeywords", "' '"));
-await result.SaveFilesAsync(@"C:\output\");
+Directory.CreateDirectory("output");
+await result.SaveFilesAsync("output");
 ```
 
-#### Extract Text from PDF
+#### Extract tables from PDF
 
-Extract text content from a PDF:
-
-```csharp
-var result = await convertApi.ConvertAsync("pdf", "txt",
-    new ConvertApiFileParam(@"C:\files\document.pdf"));
-await result.SaveFilesAsync(@"C:\output\");
-```
-
-#### Extract Tables from PDF
-
-Extract tables from a PDF into Excel:
+Extract the tables of a PDF into an Excel workbook (XLSX):
 
 ```csharp
+using ConvertApiDotNet;
+
+var convertApi = new ConvertApi(Environment.GetEnvironmentVariable("CONVERTAPI_TOKEN"));
 var result = await convertApi.ConvertAsync("pdf", "xlsx",
-    new ConvertApiFileParam(@"C:\files\document.pdf"));
-await result.SaveFilesAsync(@"C:\output\");
+    new ConvertApiFileParam("document.pdf"));
+Directory.CreateDirectory("output");
+await result.SaveFilesAsync("output");
 ```
 
-#### Extract Images from PDF
+#### Extract images from PDF
 
-Extract images from a PDF:
+Save the images inside a PDF as PNG files:
 
 ```csharp
+using ConvertApiDotNet;
+
+var convertApi = new ConvertApi(Environment.GetEnvironmentVariable("CONVERTAPI_TOKEN"));
 var result = await convertApi.ConvertAsync("pdf", "extract-images",
-    new ConvertApiFileParam(@"C:\files\document.pdf"),
+    new ConvertApiFileParam("document.pdf"),
     new ConvertApiParam("ImageOutputFormat", "png"));
-await result.SaveFilesAsync(@"C:\output\");
+Directory.CreateDirectory("output");
+await result.SaveFilesAsync("output");
 ```
 
-#### Extract Form Data
+#### Extract form data
 
-Extract form data from a PDF:
+Export the form field values of a PDF to an FDF file:
 
 ```csharp
+using ConvertApiDotNet;
+
+var convertApi = new ConvertApi(Environment.GetEnvironmentVariable("CONVERTAPI_TOKEN"));
 var result = await convertApi.ConvertAsync("pdf", "fdf-extract",
-    new ConvertApiFileParam(@"C:\files\form.pdf"));
-await result.SaveFilesAsync(@"C:\output\");
+    new ConvertApiFileParam("form.pdf"));
+Directory.CreateDirectory("output");
+await result.SaveFilesAsync("output");
 ```
 
-#### Extract Email Attachments
+#### Extract email attachments
 
-Extract attachments from an email file:
+Save the attachments of an EML or MSG email:
 
 ```csharp
+using ConvertApiDotNet;
+
+var convertApi = new ConvertApi(Environment.GetEnvironmentVariable("CONVERTAPI_TOKEN"));
 var result = await convertApi.ConvertAsync("email", "extract",
-    new ConvertApiFileParam(@"C:\files\email.eml"));
-await result.SaveFilesAsync(@"C:\output\");
+    new ConvertApiFileParam("email.eml"));
+Directory.CreateDirectory("output");
+await result.SaveFilesAsync("output");
 ```
 
-#### Generate Document from Template
+#### Generate document from template
 
-Generate a document from a template using JSON data:
+Fill a Word template with JSON data and save the result as PDF. Here `template.docx` contains the placeholder `{{name}}`.
 
 ```csharp
+using ConvertApiDotNet;
+
+var convertApi = new ConvertApi(Environment.GetEnvironmentVariable("CONVERTAPI_TOKEN"));
 var result = await convertApi.ConvertAsync("template", "pdf",
-    new ConvertApiFileParam(@"C:\templates\template.docx"),
+    new ConvertApiFileParam("template.docx"),
     new ConvertApiParam("BindingMethod", "placeholders"),
     new ConvertApiParam("JsonPayload", "[{\"Name\": \"name\", \"Value\": \"John\", \"Type\": \"string\"}]"));
-await result.SaveFilesAsync(@"C:\output\");
+Directory.CreateDirectory("output");
+await result.SaveFilesAsync("output");
 ```
 
-#### Compare Documents
+#### Compare documents
 
-Compare two DOCX documents:
+Compare two Word documents. The result is a DOCX that marks the differences as tracked changes.
 
 ```csharp
+using ConvertApiDotNet;
+
+var convertApi = new ConvertApi(Environment.GetEnvironmentVariable("CONVERTAPI_TOKEN"));
 var result = await convertApi.ConvertAsync("docx", "compare",
-    new ConvertApiFileParam(@"C:\files\doc1.docx"),
-    new ConvertApiFileParam("CompareFile", @"C:\files\doc2.docx"));
-await result.SaveFilesAsync(@"C:\output\");
+    new ConvertApiFileParam("original.docx"),
+    new ConvertApiFileParam("CompareFile", "revised.docx"));
+Directory.CreateDirectory("output");
+await result.SaveFilesAsync("output");
 ```
 
-#### Create ZIP Archive
+#### Create ZIP archive
 
-Create a ZIP archive from multiple files:
+Put several files into one ZIP archive:
 
 ```csharp
-var result = await convertApi.ConvertAsync("any", "zip",
-    new ConvertApiFileParam(@"C:\files\file1.pdf"),
-    new ConvertApiFileParam(@"C:\files\file2.docx"));
-await result.SaveFilesAsync(@"C:\output\");
+using ConvertApiDotNet;
+
+var convertApi = new ConvertApi(Environment.GetEnvironmentVariable("CONVERTAPI_TOKEN"));
+var result = await convertApi.ConvertAsync("file", "zip",
+    new ConvertApiFileParam("document.pdf"),
+    new ConvertApiFileParam("document.docx"));
+Directory.CreateDirectory("output");
+await result.SaveFilesAsync("output");
 ```
 
-### Other result operations:
+### Work with the result
+
+`ConvertAsync` returns the conversion cost and the result files. Each file is a `ConvertApiFile` with a name, a size and a download URL. Save the files, read them as streams, and delete them from the server when you are done:
 
 ```csharp
-// save all result files to folder
-result.SaveFilesAsync(@"\result\");
+using ConvertApiDotNet;
+using ConvertApiDotNet.Model;
 
-// get result files
-ProcessedFile[] files = result.Files;
+var convertApi = new ConvertApi(Environment.GetEnvironmentVariable("CONVERTAPI_TOKEN"));
+var result = await convertApi.ConvertAsync("pdf", "jpg",
+    new ConvertApiFileParam("document.pdf"));
 
-// get conversion cost
-int cost = result.ConversionCost; 
+Console.WriteLine($"Conversion cost: {result.ConversionCost}");
+ConvertApiFile[] files = result.Files;
+foreach (var file in files)
+    Console.WriteLine($"{file.FileName}: {file.FileSize} bytes");
+
+// Save every file to a folder, or one file under a name you choose
+Directory.CreateDirectory("output");
+await result.SaveFilesAsync("output");
+await files[0].SaveFileAsync(Path.Combine("output", "first-page.jpg"));
+
+// Read a file as a stream, for example to upload it elsewhere
+using var stream = await files[0].FileStreamAsync();
+
+// Delete the uploaded and the result files from the server now, not after 3 hours
+await result.DeleteFilesAsync();
 ```
 
-#### Convert file url
+### Convert a file from a URL
+
+Pass a `Uri` to convert a file that is already online, without downloading it first:
 
 ```csharp
-ConvertApiResponse result = await convertApi.ConvertAsync("pptx", "pdf",
-   new ConvertApiFileParam(new Uri("https://cdn.convertapi.com/cara/testfiles/presentation.pptx"))
-);
+using ConvertApiDotNet;
+
+var convertApi = new ConvertApi(Environment.GetEnvironmentVariable("CONVERTAPI_TOKEN"));
+var result = await convertApi.ConvertAsync("pptx", "pdf",
+    new ConvertApiFileParam(new Uri("https://cdn.convertapi.com/cara/testfiles/presentation.pptx")));
+Directory.CreateDirectory("output");
+await result.SaveFilesAsync("output");
 ```
 
-#### Additional conversion parameters
+### Additional conversion parameters
 
-ConvertAPI accepts extra conversion parameters depending on converted formats. All conversion 
-parameters and explanations can be found [here](https://www.convertapi.com/conversions).
+Each conversion accepts extra parameters, listed on its page in the [API reference](https://www.convertapi.com/api), for example [PDF to JPG](https://www.convertapi.com/pdf-to-jpg). This program makes a thumbnail of the first page of a PDF that fits in 300 by 300 pixels:
 
 ```csharp
-ConvertApiResponse result = await convertApi.ConvertAsync("pdf", "jpg",
-   new ConvertApiFileParam(@"c:\source\test.pdf"),
-   new ConvertApiParam("ScaleImage","true"),
-   new ConvertApiParam("ScaleProportions","true"),
-   new ConvertApiParam("ImageHeight","300"),
-   new ConvertApiParam("ImageWidth","300")
-);
+using ConvertApiDotNet;
+
+var convertApi = new ConvertApi(Environment.GetEnvironmentVariable("CONVERTAPI_TOKEN"));
+var result = await convertApi.ConvertAsync("pdf", "jpg",
+    new ConvertApiFileParam("document.pdf"),
+    new ConvertApiParam("PageRange", "1"),
+    new ConvertApiParam("ImageWidth", 300),
+    new ConvertApiParam("ImageHeight", 300),
+    new ConvertApiParam("FitToSize", "true"));
+Directory.CreateDirectory("output");
+await result.SaveFilesAsync("output");
+```
+
+### Handle errors
+
+When the API returns an error, the SDK throws a `ConvertApiException`. Its `StatusCode` says what went wrong:
+
+- **401 Unauthorized:** the API token is missing or invalid. Check `CONVERTAPI_TOKEN`, or [get your token](#set-the-api-token).
+- **403 Forbidden:** the account has no conversions left, or it is suspended.
+- **503 Service Unavailable:** the service is temporarily unavailable. Wait a few seconds and retry, as the [HandleRetry](https://github.com/ConvertAPI/convertapi-library-dotnet/blob/main/Examples/HandleRetry/Program.cs) example does.
+
+For other codes, `Response` holds the error message from the API. If `CONVERTAPI_TOKEN` is not set, the `ConvertApi` constructor throws an `ArgumentNullException` before any request is sent.
+
+```csharp
+using ConvertApiDotNet;
+using ConvertApiDotNet.Exceptions;
+
+var convertApi = new ConvertApi(Environment.GetEnvironmentVariable("CONVERTAPI_TOKEN"));
+try
+{
+    var result = await convertApi.ConvertAsync("docx", "pdf",
+        new ConvertApiFileParam("document.docx"));
+    Directory.CreateDirectory("output");
+    await result.SaveFilesAsync("output");
+}
+catch (ConvertApiException e)
+{
+    Console.WriteLine($"ConvertAPI returned {(int)e.StatusCode} {e.StatusCode}: {e.Response}");
+}
 ```
 
 ### User information
 
-You can always check the remaining conversions amount and other account information by fetching [user information](https://www.convertapi.com/doc/user).
+Check how many conversions your account has used. See [user information](https://www.convertapi.com/docs/user-information) for all fields.
 
 ```csharp
-ConvertApiUser user = await convert.GetUserAsync();
-int conversionsTotal = user.ConversionsTotal;
-int conversionsConsumed = user.ConversionsConsumed;
+using ConvertApiDotNet;
+
+var convertApi = new ConvertApi(Environment.GetEnvironmentVariable("CONVERTAPI_TOKEN"));
+var user = await convertApi.GetUserAsync();
+Console.WriteLine($"Conversions used: {user.ConversionsConsumed} of {user.ConversionsTotal}");
 ```
 
 ### More examples
 
-You can find more advanced examples in the [examples](https://github.com/ConvertAPI/convertapi-library-dotnet/tree/main/Examples) folder.
+Each example is a complete console project in the `Examples` folder of this repository:
 
 - [ConvertPdfToDocx/Program.cs](https://github.com/ConvertAPI/convertapi-library-dotnet/blob/main/Examples/ConvertPdfToDocx/Program.cs) - Convert a PDF to an editable Word DOCX document
 - [ConvertPdfToPdfA/Program.cs](https://github.com/ConvertAPI/convertapi-library-dotnet/blob/main/Examples/ConvertPdfToPdfA/Program.cs) - Convert a PDF to PDF/A with an embedded invoice XML
@@ -479,32 +754,24 @@ You can find more advanced examples in the [examples](https://github.com/Convert
 - [WatermarkPdf/Program.cs](https://github.com/ConvertAPI/convertapi-library-dotnet/blob/main/Examples/WatermarkPdf/Program.cs) - Add a text watermark and a PDF overlay to a PDF
 - [Workflow/Program.cs](https://github.com/ConvertAPI/convertapi-library-dotnet/blob/main/Examples/Workflow/Program.cs) - Chain two conversions: PDF to JPG images, then the images to a ZIP
 
-#### Converting your first file, complete example:
+## Compatibility
 
-ConvertAPI is designed to make converting files super easy. The following snippet shows how easy it is to get started. Let's convert the WORD DOCX file to PDF:
+The package targets .NET Standard 2.0, so it runs on:
 
-```csharp
-try
-{
-  var convertApi = new ConvertApi("api_token");  
-  var conversionTask = await convertApi.ConvertAsync("docx", "pdf", 
-      new ConvertApiFileParam(@"c:\source\test.docx")
-  );
-  var fileSaved = await conversionTask.Files.SaveFilesAsync(@"c:\");
-}
-//Catch exceptions from asynchronous methods
-catch (ConvertApiException e)
-{
-  Console.WriteLine("Status Code: " + e.StatusCode);
-  Console.WriteLine("Response: " + e.Response);
+- .NET 5 to .NET 10 and later, and .NET Core 2.0 or later
+- .NET Framework 4.6.2 or later (4.7.2 or later is recommended, because older versions cannot use .NET Standard 2.0 packages reliably)
+- Libraries that target .NET Standard 2.0 or later
+- Windows, Linux and macOS, including Azure App Service and Azure Functions
+- Console, web and desktop applications
 
-   if (e.StatusCode == HttpStatusCode.Unauthorized)
-       Console.WriteLine("Secret is not provided or no additional seconds left in the account to proceed conversion. More information https://www.convertapi.com/a");
-}
-```
+## Security, data and support
 
-### Issues &amp; Comments
-Please leave all comments, bugs, requests, and issues on the Issues page. We'll respond to your request ASAP!
+- Uploaded and converted files are stored for at most 3 hours, then deleted automatically. To delete them as soon as you have the result, call `await result.DeleteFilesAsync();`, as the [DeleteFiles](https://github.com/ConvertAPI/convertapi-library-dotnet/blob/main/Examples/DeleteFiles/Program.cs) example does.
+- Data is always encrypted at rest and in transit.
+- To keep processing in one region, such as the EU, [set the conversion location](#set-the-conversion-location-optional). All locations are listed in [server locations](https://www.convertapi.com/docs/servers-location).
+- ISO 27001, SOC 2, GDPR and HIPAA: see [ConvertAPI security and compliance](https://www.convertapi.com/compliance). Live availability: [ConvertAPI status](https://status.convertapi.com).
+- Bugs and requests for this SDK: [GitHub issues](https://github.com/ConvertAPI/convertapi-library-dotnet/issues). Questions about the API or your account: [ConvertAPI support](https://www.convertapi.com/support).
 
-### License
-The ConvertAPI .NET Library is licensed under the [MIT](http://www.opensource.org/licenses/mit-license.php "Read more about the MIT license form") license. Refere to the [LICENSE](https://github.com/ConvertAPI/convertapi-library-dotnet/blob/main/LICENSE) file for more information.
+## License
+
+The ConvertAPI .NET library is licensed under the [MIT license](https://opensource.org/license/mit). See the [LICENSE](https://github.com/ConvertAPI/convertapi-library-dotnet/blob/main/LICENSE) file for more information.
