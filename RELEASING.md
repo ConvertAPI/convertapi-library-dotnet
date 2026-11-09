@@ -2,7 +2,7 @@
 
 `main` is the only long-lived branch. Changes reach it through pull requests, merge commits only, and
 every pull request and push to `main` must pass the `build` check (`.github/workflows/build.yml`: restore,
-build the library and every example, pack). Merging publishes nothing.
+build the library, its unit tests and every example, run the unit tests, pack). Merging publishes nothing.
 
 A release is a **GitHub Release** whose tag is the version, published by `tomasr78`:
 
