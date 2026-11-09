@@ -91,7 +91,7 @@ For every supported format and conversion, see the [ConvertAPI API reference](ht
 
 ## Usage
 
-The conversion snippets below are complete programs: paste one into `Program.cs`, put the input file in the project folder, and run `dotnet run`. Results are saved in the `output` folder. When you start the program from Visual Studio, it runs in `bin\Debug\net10.0`: put the input file there, or use its full path.
+The conversion snippets below are complete programs: paste one into `Program.cs`, put the input file in the project folder, and run `dotnet run`. Results are saved in the `output` folder. Visual Studio runs the program in the working directory set in the project's debug launch profile; by default that is the build output folder, such as `bin\Debug\net8.0`. Put the input file there, or use its full path. The `output` folder is created there too.
 
 ### Set the API token
 
