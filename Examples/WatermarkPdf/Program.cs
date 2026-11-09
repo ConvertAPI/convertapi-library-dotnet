@@ -1,7 +1,7 @@
 ﻿/// <summary>
 /// The example shows how to watermark PDF with text and put overlay PDF.
-/// https://www.convertapi.com/pdf-to-watermark
-/// https://www.convertapi.com/pdf-to-watermark-overlay
+/// https://www.convertapi.com/pdf-to-text-watermark
+/// https://www.convertapi.com/pdf-to-pdf-watermark
 /// </summary>
 
 using System.Diagnostics;
@@ -24,7 +24,7 @@ try
 
     Console.WriteLine("PDF sent for text watermarking...");
 
-    var pdfWatermark = await convertApi.ConvertAsync("pdf", "watermark",
+    var pdfWatermark = await convertApi.ConvertAsync("pdf", "text-watermark",
         new ConvertApiFileParam("File", pdfFile),
         new ConvertApiParam("VerticalAlignment", "bottom"),
         new ConvertApiParam("Text", "This is ConvertAPI watermark %DATETIME%"),
@@ -32,7 +32,7 @@ try
 
     Console.WriteLine("PDF sent for overlay watermarking...");
 
-    var pdfWatermarkOverlay = await convertApi.ConvertAsync("pdf", "watermark-overlay",
+    var pdfWatermarkOverlay = await convertApi.ConvertAsync("pdf", "pdf-watermark",
         new ConvertApiFileParam("File", pdfWatermark),
         new ConvertApiFileParam("OverlayFile", new FileInfo(overlayFile)),
         new ConvertApiParam("Style", "stamp"),
