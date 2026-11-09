@@ -4,6 +4,19 @@ All notable changes to this project will be documented in this file.
 
 The format is based on Keep a Changelog and this project adheres to Semantic Versioning.
 
+## [Unreleased]
+
+### Fixed
+- `SaveFileAsync` and `SaveFilesAsync` replace an existing file instead of writing over its start. They
+  opened it with `FileInfo.OpenWrite`, which does not truncate, so a result saved over a longer file kept
+  that file's trailing bytes and came out corrupt: a 146,734-byte PDF saved over a 400,000-byte file stayed
+  400,000 bytes. Every earlier version has this bug.
+
+### Changed
+- `SaveFilesAsync(outputDirectory)` creates the folder if it does not exist, instead of throwing
+  `DirectoryNotFoundException`. An empty path still means the current directory.
+- Unit tests (`ConvertApi.Tests`, NUnit) run in the `build` check of every pull request.
+
 ## [3.2.2] — 2026-10-26
 
 ### Changed
