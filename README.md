@@ -730,7 +730,7 @@ Console.WriteLine($"Conversions used: {user.ConversionsConsumed} of {user.Conver
 
 ### More examples
 
-Each example is a complete console project in the `Examples` folder of this repository:
+Each example is a complete console project in the `Examples` folder of this repository. To run one, set the `CONVERTAPI_TOKEN` environment variable and follow the steps in [Examples/README.md](https://github.com/ConvertAPI/convertapi-library-dotnet/blob/main/Examples/README.md).
 
 - [ConvertPdfToDocx/Program.cs](https://github.com/ConvertAPI/convertapi-library-dotnet/blob/main/Examples/ConvertPdfToDocx/Program.cs) - Convert a PDF to an editable Word DOCX document
 - [ConvertPdfToPdfA/Program.cs](https://github.com/ConvertAPI/convertapi-library-dotnet/blob/main/Examples/ConvertPdfToPdfA/Program.cs) - Convert a PDF to PDF/A with an embedded invoice XML
