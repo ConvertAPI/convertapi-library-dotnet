@@ -60,11 +60,12 @@ EXPECTED_OUTPUT = {
     "ExceptionHandling": re.compile(r"^Status Code: BadRequest$", re.MULTILINE),
 }
 
-# Account fields that must never reach the public log. The token itself is checked by value.
-SECRET_FIELD = re.compile(r"(?i)\b(secret|api[ _-]?key)\s*[=:]")
+# Account fields that must never reach the public log, also as quoted JSON keys ("Secret": ...).
+# The token itself is checked by value.
+SECRET_FIELD = re.compile(r"""(?i)\b(secret|api[ _-]?key)["']?\s*[=:]""")
 
 # Account details that RetrieveUserInformation prints. They are not secrets, but they stay out of the public log.
-ACCOUNT_FIELD = re.compile(r"^(FullName|Email|ConversionsTotal|ConversionsConsumed|SecondsLeft)\s*[=:]")
+ACCOUNT_FIELD = re.compile(r"""^\s*["']?(FullName|Email|ConversionsTotal|ConversionsConsumed|SecondsLeft)["']?\s*[=:]""")
 
 # README.md names its input files document.docx, page.html and so on; the runs copy these samples in under those names.
 SAMPLE_FOR_EXTENSION = {
