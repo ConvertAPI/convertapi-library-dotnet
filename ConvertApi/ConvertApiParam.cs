@@ -176,10 +176,11 @@ namespace ConvertApiDotNet
 
         private static async Task<ConvertApiFile> Upload(Stream fileStream, string fileName)
         {
-            var token = ConvertApi.ResolveToken();
             HttpResponseMessage responseMessage;
             using (var content = new StreamContent(fileStream))
             {
+                // Inside the using, so a missing token still disposes the stream, as a failed upload always did.
+                var token = ConvertApi.ResolveToken();
                 content.Headers.ContentType = new MediaTypeHeaderValue("application/octet-stream");
                 content.Headers.ContentDisposition = new ContentDispositionHeaderValue("attachment")
                 {

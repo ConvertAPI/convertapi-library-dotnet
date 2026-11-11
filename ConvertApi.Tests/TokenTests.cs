@@ -87,6 +87,21 @@ public class TokenTests
     }
 
     [Test]
+    public async Task WithNoTokenAtAllASuppliedStreamIsStillDisposed()
+    {
+        var stream = new MemoryStream(Encoding.UTF8.GetBytes("not really a docx"));
+
+        await Assert.ThrowsAsync<ConvertApiException>(() =>
+            new ConvertApi().ConvertAsync("docx", "pdf", new ConvertApiFileParam(stream, "document.docx")));
+
+        using (Assert.EnterMultipleScope())
+        {
+            Assert.That(stream.CanRead, Is.False, "the stream should be disposed");
+            Assert.That(_server.Tokens, Is.Empty);
+        }
+    }
+
+    [Test]
     public async Task WithNoTokenAtAllGetUserAsyncSendsNothing()
     {
         var error = await Assert.ThrowsAsync<ConvertApiException>(() => new ConvertApi().GetUserAsync());
