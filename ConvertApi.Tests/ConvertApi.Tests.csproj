@@ -1,7 +1,10 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net10.0</TargetFramework>
+    <!-- net48 runs the tests on .NET Framework too, on Windows only: elsewhere there is no runtime for it. -->
+    <TargetFrameworks>net10.0</TargetFrameworks>
+    <TargetFrameworks Condition="$([MSBuild]::IsOSPlatform('Windows'))">net10.0;net48</TargetFrameworks>
+    <LangVersion>latest</LangVersion>
     <RootNamespace>ConvertApiDotNet.Tests</RootNamespace>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
@@ -18,6 +21,8 @@
 
   <ItemGroup>
     <Using Include="NUnit.Framework" />
+    <!-- Implicit usings include it on .NET but not on .NET Framework (net48). -->
+    <Using Include="System.Net.Http" />
   </ItemGroup>
 
   <ItemGroup>

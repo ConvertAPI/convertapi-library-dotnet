@@ -4,7 +4,8 @@ run-name: >-
    || format('Building {0}', github.ref_name) }}
 
 # Trunk-based: main is the only long-lived branch. Every pull request and every push to main builds the
-# whole solution (the library, its unit tests and all Examples), runs the unit tests and packs the library,
+# whole solution (the library, its unit tests and all Examples), runs the unit tests (on Linux, and on Windows
+# with .NET and .NET Framework) and packs the library,
 # but nothing is published here: this is a public NuGet package, and NuGet versions are permanent, so a
 # release is a deliberate act - publishing a GitHub Release v{semver}, which runs publish.yml. A clean build,
 # a passing test run and a pack are the check that gates the merge (the required status check is this job's
@@ -20,8 +21,42 @@ permissions:
   contents: read
 
 jobs:
+  # The unit tests on Windows, on .NET and on .NET Framework 4.8 (the test project adds net48 on Windows only).
+  # File behaviour differs there: an existing hidden or system file, for example, cannot be opened with
+  # FileMode.Create. The build job below waits for this one and fails if it failed, so `build` stays the one
+  # required check.
+  test-windows:
+    name: test (windows)
+    runs-on: windows-latest
+    timeout-minutes: 15
+    concurrency:
+      group: test-windows-${{ github.event_name == 'pull_request' && format('pr-{0}', github.event.pull_request.number) || github.run_id }}
+      cancel-in-progress: true
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-dotnet@0f4a354dd5547a28c70b7853dbd95d5b67886e73 # v6.1.0
+        with:
+          global-json-file: global.json
+
+      - name: Restore
+        run: dotnet restore ConvertApi.Tests/ConvertApi.Tests.csproj
+
+      - name: Build
+        run: dotnet build ConvertApi.Tests/ConvertApi.Tests.csproj -c Release --no-restore -p:ContinuousIntegrationBuild=true
+
+      # TreatNoTestsAsError fails the step when no test ran, for example after a test adapter stops finding them.
+      - name: Test (net10.0 and net48)
+        run: dotnet test ConvertApi.Tests/ConvertApi.Tests.csproj -c Release --no-build -- RunConfiguration.TreatNoTestsAsError=true
+
   build:
     name: build
+    needs: test-windows
+    # Runs even when test-windows failed, so the required `build` check reports a failure instead of being skipped
+    # (GitHub counts a skipped required check as passing).
+    if: ${{ !cancelled() }}
     runs-on: ubuntu-latest
     timeout-minutes: 15
     concurrency:
@@ -29,6 +64,14 @@ jobs:
       group: build-${{ github.event_name == 'pull_request' && format('pr-{0}', github.event.pull_request.number) || github.run_id }}
       cancel-in-progress: true
     steps:
+      - name: Check the Windows tests passed
+        if: ${{ needs.test-windows.result != 'success' }}
+        env:
+          RESULT: ${{ needs.test-windows.result }}
+        run: |
+          echo "::error::The unit tests on Windows did not pass (result: $RESULT). See the test (windows) job."
+          exit 1
+
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
@@ -46,8 +89,9 @@ jobs:
         run: dotnet build ConvertApi.sln -c Release --no-restore -p:ContinuousIntegrationBuild=true
 
       # ConvertApi.Tests serves results from a fake HTTP client, so the tests need no network and no API token.
+      # TreatNoTestsAsError fails the step when no test ran, for example after a test adapter stops finding them.
       - name: Test
-        run: dotnet test ConvertApi.Tests/ConvertApi.Tests.csproj -c Release --no-build
+        run: dotnet test ConvertApi.Tests/ConvertApi.Tests.csproj -c Release --no-build -- RunConfiguration.TreatNoTestsAsError=true
 
       # A pre-release version that sorts below any real release and names the run, so a package
       # downloaded from this run can be tried out but never mistaken for a published one.
