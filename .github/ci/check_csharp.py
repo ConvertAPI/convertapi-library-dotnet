@@ -1,20 +1,21 @@
 #!/usr/bin/env python3
-"""Runs the C# examples and the C# code in README.md against the ConvertAPI staging API.
+"""Runs the C# examples and the C# code in README.md against the ConvertAPI API.
 
-CI only: the Examples workflow (.github/workflows/examples.yml) calls it. MSBuild imports
-staging-host.targets into every program that job builds, so each program calls CONVERTAPI_BASE_URI
-without a change to the code people copy.
+CI only: the Examples workflow (.github/workflows/examples.yml) calls it. MSBuild imports ci-host.targets
+into every program that job builds, which compiles in CiHost.cs: the programs run as people copy them,
+and the files they upload or get back are deleted from the server when they exit.
 
     check_csharp.py examples [NAME ...]       run every project in Examples/, or the named ones (built beforehand)
     check_csharp.py readme-build --work DIR   make a console project of each C# block in README.md and build it
     check_csharp.py readme-run --work DIR     run the quick start and the "... in C#" task blocks
 
-The runs need CONVERTAPI_TOKEN (a staging API token) and CONVERTAPI_BASE_URI. The staging API answers 503
-in bursts, so a failed run is tried again up to twice, CI_RETRY_DELAY seconds apart (30 by default).
-Only the Python 3 standard library is used. To run it on your machine, from the repository root:
+The runs need CONVERTAPI_TOKEN and convert real files on that token's account: about 40 conversions for
+all of them. A failed run is tried again up to twice, CI_RETRY_DELAY seconds apart (30 by default), because
+the API can answer 503 for a moment. Only the Python 3 standard library is used. To run it on your
+machine, from the repository root:
 
-    export CONVERTAPI_TOKEN=your-staging-token CONVERTAPI_BASE_URI=https://stag-v2.convertapi.com
-    export CustomAfterMicrosoftCommonTargets="$PWD/.github/ci/staging-host.targets"
+    export CONVERTAPI_TOKEN=your-api-token
+    export CustomAfterMicrosoftCommonTargets="$PWD/.github/ci/ci-host.targets"
     dotnet build ConvertApi.sln -c Release && python3 .github/ci/check_csharp.py examples
 """
 
@@ -41,8 +42,11 @@ ATTEMPTS = 3
 RETRY_DELAY = int(os.environ.get("CI_RETRY_DELAY", "30"))
 RUN_TIMEOUT = 300  # seconds for one run of one program
 
-# StagingHost.cs prints this line before Main. A run without it did not call the staging API.
-STAGING_LINE = "[ci] ConvertApi.ApiBaseUri = "
+# CiHost.cs prints this line before Main. A run without it was built without CiHost.cs, so nothing
+# deleted its files from the server.
+CI_LINE = "[ci] ConvertApi.ApiBaseUri = "
+# ... and this one when the program exits.
+DELETED_LINE = re.compile(r"^\[ci\] Deleted (\d+) of (\d+) files from the server$", re.MULTILINE)
 
 # The examples catch ConvertApiException, print it and still exit with 0, so these lines mark a failed call.
 ERROR_LINE = re.compile(
@@ -59,6 +63,9 @@ EXPECTED_OUTPUT = {
 # Account fields that must never reach the public log. The token itself is checked by value.
 SECRET_FIELD = re.compile(r"(?i)\b(secret|api[ _-]?key)\s*[=:]")
 
+# Account details that RetrieveUserInformation prints. They are not secrets, but they stay out of the public log.
+ACCOUNT_FIELD = re.compile(r"^(FullName|Email|ConversionsTotal|ConversionsConsumed|SecondsLeft)\s*[=:]")
+
 # README.md names its input files document.docx, page.html and so on; the runs copy these samples in under those names.
 SAMPLE_FOR_EXTENSION = {
     ".docx": "test.docx",
@@ -68,7 +75,7 @@ SAMPLE_FOR_EXTENSION = {
     ".xlsx": "test.xlsx",
 }
 
-# The README blocks that run against staging: the quick start program and the blocks under the
+# The README blocks that run against the API: the quick start program and the blocks under the
 # "... in C#" task headings. Every other block is only built.
 QUICK_START_HEADING = "Quick start"
 RUN_HEADING = re.compile(r" in C#$")
@@ -115,8 +122,11 @@ def print_program_output(text, token):
     print(f"::stop-commands::{marker}")
     for line in lines:
         line = "".join(ch if ch.isprintable() or ch == "\t" else "?" for ch in line)
+        account = ACCOUNT_FIELD.match(line)
         if SECRET_FIELD.search(line):
             line = "(line hidden: it names a secret field)"
+        elif account:
+            line = f"{account.group(1)}=(hidden in this public log)"
         print("    " + (line if len(line) <= 300 else line[:300] + " ..."))
     print(f"::{marker}::")
 
@@ -136,12 +146,16 @@ def table_cell(text):
 # Running a program
 
 
-def require_staging():
-    missing = [name for name in ("CONVERTAPI_TOKEN", "CONVERTAPI_BASE_URI") if not os.environ.get(name)]
-    if missing:
-        annotate("error", f"{' and '.join(missing)} not set, so nothing can run against the staging API")
+def require_token():
+    if not os.environ.get("CONVERTAPI_TOKEN"):
+        annotate("error", "CONVERTAPI_TOKEN is not set, so nothing can run against the API")
         sys.exit(1)
     return os.environ["CONVERTAPI_TOKEN"]
+
+
+def program_output(text):
+    """The program's own output, without the lines CiHost.cs adds."""
+    return "\n".join(line for line in text.splitlines() if not line.startswith("[ci] "))
 
 
 def find_leaks(text, token):
@@ -178,11 +192,16 @@ def run_with_retries(label, command, cwd, check, token, env=None, reset=None):
             print(f"::group::{label}: passed ({seconds:.1f} s{f', attempt {attempt}' if attempt > 1 else ''})")
             print_program_output(text, token)
             print("::endgroup::")
+            # Not a failure: the API deletes what is left after 3 hours anyway.
+            deleted = DELETED_LINE.search(text)
+            if not deleted or deleted.group(1) != deleted.group(2):
+                annotate("warning", f"{label}: {deleted.group(0)[5:] if deleted else 'CiHost.cs did not report deleting its files'}",
+                         title="Files left on the server")
             return True, attempt, []
 
         print(f"{label}: FAILED on attempt {attempt} of {ATTEMPTS} ({seconds:.1f} s): {'; '.join(problems)}")
         print_program_output(text, token)
-        # A leak is in the code, not in the staging API, so another attempt would only print it again.
+        # A leak is in the code, not in the API, so another attempt would only print it again.
         if leaks or attempt == ATTEMPTS:
             break
         annotate("warning", f"{label} failed on attempt {attempt}: {'; '.join(problems)}. Trying again in {RETRY_DELAY} s.",
@@ -197,8 +216,8 @@ def common_problems(exit_code, text):
         problems.append(f"timed out after {RUN_TIMEOUT} s")
     elif exit_code != 0:
         problems.append(f"exit code {exit_code}")
-    if STAGING_LINE not in text:
-        problems.append("it did not run against the staging API: StagingHost.cs was not compiled in")
+    if CI_LINE not in text:
+        problems.append("it did not print the [ci] line: .github/ci/CiHost.cs was not compiled in")
     return problems
 
 
@@ -207,7 +226,7 @@ def common_problems(exit_code, text):
 
 
 def run_examples(args):
-    token = require_staging()
+    token = require_token()
     projects = sorted(p for p in EXAMPLES.glob("*/*.csproj") if not args.names or p.stem in args.names)
     if not projects or (args.names and len(projects) != len(set(args.names))):
         annotate("error", f"No example projects found in {EXAMPLES} for {' '.join(args.names) or 'any name'}")
@@ -243,11 +262,11 @@ def run_examples(args):
     for name, _, _, problems in failed:
         annotate("error", f"{name}: {'; '.join(problems)}", title="Example failed",
                  file=f"Examples/{name}/Program.cs")
-    print(f"\nExamples: {len(results) - len(failed)} of {len(results)} passed against the staging API.")
+    print(f"\nExamples: {len(results) - len(failed)} of {len(results)} passed against the API.")
 
     rows = [f"| {name} | {'passed' if passed else 'FAILED: ' + table_cell('; '.join(problems))} | {attempts} |"
             for name, passed, attempts, problems in results]
-    write_summary("### Examples on the staging API\n\n| Example | Result | Attempts |\n|---|---|---|\n" + "\n".join(rows) + "\n")
+    write_summary("### Examples\n\n| Example | Result | Attempts |\n|---|---|---|\n" + "\n".join(rows) + "\n")
     return 1 if failed else 0
 
 
@@ -437,7 +456,7 @@ def project_files(folder):
 
 
 def readme_run(args):
-    token = require_staging()
+    token = require_token()
     work = Path(args.work).resolve()
     if not (work / "blocks.json").exists():
         annotate("error", f"{work / 'blocks.json'} is missing: run readme-build first")
@@ -475,7 +494,7 @@ def readme_run(args):
             if saves_files:
                 if not [p for p in project_files(folder) - before if p.stat().st_size > 0]:
                     problems.append("it saved no file")
-            elif not text.replace(STAGING_LINE, "").strip():
+            elif not program_output(text).strip():
                 problems.append("it printed nothing")
             return problems
 
@@ -485,12 +504,12 @@ def readme_run(args):
 
     failed = [r for r in results if not r[1]]
     for e, _, _, problems in failed:
-        annotate("error", "; ".join(problems), title="README block failed on the staging API", file="README.md", line=e["line"])
-    print(f"\nREADME.md: {len(results) - len(failed)} of {len(results)} programs passed against the staging API.")
+        annotate("error", "; ".join(problems), title="README block failed against the API", file="README.md", line=e["line"])
+    print(f"\nREADME.md: {len(results) - len(failed)} of {len(results)} programs passed against the API.")
 
     rows = [f"| {e['line']} | {table_cell(e['heading'])} | {'passed' if passed else 'FAILED: ' + table_cell('; '.join(problems))} | {attempts} |"
             for e, passed, attempts, problems in results]
-    write_summary("### README.md programs on the staging API\n\n| Line | Section | Result | Attempts |\n|---|---|---|---|\n"
+    write_summary("### README.md programs\n\n| Line | Section | Result | Attempts |\n|---|---|---|---|\n"
                   + "\n".join(rows) + "\n")
     return 1 if failed or not results else 0
 
