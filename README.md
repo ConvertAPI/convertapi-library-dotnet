@@ -69,15 +69,15 @@ Each task links to its C# code in this README and, where there is one, to a comp
 
 | Task | Example project |
 |---|---|
-| [Convert Word (DOCX) to PDF](#convert-word-docx-to-pdf-in-c) | [ConvertWordToPdfAndPng](https://github.com/ConvertAPI/convertapi-library-dotnet/blob/main/Examples/ConvertWordToPdfAndPng/Program.cs) |
-| [Convert HTML to PDF: a file, a string or a web page](#convert-html-to-pdf-in-c) | [FromStreamToStream](https://github.com/ConvertAPI/convertapi-library-dotnet/blob/main/Examples/FromStreamToStream/Program.cs), [ConvertUrlToPdf](https://github.com/ConvertAPI/convertapi-library-dotnet/blob/main/Examples/ConvertUrlToPdf/Program.cs) |
-| [Convert Excel (XLSX) to PDF](#convert-excel-to-pdf-in-c) | |
+| [Convert Word (DOCX) to PDF](#convert-word-docx-to-pdf-in-c) | [ConvertDocxToPdf](https://github.com/ConvertAPI/convertapi-library-dotnet/blob/main/Examples/ConvertDocxToPdf/Program.cs), [ConvertWordToPdfAndPng](https://github.com/ConvertAPI/convertapi-library-dotnet/blob/main/Examples/ConvertWordToPdfAndPng/Program.cs) |
+| [Convert HTML to PDF: a file, a string or a web page](#convert-html-to-pdf-in-c) | [ConvertHtmlToPdf](https://github.com/ConvertAPI/convertapi-library-dotnet/blob/main/Examples/ConvertHtmlToPdf/Program.cs), [FromStreamToStream](https://github.com/ConvertAPI/convertapi-library-dotnet/blob/main/Examples/FromStreamToStream/Program.cs), [ConvertUrlToPdf](https://github.com/ConvertAPI/convertapi-library-dotnet/blob/main/Examples/ConvertUrlToPdf/Program.cs) |
+| [Convert Excel (XLSX) to PDF](#convert-excel-to-pdf-in-c) | [ConvertExcelToPdf](https://github.com/ConvertAPI/convertapi-library-dotnet/blob/main/Examples/ConvertExcelToPdf/Program.cs) |
 | [Convert PDF to Word (DOCX)](#convert-pdf-to-word-in-c) | [ConvertPdfToDocx](https://github.com/ConvertAPI/convertapi-library-dotnet/blob/main/Examples/ConvertPdfToDocx/Program.cs) |
 | [Convert PDF to JPG or PNG](#convert-pdf-to-jpg-or-png-in-c) | [CreatePdfThumbnail](https://github.com/ConvertAPI/convertapi-library-dotnet/blob/main/Examples/CreatePdfThumbnail/Program.cs) |
-| [Extract text from PDF](#extract-text-from-pdf-in-c) | |
-| [OCR a scanned PDF to make it searchable](#ocr-a-scanned-pdf-in-c) | |
-| [Compress PDF](#compress-pdf-in-c) | |
-| [Convert HTML to Word (DOCX)](#convert-html-to-docx-in-c) | |
+| [Extract text from PDF](#extract-text-from-pdf-in-c) | [ExtractTextFromPdf](https://github.com/ConvertAPI/convertapi-library-dotnet/blob/main/Examples/ExtractTextFromPdf/Program.cs) |
+| [OCR a scanned PDF to make it searchable](#ocr-a-scanned-pdf-in-c) | [OcrPdf](https://github.com/ConvertAPI/convertapi-library-dotnet/blob/main/Examples/OcrPdf/Program.cs) |
+| [Compress PDF](#compress-pdf-in-c) | [CompressPdf](https://github.com/ConvertAPI/convertapi-library-dotnet/blob/main/Examples/CompressPdf/Program.cs) |
+| [Convert HTML to Word (DOCX)](#convert-html-to-docx-in-c) | [ConvertHtmlToDocx](https://github.com/ConvertAPI/convertapi-library-dotnet/blob/main/Examples/ConvertHtmlToDocx/Program.cs) |
 | [Convert PowerPoint (PPTX) to PDF](#powerpoint-to-pdf) | [ConvertRemoteFile](https://github.com/ConvertAPI/convertapi-library-dotnet/blob/main/Examples/ConvertRemoteFile/Program.cs) |
 | [Convert an image to PDF](#image-to-pdf) | |
 | [Combine images into one PDF](#combine-images-into-one-pdf) | |
@@ -157,6 +157,8 @@ await result.SaveFilesAsync("output");
 
 The PDF is saved as `output/document.pdf`. For plain text or HTML, use `"txt"` or `"html"` in place of `"pdf"`.
 
+Example project: [ConvertDocxToPdf](https://github.com/ConvertAPI/convertapi-library-dotnet/blob/main/Examples/ConvertDocxToPdf/Program.cs)
+
 ### Convert HTML to PDF in C#
 
 Convert an HTML file to PDF. Only the HTML file is uploaded, so link images and stylesheets by absolute URL or put them inline.
@@ -198,6 +200,8 @@ Directory.CreateDirectory("output");
 await result.SaveFilesAsync("output");
 ```
 
+Example projects: [ConvertHtmlToPdf](https://github.com/ConvertAPI/convertapi-library-dotnet/blob/main/Examples/ConvertHtmlToPdf/Program.cs) for an HTML file and an HTML string, [ConvertUrlToPdf](https://github.com/ConvertAPI/convertapi-library-dotnet/blob/main/Examples/ConvertUrlToPdf/Program.cs) for a web page
+
 ### Convert Excel to PDF in C#
 
 Convert an Excel workbook (XLSX or XLS) to PDF:
@@ -213,6 +217,8 @@ await result.SaveFilesAsync("output");
 ```
 
 To save each worksheet as a CSV file, use `"csv"` in place of `"pdf"`.
+
+Example project: [ConvertExcelToPdf](https://github.com/ConvertAPI/convertapi-library-dotnet/blob/main/Examples/ConvertExcelToPdf/Program.cs)
 
 ### Convert PDF to Word in C#
 
@@ -260,6 +266,8 @@ var text = await reader.ReadToEndAsync();
 Console.WriteLine(text);
 ```
 
+Example project: [ExtractTextFromPdf](https://github.com/ConvertAPI/convertapi-library-dotnet/blob/main/Examples/ExtractTextFromPdf/Program.cs)
+
 ### OCR a scanned PDF in C#
 
 Make a scanned PDF searchable. OCR adds an invisible text layer, so the text can be found, selected and copied; pages that already have text are skipped. `OcrLanguage` is the language of the text, such as `de` or `es`. The [PDF OCR page](https://www.convertapi.com/pdf-to-ocr) lists all languages.
@@ -277,6 +285,8 @@ await result.SaveFilesAsync("output");
 
 The searchable PDF is saved as `output/scanned.pdf`. If text is missed, for example in tables, low-quality scans, photos or small print, add `new ConvertApiParam("OcrQuality", "enhanced")`: it is slower but reads more.
 
+Example project: [OcrPdf](https://github.com/ConvertAPI/convertapi-library-dotnet/blob/main/Examples/OcrPdf/Program.cs)
+
 ### Compress PDF in C#
 
 Make a PDF smaller. The `Preset` parameter accepts `lossless`, `text`, `archive`, `web`, `ebook` and `printer`.
@@ -292,6 +302,8 @@ Directory.CreateDirectory("output");
 await result.SaveFilesAsync("output");
 ```
 
+Example project: [CompressPdf](https://github.com/ConvertAPI/convertapi-library-dotnet/blob/main/Examples/CompressPdf/Program.cs)
+
 ### Convert HTML to DOCX in C#
 
 Convert an HTML file to an editable Word document:
@@ -305,6 +317,8 @@ var result = await convertApi.ConvertAsync("html", "docx",
 Directory.CreateDirectory("output");
 await result.SaveFilesAsync("output");
 ```
+
+Example project: [ConvertHtmlToDocx](https://github.com/ConvertAPI/convertapi-library-dotnet/blob/main/Examples/ConvertHtmlToDocx/Program.cs)
 
 ### More conversions and PDF tools
 
@@ -964,6 +978,11 @@ Console.WriteLine($"Conversions used: {user.ConversionsConsumed} of {user.Conver
 
 Each example is a complete console project in the `Examples` folder of this repository. To run one, set the `CONVERTAPI_TOKEN` environment variable and follow the steps in [Examples/README.md](https://github.com/ConvertAPI/convertapi-library-dotnet/blob/main/Examples/README.md).
 
+- [CompressPdf/Program.cs](https://github.com/ConvertAPI/convertapi-library-dotnet/blob/main/Examples/CompressPdf/Program.cs) - Compress a PDF and print its size before and after
+- [ConvertDocxToPdf/Program.cs](https://github.com/ConvertAPI/convertapi-library-dotnet/blob/main/Examples/ConvertDocxToPdf/Program.cs) - Convert a Word DOCX document to PDF
+- [ConvertExcelToPdf/Program.cs](https://github.com/ConvertAPI/convertapi-library-dotnet/blob/main/Examples/ConvertExcelToPdf/Program.cs) - Convert an Excel XLSX workbook to PDF
+- [ConvertHtmlToDocx/Program.cs](https://github.com/ConvertAPI/convertapi-library-dotnet/blob/main/Examples/ConvertHtmlToDocx/Program.cs) - Convert an HTML file to an editable Word DOCX document
+- [ConvertHtmlToPdf/Program.cs](https://github.com/ConvertAPI/convertapi-library-dotnet/blob/main/Examples/ConvertHtmlToPdf/Program.cs) - Convert an HTML file and an HTML string to PDF
 - [ConvertPdfToDocx/Program.cs](https://github.com/ConvertAPI/convertapi-library-dotnet/blob/main/Examples/ConvertPdfToDocx/Program.cs) - Convert a PDF to an editable Word DOCX document
 - [ConvertPdfToPdfA/Program.cs](https://github.com/ConvertAPI/convertapi-library-dotnet/blob/main/Examples/ConvertPdfToPdfA/Program.cs) - Convert a PDF to PDF/A with an embedded invoice XML
 - [ConvertPdfToPptx/Program.cs](https://github.com/ConvertAPI/convertapi-library-dotnet/blob/main/Examples/ConvertPdfToPptx/Program.cs) - Convert a PDF to a PowerPoint PPTX presentation
@@ -975,10 +994,12 @@ Each example is a complete console project in the `Examples` folder of this repo
 - [CreatePdfThumbnail/Program.cs](https://github.com/ConvertAPI/convertapi-library-dotnet/blob/main/Examples/CreatePdfThumbnail/Program.cs) - Turn the first page of a PDF into a JPG thumbnail
 - [DeleteFiles/Program.cs](https://github.com/ConvertAPI/convertapi-library-dotnet/blob/main/Examples/DeleteFiles/Program.cs) - Delete the uploaded and result files from the server after a conversion
 - [ExceptionHandling/Program.cs](https://github.com/ConvertAPI/convertapi-library-dotnet/blob/main/Examples/ExceptionHandling/Program.cs) - Catch a ConvertAPI exception and print its status code and response
+- [ExtractTextFromPdf/Program.cs](https://github.com/ConvertAPI/convertapi-library-dotnet/blob/main/Examples/ExtractTextFromPdf/Program.cs) - Extract the text of a PDF into a string
 - [FromStreamToStream/Program.cs](https://github.com/ConvertAPI/convertapi-library-dotnet/blob/main/Examples/FromStreamToStream/Program.cs) - Convert HTML from a string stream and get the PDF back as a stream
 - [GetConverterInfoDemo/Program.cs](https://github.com/ConvertAPI/convertapi-library-dotnet/blob/main/Examples/GetConverterInfoDemo/Program.cs) - Read a converter's accepted formats and parameters, for example to build a dynamic UI
 - [HandleRetry/Program.cs](https://github.com/ConvertAPI/convertapi-library-dotnet/blob/main/Examples/HandleRetry/Program.cs) - Retry a conversion when the service returns 503 (service unavailable)
 - [MergeWordDocsToPdf/Program.cs](https://github.com/ConvertAPI/convertapi-library-dotnet/blob/main/Examples/MergeWordDocsToPdf/Program.cs) - Convert Word and PowerPoint files to PDF and merge them into one PDF
+- [OcrPdf/Program.cs](https://github.com/ConvertAPI/convertapi-library-dotnet/blob/main/Examples/OcrPdf/Program.cs) - Make a scanned PDF searchable with OCR
 - [RetrieveUserInformation/Program.cs](https://github.com/ConvertAPI/convertapi-library-dotnet/blob/main/Examples/RetrieveUserInformation/Program.cs) - Retrieve your ConvertAPI account information
 - [SplitAndMergePdf/Program.cs](https://github.com/ConvertAPI/convertapi-library-dotnet/blob/main/Examples/SplitAndMergePdf/Program.cs) - Split a PDF and merge its first and last pages into a new PDF
 - [SplitPDF/Program.cs](https://github.com/ConvertAPI/convertapi-library-dotnet/blob/main/Examples/SplitPDF/Program.cs) - Split a PDF by bookmarks, page patterns, text and page ranges
