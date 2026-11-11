@@ -176,6 +176,7 @@ namespace ConvertApiDotNet
 
         private static async Task<ConvertApiFile> Upload(Stream fileStream, string fileName)
         {
+            var token = ConvertApi.ResolveToken();
             HttpResponseMessage responseMessage;
             using (var content = new StreamContent(fileStream))
             {
@@ -190,7 +191,7 @@ namespace ConvertApiDotNet
                     Path = "/upload",
                 };
 
-                responseMessage = await ConvertApi.GetClient().PostAsync(url.Uri, ConvertApiConstants.UploadTimeout, content, ConvertApi.ApiToken);
+                responseMessage = await ConvertApi.GetClient().PostAsync(url.Uri, ConvertApiConstants.UploadTimeout, content, token);
             }
 
             var result = await responseMessage.Content.ReadAsStringAsync();
@@ -204,13 +205,14 @@ namespace ConvertApiDotNet
 
         private static async Task<ConvertApiFile> Upload(Uri remoteFileUrl)
         {
+            var token = ConvertApi.ResolveToken();
             var url = new UriBuilder(ConvertApi.ApiBaseUri)
             {
                 Path = "/upload",
                 Query = $"url={WebUtility.UrlEncode(remoteFileUrl.ToString())}"
             };
 
-            var responseMessage = await ConvertApi.GetClient().PostAsync(url.Uri, ConvertApiConstants.UploadTimeout, null, ConvertApi.ApiToken);
+            var responseMessage = await ConvertApi.GetClient().PostAsync(url.Uri, ConvertApiConstants.UploadTimeout, null, token);
             var result = await responseMessage.Content.ReadAsStringAsync();
             if (responseMessage.StatusCode != HttpStatusCode.OK)
             {
