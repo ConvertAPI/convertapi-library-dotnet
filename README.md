@@ -26,21 +26,40 @@ export CONVERTAPI_TOKEN=your-api-token      # macOS and Linux
 $env:CONVERTAPI_TOKEN = "your-api-token"    # Windows PowerShell
 ```
 
-Replace `Program.cs` with this program. It converts a sample Word document to PDF:
+Put a Word file named `document.docx` in the `ConvertDemo` folder. No file at hand? Download our sample:
+
+```bash
+# macOS and Linux
+curl -o document.docx https://cdn.convertapi.com/cara/testfiles/document.docx
+```
+
+```powershell
+# Windows PowerShell
+Invoke-WebRequest https://cdn.convertapi.com/cara/testfiles/document.docx -OutFile document.docx
+```
+
+Replace `Program.cs` with this program. It uploads `document.docx`, converts it to PDF and saves the PDF in the current folder:
 
 ```csharp
 using ConvertApiDotNet;
 
 var convertApi = new ConvertApi(Environment.GetEnvironmentVariable("CONVERTAPI_TOKEN"));
 var result = await convertApi.ConvertAsync("docx", "pdf",
-    new ConvertApiFileParam(new Uri("https://cdn.convertapi.com/cara/testfiles/document.docx")));
+    new ConvertApiFileParam("document.docx"));
 var files = await result.SaveFilesAsync(".");
 Console.WriteLine($"Saved {files[0].FullName}");
 ```
 
-Run `dotnet run`, and `document.pdf` appears in the current folder.
+Run `dotnet run`, and `document.pdf` appears next to `document.docx`. If you run it from Visual Studio, see [Usage](#usage) for where to put the file.
 
-- **.NET 10 without a project:** save the program as `convert.cs`, add `#:package ConvertApi@*` as its first line, and run `dotnet run convert.cs`.
+To convert a file that is already online, pass its URL as a `Uri` instead of a file name. ConvertAPI fetches the file itself, so nothing is uploaded from your computer:
+
+```csharp
+var result = await convertApi.ConvertAsync("docx", "pdf",
+    new ConvertApiFileParam(new Uri("https://cdn.convertapi.com/cara/testfiles/document.docx")));
+```
+
+- **.NET 10 without a project:** save the program as `convert.cs` in the folder that holds `document.docx`, add `#:package ConvertApi@*` as its first line, and run `dotnet run convert.cs`.
 - **.NET Framework 4.6.2 or later:** install with `Install-Package ConvertApi`, add `using System;` and `using System.Threading.Tasks;`, and put the other lines inside `static async Task Main()`, because C# 7.3 has no top-level statements.
 - **ASP.NET Core:** keep the token in user secrets with `dotnet user-secrets init` and `dotnet user-secrets set ConvertApi:Token your-api-token`, then create the client with `new ConvertApi(builder.Configuration["ConvertApi:Token"])`.
 
