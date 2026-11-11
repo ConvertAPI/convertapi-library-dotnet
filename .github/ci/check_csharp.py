@@ -25,6 +25,7 @@ import os
 import re
 import secrets
 import shutil
+import signal
 import subprocess
 import sys
 import tempfile
@@ -169,6 +170,27 @@ def find_leaks(text, token):
     return leaks
 
 
+def run_once(command, cwd, env):
+    """Runs a program with stdin closed. Returns (exit code, or None after a timeout; stdout and stderr)."""
+    process = subprocess.Popen(command, cwd=cwd, env=env, stdin=subprocess.DEVNULL, stdout=subprocess.PIPE,
+                               stderr=subprocess.STDOUT, start_new_session=True)
+    try:
+        output, _ = process.communicate(timeout=RUN_TIMEOUT)
+        return process.returncode, output
+    except subprocess.TimeoutExpired:
+        # `dotnet run` starts the program as its own child, so stop the whole process group: a program
+        # that timed out must not go on calling the API while the next attempt runs.
+        try:
+            os.killpg(process.pid, signal.SIGKILL)
+        except (AttributeError, ProcessLookupError):  # no process groups on Windows
+            process.kill()
+        try:
+            output, _ = process.communicate(timeout=30)
+        except subprocess.TimeoutExpired:
+            output = b""
+        return None, output
+
+
 def run_with_retries(label, command, cwd, check, token, env=None, reset=None):
     """Runs a program until check() finds no problem, at most ATTEMPTS times. Returns (passed, attempts, problems)."""
     problems = []
@@ -176,14 +198,7 @@ def run_with_retries(label, command, cwd, check, token, env=None, reset=None):
         if reset:
             reset()
         started = time.monotonic()
-        try:
-            completed = subprocess.run(
-                command, cwd=cwd, env=env, stdin=subprocess.DEVNULL,
-                stdout=subprocess.PIPE, stderr=subprocess.STDOUT, timeout=RUN_TIMEOUT,
-            )
-            exit_code, raw = completed.returncode, completed.stdout
-        except subprocess.TimeoutExpired as e:
-            exit_code, raw = None, e.stdout or b""
+        exit_code, raw = run_once(command, cwd, env)
         seconds = time.monotonic() - started
         text = raw.decode("utf-8", "replace")
 
@@ -201,9 +216,13 @@ def run_with_retries(label, command, cwd, check, token, env=None, reset=None):
             return True, attempt, []
 
         print(f"{label}: FAILED on attempt {attempt} of {ATTEMPTS} ({seconds:.1f} s): {'; '.join(problems)}")
+        if leaks:
+            # None of the output is printed: a secret's value can sit on a line of its own. A leak is in the
+            # code, not in the API, so another attempt would not help either.
+            print("    (output not printed because it contains a secret; run the program locally to see it)")
+            break
         print_program_output(text, token)
-        # A leak is in the code, not in the API, so another attempt would only print it again.
-        if leaks or attempt == ATTEMPTS:
+        if attempt == ATTEMPTS:
             break
         annotate("warning", f"{label} failed on attempt {attempt}: {'; '.join(problems)}. Trying again in {RETRY_DELAY} s.",
                  title="Retrying a failed run")
