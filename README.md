@@ -75,10 +75,16 @@ Each task links to its C# code in this README and, where there is one, to a comp
 | [Convert PDF to Word (DOCX)](#convert-pdf-to-word-in-c) | [ConvertPdfToDocx](https://github.com/ConvertAPI/convertapi-library-dotnet/blob/main/Examples/ConvertPdfToDocx/Program.cs) |
 | [Convert PDF to JPG or PNG](#convert-pdf-to-jpg-or-png-in-c) | [CreatePdfThumbnail](https://github.com/ConvertAPI/convertapi-library-dotnet/blob/main/Examples/CreatePdfThumbnail/Program.cs) |
 | [Extract text from PDF](#extract-text-from-pdf-in-c) | |
+| [OCR a scanned PDF to make it searchable](#ocr-a-scanned-pdf-in-c) | |
 | [Compress PDF](#compress-pdf-in-c) | |
 | [Convert HTML to Word (DOCX)](#convert-html-to-docx-in-c) | |
 | [Convert PowerPoint (PPTX) to PDF](#powerpoint-to-pdf) | [ConvertRemoteFile](https://github.com/ConvertAPI/convertapi-library-dotnet/blob/main/Examples/ConvertRemoteFile/Program.cs) |
 | [Convert an image to PDF](#image-to-pdf) | |
+| [Combine images into one PDF](#combine-images-into-one-pdf) | |
+| [Convert a text file (TXT) to PDF](#text-to-pdf) | |
+| [Convert HEIC photos to JPG](#heic-to-jpg) | |
+| [Take a screenshot of a web page](#web-page-screenshot) | |
+| [Convert PDF, Word, PowerPoint, Excel or HTML to Markdown, and Markdown to PDF](#markdown-conversion) | |
 | [Convert PDF to PowerPoint (PPTX)](#pdf-to-powerpoint) | [ConvertPdfToPptx](https://github.com/ConvertAPI/convertapi-library-dotnet/blob/main/Examples/ConvertPdfToPptx/Program.cs) |
 | [Convert an eBook (EPUB) to PDF](#ebook-conversion) | |
 | [Convert an email (EML, MSG) to PDF](#email-conversion) | |
@@ -94,12 +100,17 @@ Each task links to its C# code in this README and, where there is one, to a comp
 | [Remove a PDF password](#remove-pdf-password) | |
 | [Redact a PDF](#redact-pdf) | |
 | [Convert PDF to PDF/A](#convert-to-pdfa) | [ConvertPdfToPdfA](https://github.com/ConvertAPI/convertapi-library-dotnet/blob/main/Examples/ConvertPdfToPdfA/Program.cs) |
+| [Make a PDF accessible (PDF/UA)](#make-a-pdf-accessible-pdfua) | |
+| [Read PDF metadata](#read-pdf-metadata) | |
 | [Remove PDF metadata](#remove-metadata) | |
 | [Extract tables from PDF to Excel](#extract-tables-from-pdf) | [ConvertPdfToXlsx](https://github.com/ConvertAPI/convertapi-library-dotnet/blob/main/Examples/ConvertPdfToXlsx/Program.cs) |
+| [Extract data from invoices and other documents with AI](#extract-data-with-ai) | |
 | [Extract images from PDF](#extract-images-from-pdf) | |
 | [Extract PDF form data](#extract-form-data) | |
+| [Read email metadata: sender, recipients, subject and attachments](#read-email-metadata) | |
 | [Extract email attachments](#extract-email-attachments) | |
 | [Generate a document from a template](#generate-document-from-template) | |
+| [Update a Word table of contents](#update-a-word-table-of-contents) | |
 | [Compare Word documents](#compare-documents) | |
 | [Create a ZIP archive](#create-zip-archive) | [Workflow](https://github.com/ConvertAPI/convertapi-library-dotnet/blob/main/Examples/Workflow/Program.cs) |
 | [Save, stream and delete result files](#work-with-the-result) | [DeleteFiles](https://github.com/ConvertAPI/convertapi-library-dotnet/blob/main/Examples/DeleteFiles/Program.cs) |
@@ -144,7 +155,7 @@ Directory.CreateDirectory("output");
 await result.SaveFilesAsync("output");
 ```
 
-The PDF is saved as `output/document.pdf`.
+The PDF is saved as `output/document.pdf`. For plain text or HTML, use `"txt"` or `"html"` in place of `"pdf"`.
 
 ### Convert HTML to PDF in C#
 
@@ -201,6 +212,8 @@ Directory.CreateDirectory("output");
 await result.SaveFilesAsync("output");
 ```
 
+To save each worksheet as a CSV file, use `"csv"` in place of `"pdf"`.
+
 ### Convert PDF to Word in C#
 
 Convert a PDF to an editable Word document (DOCX):
@@ -247,6 +260,23 @@ var text = await reader.ReadToEndAsync();
 Console.WriteLine(text);
 ```
 
+### OCR a scanned PDF in C#
+
+Make a scanned PDF searchable. OCR adds an invisible text layer, so the text can be found, selected and copied; pages that already have text are skipped. `OcrLanguage` is the language of the text, such as `de` or `es`. The [PDF OCR page](https://www.convertapi.com/pdf-to-ocr) lists all languages.
+
+```csharp
+using ConvertApiDotNet;
+
+var convertApi = new ConvertApi(Environment.GetEnvironmentVariable("CONVERTAPI_TOKEN"));
+var result = await convertApi.ConvertAsync("pdf", "ocr",
+    new ConvertApiFileParam("scanned.pdf"),
+    new ConvertApiParam("OcrLanguage", "en"));
+Directory.CreateDirectory("output");
+await result.SaveFilesAsync("output");
+```
+
+The searchable PDF is saved as `output/scanned.pdf`. If text is missed, for example in tables, low-quality scans, photos or small print, add `new ConvertApiParam("OcrQuality", "enhanced")`: it is slower but reads more.
+
 ### Compress PDF in C#
 
 Make a PDF smaller. The `Preset` parameter accepts `lossless`, `text`, `archive`, `web`, `ebook` and `printer`.
@@ -278,6 +308,8 @@ await result.SaveFilesAsync("output");
 
 ### More conversions and PDF tools
 
+Every other format pair works the same way: pass its source and target format to `ConvertAsync`. All formats and conversions are listed in the [API reference](https://www.convertapi.com/api).
+
 #### PowerPoint to PDF
 
 Convert a PowerPoint presentation (PPTX or PPT) to PDF:
@@ -302,6 +334,99 @@ using ConvertApiDotNet;
 var convertApi = new ConvertApi(Environment.GetEnvironmentVariable("CONVERTAPI_TOKEN"));
 var result = await convertApi.ConvertAsync("jpg", "pdf",
     new ConvertApiFileParam("image.jpg"));
+Directory.CreateDirectory("output");
+await result.SaveFilesAsync("output");
+```
+
+PNG, TIFF, GIF, HEIC and WEBP images work the same way with `"png"`, `"tiff"`, `"gif"`, `"heic"` or `"webp"` in place of `"jpg"`; `"tiff"` also takes TIF files.
+
+#### Combine images into one PDF
+
+Combine several images, such as scanned pages or photos, into one PDF with one page per image, in the order you pass them. Here every page is A4:
+
+```csharp
+using ConvertApiDotNet;
+
+var convertApi = new ConvertApi(Environment.GetEnvironmentVariable("CONVERTAPI_TOKEN"));
+var result = await convertApi.ConvertAsync("images", "pdf",
+    new ConvertApiFileParam("Files", "page1.jpg"),
+    new ConvertApiFileParam("Files", "page2.jpg"),
+    new ConvertApiParam("PageSize", "a4"));
+Directory.CreateDirectory("output");
+await result.SaveFilesAsync("output");
+```
+
+The PDF takes the name of the first image: `output/page1.pdf`. All pages get the same size and orientation; `PageOrientation` sets `portrait` or `landscape`.
+
+#### Text to PDF
+
+Convert a plain text file to PDF. `FontName`, `FontSize` and `PageSize` change the layout.
+
+```csharp
+using ConvertApiDotNet;
+
+var convertApi = new ConvertApi(Environment.GetEnvironmentVariable("CONVERTAPI_TOKEN"));
+var result = await convertApi.ConvertAsync("txt", "pdf",
+    new ConvertApiFileParam("notes.txt"));
+Directory.CreateDirectory("output");
+await result.SaveFilesAsync("output");
+```
+
+#### HEIC to JPG
+
+Convert a HEIC photo, the format iPhones save, to JPG. For PNG, use `"png"` in place of `"jpg"`.
+
+```csharp
+using ConvertApiDotNet;
+
+var convertApi = new ConvertApi(Environment.GetEnvironmentVariable("CONVERTAPI_TOKEN"));
+var result = await convertApi.ConvertAsync("heic", "jpg",
+    new ConvertApiFileParam("photo.heic"));
+Directory.CreateDirectory("output");
+await result.SaveFilesAsync("output");
+```
+
+#### Web page screenshot
+
+Take a screenshot of a whole web page as a PNG image. For JPG, use `"jpg"` in place of `"png"`.
+
+```csharp
+using ConvertApiDotNet;
+
+var convertApi = new ConvertApi(Environment.GetEnvironmentVariable("CONVERTAPI_TOKEN"));
+var result = await convertApi.ConvertAsync("html", "png",
+    new ConvertApiParam("Url", "https://cdn.convertapi.com/public/files/demo"));
+Directory.CreateDirectory("output");
+await result.SaveFilesAsync("output");
+```
+
+The image is named after the site: `output/cdn_convertapi_com.png`.
+
+#### Markdown conversion
+
+Convert a PDF to Markdown, for example to feed it to an LLM or a search index. Word, PowerPoint, Excel and HTML files work the same way with `"docx"`, `"pptx"`, `"xlsx"` or `"html"` in place of `"pdf"`.
+
+```csharp
+using ConvertApiDotNet;
+
+var convertApi = new ConvertApi(Environment.GetEnvironmentVariable("CONVERTAPI_TOKEN"));
+var result = await convertApi.ConvertAsync("pdf", "md",
+    new ConvertApiFileParam("document.pdf"),
+    new ConvertApiParam("Images", "remove"));
+Directory.CreateDirectory("output");
+await result.SaveFilesAsync("output");
+```
+
+`Images` set to `remove` keeps the Markdown compact by replacing images with their alt text. Without it, images are embedded as base64 data; `describe` replaces each image with a description written by AI.
+
+Convert a Markdown file to PDF:
+
+```csharp
+using ConvertApiDotNet;
+
+var convertApi = new ConvertApi(Environment.GetEnvironmentVariable("CONVERTAPI_TOKEN"));
+var result = await convertApi.ConvertAsync("md", "pdf",
+    new ConvertApiFileParam("document.md"));
 Directory.CreateDirectory("output");
 await result.SaveFilesAsync("output");
 ```
@@ -524,6 +649,36 @@ Directory.CreateDirectory("output");
 await result.SaveFilesAsync("output");
 ```
 
+#### Make a PDF accessible (PDF/UA)
+
+Convert a PDF to PDF/UA, the standard for accessible PDF files that screen readers can navigate. The result is a tagged PDF marked as PDF/UA:
+
+```csharp
+using ConvertApiDotNet;
+
+var convertApi = new ConvertApi(Environment.GetEnvironmentVariable("CONVERTAPI_TOKEN"));
+var result = await convertApi.ConvertAsync("pdf", "pdfua",
+    new ConvertApiFileParam("document.pdf"));
+Directory.CreateDirectory("output");
+await result.SaveFilesAsync("output");
+```
+
+#### Read PDF metadata
+
+Read the title, subject, author, keywords, producer, creation and modification dates and page count of a PDF as JSON:
+
+```csharp
+using ConvertApiDotNet;
+
+var convertApi = new ConvertApi(Environment.GetEnvironmentVariable("CONVERTAPI_TOKEN"));
+var result = await convertApi.ConvertAsync("pdf", "meta",
+    new ConvertApiFileParam("document.pdf"));
+Directory.CreateDirectory("output");
+await result.SaveFilesAsync("output");
+```
+
+The JSON is saved as `output/document.json`.
+
 #### Remove metadata
 
 Remove the title, subject, author, creator and keywords from a PDF. A space in single quotes clears a field.
@@ -557,6 +712,23 @@ Directory.CreateDirectory("output");
 await result.SaveFilesAsync("output");
 ```
 
+#### Extract data with AI
+
+Extract structured data from a PDF with AI, such as the number, dates, totals and line items of an invoice. Besides `invoice`, `DocumentType` takes `receipt`, `contract`, `identification`, `financial`, `form` and `manual`, or `auto` to let the AI decide.
+
+```csharp
+using ConvertApiDotNet;
+
+var convertApi = new ConvertApi(Environment.GetEnvironmentVariable("CONVERTAPI_TOKEN"));
+var result = await convertApi.ConvertAsync("pdf", "extract",
+    new ConvertApiFileParam("invoice.pdf"),
+    new ConvertApiParam("DocumentType", "invoice"));
+Directory.CreateDirectory("output");
+await result.SaveFilesAsync("output");
+```
+
+The result, `output/invoice.json`, lists each field with its name, value and a confidence score. To choose the fields yourself, see `CustomExtractionData` on the [AI data extraction page](https://www.convertapi.com/pdf-to-extract).
+
 #### Extract images from PDF
 
 Save the images inside a PDF as PNG files:
@@ -586,6 +758,22 @@ Directory.CreateDirectory("output");
 await result.SaveFilesAsync("output");
 ```
 
+#### Read email metadata
+
+Read the sender, recipients, subject, sent time, text and HTML body, and attachment list of an EML or MSG email as JSON:
+
+```csharp
+using ConvertApiDotNet;
+
+var convertApi = new ConvertApi(Environment.GetEnvironmentVariable("CONVERTAPI_TOKEN"));
+var result = await convertApi.ConvertAsync("email", "metadata",
+    new ConvertApiFileParam("email.eml"));
+Directory.CreateDirectory("output");
+await result.SaveFilesAsync("output");
+```
+
+The JSON is saved as `output/email.json`. To leave inline images, such as a logo in the signature, out of the attachment list, add `new ConvertApiParam("IgnoreInlineAttachments", "true")`.
+
 #### Extract email attachments
 
 Save the attachments of an EML or MSG email:
@@ -612,6 +800,22 @@ var result = await convertApi.ConvertAsync("template", "pdf",
     new ConvertApiFileParam("template.docx"),
     new ConvertApiParam("BindingMethod", "placeholders"),
     new ConvertApiParam("JsonPayload", "[{\"Name\": \"name\", \"Value\": \"John\", \"Type\": \"string\"}]"));
+Directory.CreateDirectory("output");
+await result.SaveFilesAsync("output");
+```
+
+#### Update a Word table of contents
+
+Update the table of contents, its page numbers and the cross-references of a Word document, for example after your code has filled in a template:
+
+```csharp
+using ConvertApiDotNet;
+
+var convertApi = new ConvertApi(Environment.GetEnvironmentVariable("CONVERTAPI_TOKEN"));
+var result = await convertApi.ConvertAsync("docx", "docx",
+    new ConvertApiFileParam("report.docx"),
+    new ConvertApiParam("UpdateTableOfContents", "true"),
+    new ConvertApiParam("UpdateReferences", "true"));
 Directory.CreateDirectory("output");
 await result.SaveFilesAsync("output");
 ```
@@ -645,6 +849,15 @@ var result = await convertApi.ConvertAsync("file", "zip",
 Directory.CreateDirectory("output");
 await result.SaveFilesAsync("output");
 ```
+
+#### Also available
+
+These converters are documented, with their parameters, on their own pages:
+
+- E-invoices: [PDF to ZUGFeRD](https://www.convertapi.com/pdf-to-zugferd), [PDF to Factur-X](https://www.convertapi.com/pdf-to-facturx), [ZUGFeRD to Peppol](https://www.convertapi.com/zugferd-to-peppol) and [Factur-X to Peppol](https://www.convertapi.com/facturx-to-peppol)
+- QR codes and barcodes: [create a QR code](https://www.convertapi.com/data-to-qrcode), [create a barcode](https://www.convertapi.com/data-to-barcode), [read QR codes](https://www.convertapi.com/qrcode-to-data) and [read barcodes](https://www.convertapi.com/barcode-to-data)
+- [Crop PDF](https://www.convertapi.com/pdf-to-crop)
+- [Validate PDF/A](https://www.convertapi.com/pdfa-to-validate)
 
 ### Work with the result
 
