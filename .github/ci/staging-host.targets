@@ -1,0 +1,13 @@
+<Project>
+  <!--
+    CI only. The Examples workflow sets the environment variable CustomAfterMicrosoftCommonTargets to this
+    file's path, and MSBuild then imports it into every project that job builds. Nothing in the repository
+    imports it, so a normal build, and every folder people copy, is unchanged.
+
+    It compiles StagingHost.cs into the programs (the examples and the projects made from README.md), never
+    into the library or the unit tests, so those programs call the API at CONVERTAPI_BASE_URI.
+  -->
+  <ItemGroup Condition="'$(OutputType)' == 'Exe' and '$(IsTestProject)' != 'true' and '$(TargetFrameworkIdentifier)' == '.NETCoreApp'">
+    <Compile Include="$(MSBuildThisFileDirectory)StagingHost.cs" Link="ci/StagingHost.cs" Visible="false" />
+  </ItemGroup>
+</Project>

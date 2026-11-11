@@ -1,0 +1,124 @@
+name: Examples
+run-name: >-
+  ${{ github.event_name == 'pull_request' && format('Running the examples and README code of #{0} on staging', github.event.pull_request.number)
+   || format('Running the examples and README code of {0} on staging', github.ref_name) }}
+
+# The examples in Examples/ and the C# code in README.md are what people copy, so this workflow runs them
+# against the staging API: a broken example or README snippet fails here instead of for a user.
+# build.yml only compiles the examples and never builds the README code.
+#
+# The programs run exactly as people copy them. Every project this job builds imports
+# .github/ci/staging-host.targets (through the CustomAfterMicrosoftCommonTargets variable below), which
+# compiles .github/ci/StagingHost.cs into the programs: a module initializer that points
+# ConvertApi.ApiBaseUri at CONVERTAPI_BASE_URI before Main runs. .github/ci/check_csharp.py then runs
+# them, and the job fails when
+#   - an example exits with an error or prints an API error it caught (ExceptionHandling must print its 400);
+#   - a C# block in README.md does not build as its own console project against the library source;
+#   - the quick start or a "... in C#" task block in README.md fails on staging or saves no file;
+#   - any output contains the API token or a Secret or ApiKey field, because these logs are public;
+#   - a program did not print StagingHost's line, so it may have called the production API.
+# A run that fails is tried again up to twice, 30 s apart, because the staging API answers 503 in bursts.
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+  # The API can change without a commit here (a converter parameter goes away, a site starts blocking
+  # the renderer), so the examples also run every Monday.
+  schedule:
+    - cron: '17 5 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+# A newer push to the same pull request cancels the older run; other runs never cancel each other.
+concurrency:
+  group: examples-${{ github.event_name == 'pull_request' && format('pr-{0}', github.event.pull_request.number) || github.run_id }}
+  cancel-in-progress: true
+
+env:
+  CONVERTAPI_BASE_URI: https://stag-v2.convertapi.com
+  DOTNET_CLI_TELEMETRY_OPTOUT: 1
+  DOTNET_NOLOGO: 1
+
+jobs:
+  examples:
+    name: examples (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+    env:
+      # MSBuild reads environment variables as properties, so every project built in this job imports the
+      # staging switch. Nothing in the repository imports it.
+      CustomAfterMicrosoftCommonTargets: ${{ github.workspace }}/.github/ci/staging-host.targets
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68 # v6.0.0
+        with:
+          global-json-file: global.json
+
+      - name: Build the examples
+        id: build-examples
+        run: dotnet build ConvertApi.sln -c Release
+
+      # Each C# block becomes Program.cs of a `dotnet new console` project that references the library
+      # source, so README.md is checked against what the next release ships. A fragment is spliced into the
+      # quick start program; one that does not fit is listed as skipped. Needs no token, so it also runs
+      # for pull requests from forks.
+      - name: Build the C# code in README.md
+        id: build-readme
+        if: ${{ !cancelled() }}
+        run: python3 .github/ci/check_csharp.py readme-build --work "$RUNNER_TEMP/readme"
+
+      - name: Check the staging token
+        id: token
+        if: ${{ !cancelled() }}
+        env:
+          CONVERTAPI_TOKEN: ${{ secrets.CONVERTAPI_STAGING_TOKEN }}
+          FROM_FORK: ${{ github.event.pull_request.head.repo.fork }}
+        run: |
+          set -euo pipefail
+          if [ -z "$CONVERTAPI_TOKEN" ]; then
+            if [ "$FROM_FORK" = true ]; then
+              echo "::error::A pull request from a fork gets no secrets, so its examples cannot run on staging. They run on main after the merge."
+            elif [ "$GITHUB_ACTOR" = "dependabot[bot]" ]; then
+              echo "::error::Dependabot runs get only Dependabot secrets, so CONVERTAPI_STAGING_TOKEN must also be a Dependabot secret."
+            else
+              echo "::error::The repository has no CONVERTAPI_STAGING_TOKEN secret, so the examples cannot run on staging."
+            fi
+            exit 1
+          fi
+          status=$(curl -sS --retry 5 --retry-delay 10 -o "$RUNNER_TEMP/user.json" -w '%{http_code}' \
+            -H "Authorization: Bearer $CONVERTAPI_TOKEN" "$CONVERTAPI_BASE_URI/user")
+          if [ "$status" != 200 ]; then
+            echo "::error::The staging API answered $status to CONVERTAPI_STAGING_TOKEN (GET /user)."
+            exit 1
+          fi
+          # RetrieveUserInformation prints the account's name and email. This log is public, so mask both.
+          for field in FullName Email; do
+            value=$(jq -r --arg field "$field" '.[$field] // empty' "$RUNNER_TEMP/user.json")
+            if [ -n "$value" ]; then echo "::add-mask::$value"; fi
+          done
+          jq -r '"Staging account: \(.ConversionsConsumed) of \(.ConversionsTotal) conversions used"' "$RUNNER_TEMP/user.json"
+          rm "$RUNNER_TEMP/user.json"
+
+      - name: Run the examples on staging
+        if: ${{ !cancelled() && steps.token.outcome == 'success' && steps.build-examples.outcome == 'success' }}
+        env:
+          CONVERTAPI_TOKEN: ${{ secrets.CONVERTAPI_STAGING_TOKEN }}
+        run: python3 .github/ci/check_csharp.py examples
+
+      # The quick start and the blocks under the "... in C#" task headings, with the sample files from
+      # Examples/TestFiles copied in under the names they use. The other blocks are only built.
+      - name: Run the README quick start and task code on staging
+        if: ${{ !cancelled() && steps.token.outcome == 'success' }}
+        env:
+          CONVERTAPI_TOKEN: ${{ secrets.CONVERTAPI_STAGING_TOKEN }}
+        run: python3 .github/ci/check_csharp.py readme-run --work "$RUNNER_TEMP/readme"
