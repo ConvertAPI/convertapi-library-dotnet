@@ -133,6 +133,8 @@ Keep the token out of your source code. The snippets read it from the `CONVERTAP
 var convertApi = new ConvertApi(Environment.GetEnvironmentVariable("CONVERTAPI_TOKEN"));
 ```
 
+From version 3.3.0, `new ConvertApi()` reads `CONVERTAPI_TOKEN` by itself. A token you pass in code always comes first. If neither is set, the first request throws a `ConvertApiException` with status 401 before anything is uploaded.
+
 ### Set the conversion location (optional)
 
 By default, each request goes to the nearest ConvertAPI server. To keep files in one region, for example in the EU, set the API address once, before the first conversion. All addresses are listed in [server locations](https://www.convertapi.com/docs/servers-location).
@@ -942,7 +944,7 @@ When the API returns an error, the SDK throws a `ConvertApiException`. Its `Stat
 - **403 Forbidden:** the account has no conversions left, or it is suspended.
 - **503 Service Unavailable:** the service is temporarily unavailable. Wait a few seconds and retry, as the [HandleRetry](https://github.com/ConvertAPI/convertapi-library-dotnet/blob/main/Examples/HandleRetry/Program.cs) example does.
 
-For other codes, `Response` holds the error message from the API. If `CONVERTAPI_TOKEN` is not set, the `ConvertApi` constructor throws an `ArgumentNullException` before any request is sent.
+For other codes, `Response` holds the error message from the API. If `CONVERTAPI_TOKEN` is not set, `new ConvertApi(Environment.GetEnvironmentVariable("CONVERTAPI_TOKEN"))` throws an `ArgumentNullException` before any request is sent.
 
 ```csharp
 using ConvertApiDotNet;
