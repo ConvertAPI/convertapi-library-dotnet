@@ -33,10 +33,16 @@ namespace ConvertApiDotNet
             var fileInfo = new FileInfo(fileName);
             using (var readFile = await AsStreamAsync(url))
             {
-                // FileMode.Create truncates an existing file. FileInfo.OpenWrite (FileMode.OpenOrCreate) did not,
-                // so a result saved over a longer file kept that file's trailing bytes and came out corrupt.
-                using (var fileStream = new FileStream(fileInfo.FullName, FileMode.Create, FileAccess.Write, FileShare.None))
+                // OpenWrite (FileMode.OpenOrCreate) does not truncate, so after the copy the file is cut to what was
+                // written: otherwise a result saved over a longer file keeps that file's trailing bytes. FileMode.Create
+                // would truncate, but on Windows it fails on an existing hidden or system file, which OpenWrite writes.
+                // A stream that cannot seek (a device such as /dev/null) has no length to set.
+                using (var fileStream = fileInfo.OpenWrite())
+                {
                     await readFile.CopyToAsync(fileStream);
+                    if (fileStream.CanSeek && fileStream.Length > fileStream.Position)
+                        fileStream.SetLength(fileStream.Position);
+                }
             }
 
             return fileInfo;
@@ -75,21 +81,53 @@ namespace ConvertApiDotNet
 
         /// <summary>
         /// Save the files into <paramref name="outputDirectory"/>, each under its own name, replacing files that
-        /// exist. The folder is created if it does not exist.
+        /// exist. The folder is created if it does not exist. An empty string means the current folder.
         /// </summary>
+        /// <exception cref="ArgumentException"><paramref name="outputDirectory"/> is blank, is an existing file, or
+        /// looks like a result file name (for example "result.pdf" for PDF results). To save one result as a file,
+        /// call <c>SaveFileAsync</c>. To use a new folder whose name has an extension, end the path with a slash.</exception>
         public static async Task<List<FileInfo>> SaveFilesAsync(this IEnumerable<ConvertApiFile> processedFile, string outputDirectory)
         {
+            var files = processedFile.ToList();
+            var list = new List<FileInfo>();
+            // Nothing to save: no folder is created, as in versions before the folder was created.
+            if (files.Count == 0)
+                return list;
+
             // An empty path still means the current directory, as Path.Combine("", name) below always did.
             if (!string.IsNullOrEmpty(outputDirectory))
+            {
+                CheckIsAFolder(outputDirectory, files);
                 Directory.CreateDirectory(outputDirectory);
+            }
 
-            var list = new List<FileInfo>();
-            foreach (var file in processedFile)
+            foreach (var file in files)
             {
                 list.Add(await file.SaveFileAsync(Path.Combine(outputDirectory, file.FileName)));
             }
 
             return list;
+        }
+
+        // SaveFilesAsync("result.pdf") would otherwise create a folder named result.pdf, which then blocks
+        // SaveFileAsync("result.pdf"). Checked before anything is downloaded.
+        private static void CheckIsAFolder(string outputDirectory, List<ConvertApiFile> files)
+        {
+            if (string.IsNullOrWhiteSpace(outputDirectory))
+                throw new ArgumentException("The output folder is blank. Pass \"\" or \".\" for the current folder.", nameof(outputDirectory));
+
+            var endsInSeparator = outputDirectory.EndsWith(Path.DirectorySeparatorChar.ToString())
+                                  || outputDirectory.EndsWith(Path.AltDirectorySeparatorChar.ToString());
+            var extension = Path.GetExtension(outputDirectory);
+            var looksLikeAResultFile = !endsInSeparator
+                                       && extension.Length > 1
+                                       && !Directory.Exists(outputDirectory)
+                                       && files.Any(f => string.Equals(Path.GetExtension(f.FileName ?? ""), extension, StringComparison.OrdinalIgnoreCase));
+
+            if (File.Exists(outputDirectory) || looksLikeAResultFile)
+                throw new ArgumentException(
+                    $"SaveFilesAsync saves into a folder, and '{outputDirectory}' is a file name. To save the result as '{outputDirectory}', " +
+                    "call SaveFileAsync. To use a new folder with this name, end the path with a slash.", nameof(outputDirectory));
         }
         
         /// <summary>

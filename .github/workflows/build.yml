@@ -46,8 +46,9 @@ jobs:
         run: dotnet build ConvertApi.sln -c Release --no-restore -p:ContinuousIntegrationBuild=true
 
       # ConvertApi.Tests serves results from a fake HTTP client, so the tests need no network and no API token.
+      # TreatNoTestsAsError fails the step when no test ran, for example after a test adapter stops finding them.
       - name: Test
-        run: dotnet test ConvertApi.Tests/ConvertApi.Tests.csproj -c Release --no-build
+        run: dotnet test ConvertApi.Tests/ConvertApi.Tests.csproj -c Release --no-build -- RunConfiguration.TreatNoTestsAsError=true
 
       # A pre-release version that sorts below any real release and names the run, so a package
       # downloaded from this run can be tried out but never mistaken for a published one.

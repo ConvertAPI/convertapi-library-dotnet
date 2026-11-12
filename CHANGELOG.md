@@ -18,14 +18,26 @@ The format is based on Keep a Changelog and this project adheres to Semantic Ver
 
 ### Fixed
 - `SaveFileAsync` and `SaveFilesAsync` replace an existing file instead of writing over its start. They
-  opened it with `FileInfo.OpenWrite`, which does not truncate, so a result saved over a longer file kept
-  that file's trailing bytes and came out corrupt: a 146,734-byte PDF saved over a 400,000-byte file stayed
-  400,000 bytes. Every earlier version has this bug.
+  open it with `FileInfo.OpenWrite`, which does not truncate, and did not cut it to the new length, so a
+  result saved over a longer file kept that file's trailing bytes and came out corrupt: a 146,734-byte PDF
+  saved over a 400,000-byte file stayed 400,000 bytes. Every version since 2.0.0 (2018) has this bug.
+  Hidden and system files on Windows are still written, as before.
 
 ### Changed
 - `SaveFilesAsync(outputDirectory)` creates the folder if it does not exist, instead of throwing
-  `DirectoryNotFoundException`. An empty path still means the current directory.
-- Unit tests (`ConvertApi.Tests`, NUnit) run in the `build` check of every pull request.
+  `DirectoryNotFoundException`. An empty path still means the current directory, and an empty result list
+  still saves nothing and creates no folder.
+- `SaveFilesAsync` checks the folder before downloading anything:
+  - A folder that cannot be created now throws before the download, with the exception
+    `Directory.CreateDirectory` throws, for example `UnauthorizedAccessException` (which is not an
+    `IOException`) when the parent folder is read-only. 3.2.2 downloaded the first file and then threw
+    `DirectoryNotFoundException`.
+  - It throws `ArgumentException` when the path is blank, is an existing file, or looks like a result file
+    name, such as `SaveFilesAsync("result.pdf")` for PDF results, which would otherwise create a folder named
+    `result.pdf`. To save one result as a file, call `SaveFileAsync`. To use a new folder whose name has an
+    extension, end the path with a slash: `SaveFilesAsync("archive.pdf/")`.
+- Unit tests (`ConvertApi.Tests`, NUnit) run in the `build` check of every pull request. The check fails if
+  no test runs.
 - The package readme on nuget.org is the repository's `README.md`; the separate `ConvertApi/docs/README.md`
   had drifted and is removed. The publish workflow tags the packed copy's links `utm_source=nuget`.
 - README: a quick start, C# task sections, and snippets that run as copied on Windows, macOS and Linux.
