@@ -179,6 +179,8 @@ namespace ConvertApiDotNet
             HttpResponseMessage responseMessage;
             using (var content = new StreamContent(fileStream))
             {
+                // Inside the using, so a missing token still disposes the stream, as a failed upload always did.
+                var token = ConvertApi.ResolveToken();
                 content.Headers.ContentType = new MediaTypeHeaderValue("application/octet-stream");
                 content.Headers.ContentDisposition = new ContentDispositionHeaderValue("attachment")
                 {
@@ -190,7 +192,7 @@ namespace ConvertApiDotNet
                     Path = "/upload",
                 };
 
-                responseMessage = await ConvertApi.GetClient().PostAsync(url.Uri, ConvertApiConstants.UploadTimeout, content, ConvertApi.ApiToken);
+                responseMessage = await ConvertApi.GetClient().PostAsync(url.Uri, ConvertApiConstants.UploadTimeout, content, token);
             }
 
             var result = await responseMessage.Content.ReadAsStringAsync();
@@ -204,13 +206,14 @@ namespace ConvertApiDotNet
 
         private static async Task<ConvertApiFile> Upload(Uri remoteFileUrl)
         {
+            var token = ConvertApi.ResolveToken();
             var url = new UriBuilder(ConvertApi.ApiBaseUri)
             {
                 Path = "/upload",
                 Query = $"url={WebUtility.UrlEncode(remoteFileUrl.ToString())}"
             };
 
-            var responseMessage = await ConvertApi.GetClient().PostAsync(url.Uri, ConvertApiConstants.UploadTimeout, null, ConvertApi.ApiToken);
+            var responseMessage = await ConvertApi.GetClient().PostAsync(url.Uri, ConvertApiConstants.UploadTimeout, null, token);
             var result = await responseMessage.Content.ReadAsStringAsync();
             if (responseMessage.StatusCode != HttpStatusCode.OK)
             {

@@ -18,19 +18,35 @@ namespace ConvertApiDotNet
 {
     public class ConvertApi
     {
+        /// <summary>
+        /// The name of the environment variable the SDK reads the API token from when no token is set in code.
+        /// </summary>
+        public const string TokenEnvironmentVariable = "CONVERTAPI_TOKEN";
+
+        /// <summary>
+        /// The API token set in code. When it is null or empty, the SDK reads the token from the
+        /// <c>CONVERTAPI_TOKEN</c> environment variable at each request.
+        /// </summary>
         public static string ApiToken;
         public static string ApiBaseUri = "https://v2.convertapi.com";
         private static IConvertApiHttpClient _convertApiHttpClient;
 
+        // Where a user finds or gets a token. Tagged so the website can count the visits this message sends.
+        private const string TokenUrl = "https://www.convertapi.com/a/signup?ReturnUrl=%2Fa%2Fauthentication&utm_source=dotnet-sdk&utm_medium=referral&utm_campaign=dotnet-sdk&utm_content=error-no-token";
+
+        /// <summary>
+        /// Initializes a new instance of the ConvertApi class that uses the token set in <see cref="ApiToken"/>, or
+        /// else the token in the <c>CONVERTAPI_TOKEN</c> environment variable.
+        /// </summary>
         public ConvertApi()
         {
         }
 
-
         /// <summary>
         /// Initializes a new instance of the ConvertApi class.
         /// </summary>
-        /// <param name="apiToken">The authentication credentials token for ConvertApi. Can be obtained from https://www.convertapi.com/a/authentication</param>
+        /// <param name="apiToken">The API token. When it is null or empty, the token is read from the <c>CONVERTAPI_TOKEN</c>
+        /// environment variable. Find your token at https://www.convertapi.com/a/authentication</param>
         /// <param name="convertApiHttpClient">The HTTP client for making API requests.</param>
         public ConvertApi(string apiToken, IConvertApiHttpClient convertApiHttpClient)
         {
@@ -41,14 +57,43 @@ namespace ConvertApiDotNet
         /// <summary>
         /// Initializes a new instance of the ConvertApi class.
         /// </summary>
-        /// <param name="apiToken">The authentication credentials token for ConvertApi. Can be obtained from https://www.convertapi.com/a/authentication</param>
+        /// <param name="apiToken">The API token. Find your token at https://www.convertapi.com/a/authentication.
+        /// To read it from the <c>CONVERTAPI_TOKEN</c> environment variable instead, call <c>new ConvertApi()</c>.</param>
+        /// <exception cref="ArgumentNullException"><paramref name="apiToken"/> is null or empty.</exception>
         public ConvertApi(string apiToken)
         {
             if (string.IsNullOrEmpty(apiToken))
-                throw new ArgumentNullException(nameof(apiToken));
+                throw new ArgumentNullException(nameof(apiToken),
+                    "The API token is empty. Pass your token, or set the " + TokenEnvironmentVariable +
+                    " environment variable and call new ConvertApi(). Find your token at " + TokenUrl);
 
             ApiToken = apiToken;
         }
+
+        /// <summary>
+        /// The token requests use: <see cref="ApiToken"/> if it is set, otherwise the <c>CONVERTAPI_TOKEN</c>
+        /// environment variable. Throws before anything is sent when neither is set.
+        /// </summary>
+        internal static string ResolveToken()
+        {
+            var token = FindToken();
+            if (token == null)
+                throw new ConvertApiException(HttpStatusCode.Unauthorized, NoTokenMessage, NoTokenMessage);
+            return token;
+        }
+
+        // The token if one is set, or null. For requests that also work without a token.
+        internal static string FindToken()
+        {
+            if (!string.IsNullOrEmpty(ApiToken))
+                return ApiToken;
+            var fromEnvironment = Environment.GetEnvironmentVariable(TokenEnvironmentVariable)?.Trim();
+            return string.IsNullOrEmpty(fromEnvironment) ? null : fromEnvironment;
+        }
+
+        private static readonly string NoTokenMessage =
+            "No ConvertAPI token. Set the " + TokenEnvironmentVariable + " environment variable, or pass the token to " +
+            "new ConvertApi(\"your-api-token\"). Nothing was uploaded. Find your token at " + TokenUrl;
 
         public static IConvertApiHttpClient GetClient()
         {
@@ -62,6 +107,7 @@ namespace ConvertApiDotNet
 
         public async Task<ConvertApiResponse> ConvertAsync(string fromFormat, string toFormat, IEnumerable<ConvertApiBaseParam> parameters)
         {
+            var token = ResolveToken();
             var content = new MultipartFormDataContent
             {
                 { new StringContent("true"), "StoreFile" }                
@@ -154,7 +200,7 @@ namespace ConvertApiDotNet
             }
 
 
-            var response = await GetClient().PostAsync(url.Uri, requestTimeOut, content, ApiToken);
+            var response = await GetClient().PostAsync(url.Uri, requestTimeOut, content, token);
             var result = await response.Content.ReadAsStringAsync();
             if (response.StatusCode != HttpStatusCode.OK)
                 throw new ConvertApiException(response.StatusCode,
@@ -288,7 +334,7 @@ namespace ConvertApiDotNet
             };
             try
             {
-                var response = await GetClient().GetAsync(url.Uri, ConvertApiConstants.DownloadTimeout, ApiToken);
+                var response = await GetClient().GetAsync(url.Uri, ConvertApiConstants.DownloadTimeout, FindToken());
                 if (response.StatusCode != HttpStatusCode.OK)
                     return null;
                 var json = await response.Content.ReadAsStringAsync();
@@ -328,12 +374,13 @@ namespace ConvertApiDotNet
         /// <returns>Returns account status like user name, credits left and other information</returns>
         public async Task<ConvertApiUser> GetUserAsync()
         {
+            var token = ResolveToken();
             var url = new UriBuilder(ApiBaseUri)
             {
                 Path = "user"
             };
 
-            var response = await GetClient().GetAsync(url.Uri, ConvertApiConstants.DownloadTimeout, ApiToken);
+            var response = await GetClient().GetAsync(url.Uri, ConvertApiConstants.DownloadTimeout, token);
             var result = await response.Content.ReadAsStringAsync();
             if (response.StatusCode != HttpStatusCode.OK)
                 throw new ConvertApiException(response.StatusCode, $"Retrieve user information failed. {response.ReasonPhrase}", result);

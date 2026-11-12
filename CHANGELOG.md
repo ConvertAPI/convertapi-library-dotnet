@@ -6,6 +6,16 @@ The format is based on Keep a Changelog and this project adheres to Semantic Ver
 
 ## [Unreleased]
 
+### Added
+- When no token is set in code, the SDK reads it from the `CONVERTAPI_TOKEN` environment variable, so
+  `new ConvertApi()` works without a token in the source. A token set in code (`new ConvertApi("...")` or
+  `ConvertApi.ApiToken`) always comes first. The variable is read at each request.
+- With no token in code or in the variable, uploads, `ConvertAsync` and `GetUserAsync` throw a
+  `ConvertApiException` with status 401 that says how to set the token, before anything is sent. Earlier
+  versions uploaded the input files first and then got a 401 from the API.
+- `new ConvertApi("")` and `new ConvertApi(null)` still throw `ArgumentNullException`; its message now names
+  `CONVERTAPI_TOKEN`.
+
 ### Fixed
 - `SaveFileAsync` and `SaveFilesAsync` replace an existing file instead of writing over its start. They
   open it with `FileInfo.OpenWrite`, which does not truncate, and did not cut it to the new length, so a
