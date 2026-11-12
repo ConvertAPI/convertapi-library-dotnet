@@ -35,7 +35,7 @@ notes). Until that is decided, note that `publish.yml` only accepts a Release pu
 
 - [ ] `CHANGELOG.md`: move the `[Unreleased]` entries under `## [x.y.z] - YYYY-MM-DD` and leave an empty
       `[Unreleased]` above it.
-- [ ] Preview the README as nuget.org will show it: download the `package` artifact of the latest `build`
+- [ ] Preview the README as nuget.org will show it: download the `ConvertApi-0.0.0-ci.{run}.g{sha}` artifact of the latest `build`
       run on `main`, open `README.md` inside the `.nupkg` (it is a zip), and check that it renders and that
       its links work. Check the icon, description and tags in the `.nuspec` next to it.
 - [ ] Bump every pinned SDK version to the new one: install lines or `Version="..."` in the README, the
