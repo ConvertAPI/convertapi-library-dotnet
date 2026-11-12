@@ -946,6 +946,8 @@ When the API returns an error, the SDK throws a `ConvertApiException`. Its `Stat
 
 For other codes, `Response` holds the error message from the API. If `CONVERTAPI_TOKEN` is not set, `new ConvertApi(Environment.GetEnvironmentVariable("CONVERTAPI_TOKEN"))` throws an `ArgumentNullException` before any request is sent.
 
+From version 3.3.0, the message of a 401 or 403 also says what to do and links to the page that helps, and `SaveFileAsync`, `SaveFilesAsync` and `FileStreamAsync` throw a `ConvertApiException` when a result cannot be downloaded, instead of saving the error page as the file.
+
 ```csharp
 using ConvertApiDotNet;
 using ConvertApiDotNet.Exceptions;

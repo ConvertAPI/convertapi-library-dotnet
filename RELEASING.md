@@ -26,6 +26,49 @@ That runs `.github/workflows/publish.yml` in the `nuget` environment, which:
 gh release create v3.2.0-preview.1 --repo ConvertAPI/convertapi-library-dotnet --target my-branch --prerelease --title v3.2.0-preview.1 --notes "Preview of ..."
 ```
 
+## Release owner
+
+**TODO: name the one person who owns each release** (runs the checklist, publishes, answers for the
+notes). Until that is decided, note that `publish.yml` only accepts a Release published by `tomasr78`.
+
+## Before each release
+
+- [ ] `CHANGELOG.md`: move the `[Unreleased]` entries under `## [x.y.z] - YYYY-MM-DD` and leave an empty
+      `[Unreleased]` above it.
+- [ ] Preview the README as nuget.org will show it: download the `package` artifact of the latest `build`
+      run on `main`, open `README.md` inside the `.nupkg` (it is a zip), and check that it renders and that
+      its links work. Check the icon, description and tags in the `.nuspec` next to it.
+- [ ] Bump every pinned SDK version to the new one: install lines or `Version="..."` in the README, the
+      examples and any snippet that names a version.
+- [ ] Check that the C# quick start on https://www.convertapi.com/integrations/libraries/csharp still
+      matches the README (install command, token, first conversion). If it does not, ask for the page to
+      be updated before announcing the release.
+- [ ] Write the release notes with the template below, then publish.
+
+## Release notes template
+
+```markdown
+## What's new
+
+- <the change a user notices first, one line>
+- <next change>
+
+## Fixed
+
+- <bug, who it affected, what happens now>
+
+## Upgrading
+
+<"Drop-in: no code changes." or what to change, with a short snippet.>
+
+Full changelog: https://github.com/ConvertAPI/convertapi-library-dotnet/blob/main/CHANGELOG.md
+Install: `dotnet add package ConvertApi --version x.y.z`
+```
+
+Pass it with `--notes-file notes.md` instead of `--generate-notes`.
+
+## Mistakes
+
 nuget.org versions are permanent. A bad version can only be unlisted (and, if needed, deprecated) on
 nuget.org, then fixed by releasing the next version. Never delete and re-create a release tag.
 
