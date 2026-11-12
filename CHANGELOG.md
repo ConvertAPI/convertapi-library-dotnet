@@ -15,6 +15,11 @@ The format is based on Keep a Changelog and this project adheres to Semantic Ver
   versions uploaded the input files first and then got a 401 from the API.
 - `new ConvertApi("")` and `new ConvertApi(null)` still throw `ArgumentNullException`; its message now names
   `CONVERTAPI_TOKEN`.
+- The message of a `ConvertApiException` with status 401 or 403 says what to do and links to the page that
+  helps: "The API token is missing or invalid. Find or get your token at ..." and "No conversions left or the
+  account is suspended. Plans: ...". The exception type, `StatusCode` and `Response` are unchanged.
+- XML documentation (`ConvertApi.xml`) ships in the package, so IntelliSense describes `ConvertAsync`,
+  `ConvertApiFileParam`, the save and delete helpers and `ConvertApiException`, including what 401 and 403 mean.
 
 ### Fixed
 - `SaveFileAsync` and `SaveFilesAsync` replace an existing file instead of writing over its start. They
@@ -22,6 +27,9 @@ The format is based on Keep a Changelog and this project adheres to Semantic Ver
   result saved over a longer file kept that file's trailing bytes and came out corrupt: a 146,734-byte PDF
   saved over a 400,000-byte file stayed 400,000 bytes. Every version since 2.0.0 (2018) has this bug.
   Hidden and system files on Windows are still written, as before.
+- `SaveFileAsync`, `SaveFilesAsync` and `FileStreamAsync` throw a `ConvertApiException` (with the status and the
+  body) when the download answers anything but 200 OK. Earlier versions returned the error page as the file, so
+  `SaveFileAsync` wrote it into the output file, replacing a good one. Now no file is written.
 
 ### Changed
 - `SaveFilesAsync(outputDirectory)` creates the folder if it does not exist, instead of throwing
@@ -40,6 +48,11 @@ The format is based on Keep a Changelog and this project adheres to Semantic Ver
   no test runs.
 - The package readme on nuget.org is the repository's `README.md`; the separate `ConvertApi/docs/README.md`
   had drifted and is removed. The publish workflow tags the packed copy's links `utm_source=nuget`.
+- Package metadata: the nuget.org project link goes to the C# page on convertapi.com, the description is plain
+  ASCII and names the formats, the tags add common searches (word-to-pdf, pdf-to-word, excel-to-pdf and others,
+  and a bare `to`, without which nuget.org never finds the package for searches like "docx to pdf") and drop the
+  misspelled `prdf-extract` and `pdf2extract`. The icon is embedded in the package instead of the deprecated
+  `PackageIconUrl`.
 - README: a quick start, C# task sections, and snippets that run as copied on Windows, macOS and Linux.
   They save to a relative `output` folder they create, use `ConvertApiFile` (not `ProcessedFile`),
   `FitToSize` (not the ignored `ScaleImage` and `ScaleProportions`) and the current converter names.

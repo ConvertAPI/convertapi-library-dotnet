@@ -5,6 +5,7 @@ using System.Net;
 using System.Threading.Tasks;
 using System.Linq;
 using ConvertApiDotNet.Constants;
+using ConvertApiDotNet.Exceptions;
 using ConvertApiDotNet.Model;
 
 namespace ConvertApiDotNet
@@ -25,6 +26,17 @@ namespace ConvertApiDotNet
         private static async Task<Stream> AsStreamAsync(Uri url)
         {
             var httpResponseMessage = await ConvertApi.GetClient().GetAsync(url, ConvertApiConstants.DownloadTimeout);
+            // Anything but 200 is an error page, not the file: throw instead of handing it over (or saving it) as the
+            // result. Earlier versions returned the error body, so SaveFileAsync wrote it into the output file.
+            if (httpResponseMessage.StatusCode != HttpStatusCode.OK)
+            {
+                using (httpResponseMessage)
+                {
+                    var body = await httpResponseMessage.Content.ReadAsStringAsync();
+                    throw new ConvertApiException(httpResponseMessage.StatusCode, ConvertApiException.MessageFor(
+                        httpResponseMessage.StatusCode, $"Unable to download file. {httpResponseMessage.ReasonPhrase}"), body);
+                }
+            }
             return await httpResponseMessage.Content.ReadAsStreamAsync();
         }
 
@@ -52,6 +64,7 @@ namespace ConvertApiDotNet
         /// <summary>
         /// Save the first result file as <paramref name="fileName"/>, replacing the file if it exists.
         /// </summary>
+        /// <exception cref="ConvertApiException">The download answered with anything but 200 OK.</exception>
         public static async Task<FileInfo> SaveFileAsync(this ConvertApiResponse response, string fileName)
         {
             return await response.Files[0].SaveFileAsync(fileName);
@@ -61,11 +74,18 @@ namespace ConvertApiDotNet
         /// Save every result file into <paramref name="outputDirectory"/> under its own name, replacing files
         /// that exist. The folder is created if it does not exist.
         /// </summary>
+        /// <exception cref="ArgumentException"><paramref name="outputDirectory"/> is blank, is an existing file, or
+        /// looks like a result file name. To save one result as a file, call <c>SaveFileAsync</c>.</exception>
+        /// <exception cref="ConvertApiException">A download answered with anything but 200 OK.</exception>
         public static async Task<List<FileInfo>> SaveFilesAsync(this ConvertApiResponse response, string outputDirectory)
         {
             return await response.Files.SaveFilesAsync(outputDirectory);
         }
 
+        /// <summary>
+        /// Download the file as a stream, for example to send it on without saving it. Dispose the stream when done.
+        /// </summary>
+        /// <exception cref="ConvertApiException">The download answered with anything but 200 OK.</exception>
         public static async Task<Stream> FileStreamAsync(this ConvertApiFile processedFile)
         {
             return await AsStreamAsync(processedFile.Url);
@@ -74,6 +94,7 @@ namespace ConvertApiDotNet
         /// <summary>
         /// Save the file as <paramref name="fileName"/>, replacing the file if it exists.
         /// </summary>
+        /// <exception cref="ConvertApiException">The download answered with anything but 200 OK; no file is written.</exception>
         public static async Task<FileInfo> SaveFileAsync(this ConvertApiFile processedFile, string fileName)
         {
             return await SaveFileAsync(processedFile.Url, fileName);
@@ -86,6 +107,7 @@ namespace ConvertApiDotNet
         /// <exception cref="ArgumentException"><paramref name="outputDirectory"/> is blank, is an existing file, or
         /// looks like a result file name (for example "result.pdf" for PDF results). To save one result as a file,
         /// call <c>SaveFileAsync</c>. To use a new folder whose name has an extension, end the path with a slash.</exception>
+        /// <exception cref="ConvertApiException">A download answered with anything but 200 OK.</exception>
         public static async Task<List<FileInfo>> SaveFilesAsync(this IEnumerable<ConvertApiFile> processedFile, string outputDirectory)
         {
             var files = processedFile.ToList();

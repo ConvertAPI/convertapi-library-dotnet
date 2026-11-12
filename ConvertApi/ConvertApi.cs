@@ -100,11 +100,22 @@ namespace ConvertApiDotNet
             return _convertApiHttpClient ?? (_convertApiHttpClient = new DefaultConvertApiHttpClient());
         }
 
+        /// <summary>
+        /// Convert files from one format to another, for example <c>ConvertAsync("docx", "pdf", new ConvertApiFileParam("file.docx"))</c>.
+        /// Waits for the uploads of every <see cref="ConvertApiFileParam"/>, then converts.
+        /// </summary>
+        /// <param name="fromFormat">The source format, such as "docx", "html" or "pdf".</param>
+        /// <param name="toFormat">The target format, such as "pdf", "jpg" or "docx".</param>
+        /// <param name="parameters">The files and conversion options.</param>
+        /// <returns>The result files, still on the server: save them with <c>SaveFilesAsync</c> or <c>SaveFileAsync</c>.</returns>
+        /// <exception cref="ConvertApiException">The service answered with an error. 401: the token is missing or
+        /// invalid. 403: no conversions left or the account is suspended.</exception>
         public async Task<ConvertApiResponse> ConvertAsync(string fromFormat, string toFormat, params ConvertApiBaseParam[] parameters)
         {
             return await ConvertAsync(fromFormat, toFormat, (IEnumerable<ConvertApiBaseParam>)parameters);
         }
 
+        /// <inheritdoc cref="ConvertAsync(string, string, ConvertApiBaseParam[])"/>
         public async Task<ConvertApiResponse> ConvertAsync(string fromFormat, string toFormat, IEnumerable<ConvertApiBaseParam> parameters)
         {
             var token = ResolveToken();
@@ -203,8 +214,8 @@ namespace ConvertApiDotNet
             var response = await GetClient().PostAsync(url.Uri, requestTimeOut, content, token);
             var result = await response.Content.ReadAsStringAsync();
             if (response.StatusCode != HttpStatusCode.OK)
-                throw new ConvertApiException(response.StatusCode,
-                    $"Conversion from {fromFormat} to {toFormat} error. {response.ReasonPhrase}", result);
+                throw new ConvertApiException(response.StatusCode, ConvertApiException.MessageFor(response.StatusCode,
+                    $"Conversion from {fromFormat} to {toFormat} error. {response.ReasonPhrase}"), result);
             var apiResponse = JsonConvert.DeserializeObject<ConvertApiResponse>(result);
             if (apiResponse != null)
             {
@@ -383,7 +394,8 @@ namespace ConvertApiDotNet
             var response = await GetClient().GetAsync(url.Uri, ConvertApiConstants.DownloadTimeout, token);
             var result = await response.Content.ReadAsStringAsync();
             if (response.StatusCode != HttpStatusCode.OK)
-                throw new ConvertApiException(response.StatusCode, $"Retrieve user information failed. {response.ReasonPhrase}", result);
+                throw new ConvertApiException(response.StatusCode,
+                    ConvertApiException.MessageFor(response.StatusCode, $"Retrieve user information failed. {response.ReasonPhrase}"), result);
             return JsonConvert.DeserializeObject<ConvertApiUser>(result);
         }
     }

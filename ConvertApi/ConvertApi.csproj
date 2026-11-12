@@ -6,13 +6,15 @@
     <Version>0.0.0-local</Version>
     <Company>ConvertApi</Company>
     <Authors>ConvertApi</Authors>
-    <PackageProjectUrl>https://www.convertapi.com</PackageProjectUrl>
+    <PackageProjectUrl>https://www.convertapi.com/integrations/libraries/csharp?utm_source=nuget&amp;utm_medium=referral&amp;utm_campaign=dotnet-sdk&amp;utm_content=project-url</PackageProjectUrl>
     <RepositoryUrl>https://github.com/ConvertAPI/convertapi-library-dotnet</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
-    <PackageTags>file-converter document-converter office-to-pdf office2pdf docx-to-pdf docx2pdf xlsx-to-pdf xlsx2pdf pptx-to-pdf ppt2pdf pdf-merge pdf-split pdf-compress pdf-watermark prdf-extract pdf2extract pdf-protect pdfa ocr redact html-to-pdf web-to-pdf image-to-pdf jpg-to-pdf png-to-pdf email-to-pdf eml-to-pdf msg-to-pdf convertapi pdf docx xlsx pptx office converter csharp dotnet sdk </PackageTags>
+    <!-- The bare "to" tag is on purpose. nuget.org search needs every word of a query to match, and it matches "to"
+         only against package IDs and tags, so without it ConvertApi never shows for searches like "docx to pdf". -->
+    <PackageTags>file-converter document-converter office-to-pdf office2pdf docx-to-pdf docx2pdf word-to-pdf xlsx-to-pdf xlsx2pdf excel-to-pdf pptx-to-pdf ppt2pdf pdf-to-word pdf-to-docx pdf-to-image pdf-to-text html-to-docx pdf-merge pdf-split pdf-compress pdf-watermark pdf-protect pdfa ocr redact html-to-pdf web-to-pdf image-to-pdf jpg-to-pdf png-to-pdf email-to-pdf eml-to-pdf msg-to-pdf convertapi pdf docx xlsx pptx word excel powerpoint html image office converter csharp dotnet sdk to</PackageTags>
     <Copyright>2012-2026 ConvertApi</Copyright>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <PackageIconUrl>https://www.convertapi.com/favicon/android-chrome-192x192.png</PackageIconUrl>
+    <PackageIcon>icon.png</PackageIcon>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageId>ConvertApi</PackageId>
     <Product>ConvertApi</Product>
@@ -20,7 +22,12 @@
     <RootNamespace>ConvertApiDotNet</RootNamespace>
     <PackageReleaseNotes>https://github.com/ConvertAPI/convertapi-library-dotnet/releases</PackageReleaseNotes>
     <TargetFramework>netstandard2.0</TargetFramework>
-    <Description>ConvertAPI for .NET — one call to turn Office files into PDF or back again (DOCX ⇄ PDF, XLSX ⇄ PDF, PPTX ⇄ PDF). Convert HTML, images, ebooks, email, zip; merge, split, watermark, compress, OCR, redact, protect or repair PDF. Async and cross-platform: targets .NET Standard 2.0, so it runs on .NET Framework 4.6.2+ and every modern .NET.</Description>
+    <!-- Plain ASCII: nuget.org search and some feeds show other characters badly. -->
+    <Description>ConvertAPI C# and .NET SDK for the ConvertAPI REST API: convert Word, Excel and PowerPoint to PDF and back, HTML to PDF or DOCX, images to PDF and PDF to images or text. Merge, split, compress, watermark, OCR, redact and protect PDF. Async, targets .NET Standard 2.0, so it runs on .NET Framework 4.6.2+ and every modern .NET. Free trial at convertapi.com.</Description>
+    <!-- ConvertApi.xml ships in the package, so IntelliSense shows the docs. Only the main entry points have them, so
+         the warning for every undocumented public member stays off. -->
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <NoWarn>$(NoWarn);CS1591</NoWarn>
     <IncludeSymbols>true</IncludeSymbols>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
     <!-- A library passes its dependencies on to every consumer, so a known high or critical advisory in any of them,
@@ -39,6 +46,8 @@
     <!-- nuget.org shows the repository's own README.md, so the package page and GitHub cannot drift apart.
          The publish workflow rewrites utm_source=github to utm_source=nuget in the packed copy. -->
     <None Include="..\README.md" Pack="true" PackagePath="\" />
+    <!-- The ConvertAPI logo, 128x128, from https://www.convertapi.com/favicon/android-chrome-512x512.png. -->
+    <None Include="icon.png" Pack="true" PackagePath="\" />
   </ItemGroup>
 
 </Project>

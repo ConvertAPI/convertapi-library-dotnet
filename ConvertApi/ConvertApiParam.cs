@@ -70,6 +70,11 @@ namespace ConvertApiDotNet
         }
     }
 
+    /// <summary>
+    /// A file to convert: a local path, a <see cref="FileInfo"/>, a stream, a remote URL, an uploaded FileId, or
+    /// the result of an earlier conversion. Local files, streams and URLs start uploading as soon as the parameter
+    /// is created; <c>ConvertAsync</c> waits for them.
+    /// </summary>
     public class ConvertApiFileParam : ConvertApiBaseParam
     {
         private Task<ConvertApiFile> Tasks { get; set; }
@@ -82,6 +87,9 @@ namespace ConvertApiDotNet
         {
         }
 
+        /// <summary>
+        /// Convert a remote file, passed to the service under the parameter name <paramref name="name"/>.
+        /// </summary>
         public ConvertApiFileParam(string name, Uri url) : base(name)
         {
             Tasks = Upload(url);
@@ -95,6 +103,9 @@ namespace ConvertApiDotNet
         {
         }
 
+        /// <summary>
+        /// Convert a local file or an uploaded FileId, passed under the parameter name <paramref name="name"/>.
+        /// </summary>
         public ConvertApiFileParam(string name, string path) : base(name)
         {
             if (string.IsNullOrWhiteSpace(path))
@@ -130,6 +141,9 @@ namespace ConvertApiDotNet
         {
         }
 
+        /// <summary>
+        /// Convert a local file, passed under the parameter name <paramref name="name"/>.
+        /// </summary>
         public ConvertApiFileParam(string name, FileInfo file) : base(name)
         {
             Tasks = Upload(file);
@@ -144,23 +158,38 @@ namespace ConvertApiDotNet
         {
         }
 
+        /// <summary>
+        /// Convert a stream, passed under the parameter name <paramref name="name"/>. The stream is disposed after the upload.
+        /// </summary>
         public ConvertApiFileParam(string name, Stream fileStream, string fileName) : base(name)
         {
             Tasks = Upload(fileStream, fileName);
         }
 
+        /// <summary>
+        /// Convert a result file of an earlier conversion, without downloading it.
+        /// </summary>
         public ConvertApiFileParam(ConvertApiFile processedFile) : this("File", processedFile)
         {
         }
 
+        /// <summary>
+        /// Convert a result file of an earlier conversion, passed under the parameter name <paramref name="name"/>.
+        /// </summary>
         public ConvertApiFileParam(string name, ConvertApiFile processedFile) : base(name, processedFile.Url)
         {
         }
 
+        /// <summary>
+        /// Convert every result file of an earlier conversion, without downloading them.
+        /// </summary>
         public ConvertApiFileParam(ConvertApiResponse response) : this("File", response)
         {
         }
 
+        /// <summary>
+        /// Convert every result file of an earlier conversion, passed under the parameter name <paramref name="name"/>.
+        /// </summary>
         public ConvertApiFileParam(string name, ConvertApiResponse response) : base(name)
         {
             Value = response.Files.Select(s => s.Url.ToString()).ToArray();
@@ -198,7 +227,8 @@ namespace ConvertApiDotNet
             var result = await responseMessage.Content.ReadAsStringAsync();
             if (responseMessage.StatusCode != HttpStatusCode.OK)
             {
-                throw new ConvertApiException(responseMessage.StatusCode, $"Unable to upload file. {responseMessage.ReasonPhrase}", result);
+                throw new ConvertApiException(responseMessage.StatusCode,
+                    ConvertApiException.MessageFor(responseMessage.StatusCode, $"Unable to upload file. {responseMessage.ReasonPhrase}"), result);
             }
 
             return JsonConvert.DeserializeObject<ConvertApiFile>(result);
@@ -217,7 +247,8 @@ namespace ConvertApiDotNet
             var result = await responseMessage.Content.ReadAsStringAsync();
             if (responseMessage.StatusCode != HttpStatusCode.OK)
             {
-                throw new ConvertApiException(responseMessage.StatusCode, $"Unable to upload file. {responseMessage.ReasonPhrase}", result);
+                throw new ConvertApiException(responseMessage.StatusCode,
+                    ConvertApiException.MessageFor(responseMessage.StatusCode, $"Unable to upload file. {responseMessage.ReasonPhrase}"), result);
             }
 
             return JsonConvert.DeserializeObject<ConvertApiFile>(result);
