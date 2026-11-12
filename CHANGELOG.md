@@ -26,8 +26,8 @@ The format is based on Keep a Changelog and this project adheres to Semantic Ver
     name, such as `SaveFilesAsync("result.pdf")` for PDF results, which would otherwise create a folder named
     `result.pdf`. To save one result as a file, call `SaveFileAsync`. To use a new folder whose name has an
     extension, end the path with a slash: `SaveFilesAsync("archive.pdf/")`.
-- Unit tests (`ConvertApi.Tests`, NUnit) run in the `build` check of every pull request, on Linux and on
-  Windows (.NET and .NET Framework 4.8). The check fails if no test runs.
+- Unit tests (`ConvertApi.Tests`, NUnit) run in the `build` check of every pull request. The check fails if
+  no test runs.
 - The package readme on nuget.org is the repository's `README.md`; the separate `ConvertApi/docs/README.md`
   had drifted and is removed. The publish workflow tags the packed copy's links `utm_source=nuget`.
 - README: a quick start, C# task sections, and snippets that run as copied on Windows, macOS and Linux.
