@@ -6,6 +6,8 @@ The format is based on Keep a Changelog and this project adheres to Semantic Ver
 
 ## [Unreleased]
 
+## [3.3.0] - 2026-11-12
+
 ### Added
 - When no token is set in code, the SDK reads it from the `CONVERTAPI_TOKEN` environment variable, so
   `new ConvertApi()` works without a token in the source. A token set in code (`new ConvertApi("...")` or
